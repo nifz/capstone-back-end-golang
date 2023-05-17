@@ -28,12 +28,12 @@ func (u *userUsecase) Login(input dtos.UserLoginInput) (string, error) {
 
 	user, _ := u.userRepo.GetUserByEmail(input.Email)
 	if user.ID == 0 {
-		return accessToken, errors.New("Email or password is wrong")
+		return accessToken, errors.New("email or password is wrong")
 	}
 
 	valid := helpers.ComparePassword(input.Password, user.Password)
 	if !valid {
-		return accessToken, errors.New("Email or password is wrong")
+		return accessToken, errors.New("email or password is wrong")
 	}
 
 	accessToken, err := middlewares.CreateToken(user.ID)
@@ -52,7 +52,7 @@ func (u *userUsecase) Register(input dtos.UserRegisterInput) (dtos.UserRegisterR
 
 	user, _ = u.userRepo.GetUserByEmail(input.Email)
 	if user.ID > 0 {
-		return userResponse, errors.New("Email already used")
+		return userResponse, errors.New("email already used")
 	}
 
 	password, err := helpers.HashPassword(input.Password)
@@ -61,7 +61,7 @@ func (u *userUsecase) Register(input dtos.UserRegisterInput) (dtos.UserRegisterR
 	}
 
 	if input.Email == "" || input.FullName == "" || input.Password == "" {
-		return userResponse, errors.New("Failed to create user")
+		return userResponse, errors.New("failed to create user")
 	}
 
 	dateNow := "2006-01-02"
