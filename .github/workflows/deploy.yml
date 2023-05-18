@@ -15,7 +15,4 @@ jobs:
           script: |
             cd back-end-golang
             git pull origin main
-            go install github.com/swaggo/swag/cmd/swag@latest
-            export PATH=$(go env GOPATH)/bin:$PATH
-            swag init
             docker-compose down && docker-compose up --build --force-recreate --no-deps -d
