@@ -13,7 +13,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8088",
+    "host": "ec2-3-26-30-178.ap-southeast-2.compute.amazonaws.com:8088",
     "basePath": "/api/v1",
     "paths": {
         "/login": {
