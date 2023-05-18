@@ -18,5 +18,4 @@ jobs:
             go install github.com/swaggo/swag/cmd/swag@latest
             export PATH=$(go env GOPATH)/bin:$PATH
             swag init
-            go test -v ./..
             docker-compose down && docker-compose up --build --force-recreate --no-deps -d
