@@ -38,5 +38,8 @@ func ConnectDB() (*gorm.DB, error) {
 func MigrateDB(db *gorm.DB) error {
 	return db.AutoMigrate(
 		models.User{},
+		models.Station{},
+		models.Train{},
+		models.TrainPeron{},
 	)
 }
