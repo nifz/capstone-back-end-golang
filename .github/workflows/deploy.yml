@@ -1,0 +1,18 @@
+name: Deploy
+on: [push]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: pull-test-deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd back-end-golang
+            git pull origin main
+            docker-compose down && docker-compose up --build --force-recreate --no-deps -d

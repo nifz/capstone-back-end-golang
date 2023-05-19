@@ -7,8 +7,10 @@ import (
 )
 
 type UserRepository interface {
-	GetUserByEmail(email string) (models.User, error)
-	CreateUser(user models.User) (models.User, error)
+	UserGetById(id uint) (models.User, error)
+	UserGetByEmail(email string) (models.User, error)
+	UserCreate(user models.User) (models.User, error)
+	UserUpdate(user models.User) (models.User, error)
 }
 
 type userRepository struct {
@@ -19,13 +21,24 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{db}
 }
 
-func (r *userRepository) GetUserByEmail(email string) (models.User, error) {
-	var item models.User
-	err := r.db.Where("email = ?", email).First(&item).Error
-	return item, err
+func (r *userRepository) UserGetById(id uint) (models.User, error) {
+	var user models.User
+	err := r.db.Where("id = ?", id).First(&user).Error
+	return user, err
 }
 
-func (r *userRepository) CreateUser(user models.User) (models.User, error) {
+func (r *userRepository) UserGetByEmail(email string) (models.User, error) {
+	var user models.User
+	err := r.db.Where("email = ?", email).First(&user).Error
+	return user, err
+}
+
+func (r *userRepository) UserCreate(user models.User) (models.User, error) {
 	err := r.db.Create(&user).Error
+	return user, err
+}
+
+func (r *userRepository) UserUpdate(user models.User) (models.User, error) {
+	err := r.db.Save(&user).Error
 	return user, err
 }
