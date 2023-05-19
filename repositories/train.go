@@ -2,51 +2,58 @@ package repositories
 
 import (
 	"back-end-golang/models"
-	"strconv"
 
 	"gorm.io/gorm"
 )
 
 type TrainRepository interface {
-	GetAllStations() ([]models.Station, error)
-	GetStationByID(id string) (models.Station, error)
-	CreateStation(station *models.Station) error
-	UpdateStation(station *models.Station) error
-	DeleteStation(id string) error
+	GetAllTrains() ([]models.Train, error)
+	GetTrainByID(id uint) (models.Train, error)
+	GetStationByID2(id uint) (models.Station, error)
+	CreateTrain(train models.Train) (models.Train, error)
+	UpdateTrain(train models.Train) (models.Train, error)
+	DeleteTrain(train models.Train) error
 }
 
 type trainRepository struct {
 	db *gorm.DB
 }
 
-func NewTrainRepository(db *gorm.DB) trainRepository {
+func NewTrainRepository(db *gorm.DB) TrainRepository {
 	return &trainRepository{db}
 }
 
 // Implementasi fungsi-fungsi dari interface ItemRepository
 
-func (r *trainRepository) GetAllStations() ([]models.Station, error) {
-	var stations []models.Station
-	err := r.db.Find(&stations).Error
-	return stations, err
+func (r *trainRepository) GetAllTrains() ([]models.Train, error) {
+	var trains []models.Train
+	err := r.db.Find(&trains).Error
+	return trains, err
 }
 
-func (r *trainRepository) GetStationByID(id string) (models.Station, error) {
+func (r *trainRepository) GetTrainByID(id uint) (models.Train, error) {
+	var train models.Train
+	err := r.db.Where("id = ?", id).First(&train).Error
+	return train, err
+}
+
+func (r *trainRepository) GetStationByID2(id uint) (models.Station, error) {
 	var station models.Station
-	err := r.db.First(&station).Error
+	err := r.db.Where("id = ?", id).First(&station).Error
 	return station, err
 }
 
-func (r *trainRepository) CreateStation(station *models.Station) error {
-	var _ = r.db.Create(station).Error
-	return r.db.First(&station).Error
+func (r *trainRepository) CreateTrain(train models.Train) (models.Train, error) {
+	err := r.db.Create(&train).Error
+	return train, err
 }
 
-func (r *trainRepository) UpdateStation(station *models.Station) error {
-	return r.db.Save(station).Error
+func (r *trainRepository) UpdateTrain(train models.Train) (models.Train, error) {
+	err := r.db.Save(&train).Error
+	return train, err
 }
 
-func (r *trainRepository) DeleteStation(id string) error {
-	Id, _ := strconv.Atoi(id)
-	return r.db.Delete(&models.Station{Model: gorm.Model{ID: uint(Id)}}).Error
+func (r *trainRepository) DeleteTrain(train models.Train) error {
+	err := r.db.Delete(&train).Error
+	return err
 }

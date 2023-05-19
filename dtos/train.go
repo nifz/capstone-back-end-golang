@@ -2,15 +2,26 @@ package dtos
 
 import "time"
 
-type TrainStationDTO struct {
-	ID        uint      `form:"id" json:"id"`
-	Name      string    `form:"name" json:"name" binding:"required"`
-	Initial   string    `form:"initial" json:"initial" binding:"required"`
-	CreatedAt time.Time `form:"created_at" json:"created_at"`
-	UpdatedAt time.Time `form:"updated_at" json:"updated_at"`
+type TrainInput struct {
+	StationOriginID      uint    `json:"station_origin_id" form:"station_origin_id"`
+	StationDestinationID uint    `json:"station_destination_id" form:"station_destination_id"`
+	DepartureTime        string  `json:"departure_time" form:"departure_time"`
+	ArriveTime           string  `json:"arrive_time" form:"departure_time"`
+	Name                 string  `json:"name" form:"name"`
+	Route                string  `json:"route" form:"route"`
+	Status               *string `json:"status" form:"status"`
 }
 
-type TrainStationDTOsResponse struct {
-	Message string            `form:"message" json:"message"`
-	Data    []TrainStationDTO `form:"data" json:"data"`
+type TrainResponse struct {
+	TrainID              uint         `json:"train_id" form:"train_id"`
+	StationOriginID      uint         `json:"station_origin_id" form:"station_origin_id"`
+	StationOrigin        StationInput `json:"station_origin" form:"station_origin"`
+	StationDestinationID uint         `json:"station_destination_id" form:"station_destination_id"`
+	StationDestination   StationInput `json:"station_destination" form:"station_destination"`
+	DepartureTime        string       `json:"departure_time" form:"departure_time"`
+	ArriveTime           string       `json:"arrive_time" form:"departure_time"`
+	Name                 string       `json:"name" form:"name"`
+	Route                string       `json:"route" form:"route"`
+	Status               *string      `json:"status" form:"status"`
+	UpdateAt             time.Time    `json:"update_at"`
 }

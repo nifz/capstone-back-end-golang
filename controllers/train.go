@@ -2,155 +2,214 @@ package controllers
 
 import (
 	"back-end-golang/dtos"
-	"back-end-golang/models"
+	"back-end-golang/helpers"
 	"back-end-golang/usecases"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
 
-type StationController interface {
-	GetAllStations(c echo.Context) error
-	GetStationByID(c echo.Context) error
-	CreateStation(c echo.Context) error
-	UpdateStation(c echo.Context) error
-	DeleteStation(c echo.Context) error
+type TrainController interface {
+	GetAllTrains(c echo.Context) error
+	GetTrainByID(c echo.Context) error
+	CreateTrain(c echo.Context) error
+	UpdateTrain(c echo.Context) error
+	DeleteTrain(c echo.Context) error
 }
 
-type stationController struct {
-	stationUsecase usecases.StationUsecase
+type trainController struct {
+	trainUsecase usecases.TrainUsecase
 }
 
-func NewStationController(stationUsecase usecases.StationUsecase) StationController {
-	return &stationController{stationUsecase}
+func NewTrainController(trainUsecase usecases.TrainUsecase) TrainController {
+	return &trainController{trainUsecase}
 }
 
 // Implementasi fungsi-fungsi dari interface ItemController
 
-func (c *stationController) GetAllStations(ctx echo.Context) error {
-	stations, err := c.stationUsecase.GetAllStations()
+func (c *trainController) GetAllTrains(ctx echo.Context) error {
+	trains, err := c.trainUsecase.GetAllTrains()
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to get all train",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
-	var stationDTOs []dtos.TrainStationDTO
-
-	for _, station := range stations {
-		stationDTO := dtos.TrainStationDTO{
-			ID:      station.ID,
-			Name:    station.Name,
-			Initial: station.Initial,
-		}
-		stationDTOs = append(stationDTOs, stationDTO)
-	}
-
-	return ctx.JSON(http.StatusOK, dtos.TrainStationDTOsResponse{
-		Message: "Successfully get all station.",
-		Data:    stationDTOs,
-	})
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewResponse(
+			http.StatusOK,
+			"Successfully get all trains",
+			trains,
+		),
+	)
 }
 
-func (c *stationController) GetStationByID(ctx echo.Context) error {
-	id := ctx.Param("id")
-	station, err := c.stationUsecase.GetStationByID(id)
+func (c *trainController) GetTrainByID(ctx echo.Context) error {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	train, err := c.trainUsecase.GetTrainByID(uint(id))
+
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to get train by id",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
-	return ctx.JSON(http.StatusOK, dtos.TrainStationDTOsResponse{
-		Message: "Successfully get station by id.",
-		Data: dtos.TrainStationDTO{
-			ID:        station.ID,
-			Name:      station.Name,
-			Initial:   station.Initial,
-			CreatedAt: station.CreatedAt,
-			UpdatedAt: station.UpdatedAt,
-		},
-	})
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewResponse(
+			http.StatusOK,
+			"Successfully to get train by id",
+			train,
+		),
+	)
+
 }
 
-func (c *stationController) CreateStation(ctx echo.Context) error {
-	var stationDTO dtos.TrainStationDTO
-	if err := ctx.Bind(&stationDTO); err != nil {
+func (c *trainController) CreateTrain(ctx echo.Context) error {
+	var trainDTO dtos.TrainInput
+	if err := ctx.Bind(&trainDTO); err != nil {
 		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
 			Message: err.Error(),
 		})
 	}
 
-	station := models.Station{
-		Name:    stationDTO.Name,
-		Initial: stationDTO.Initial,
+	train, err := c.trainUsecase.CreateTrain(&trainDTO)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to created a train",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
-	err := c.stationUsecase.CreateStation(&station)
-	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
-	}
-	return ctx.JSON(http.StatusCreated, dtos.TrainStationDTOsResponse{
-		Message: "Successfully created station.",
-		Data: dtos.TrainStationDTO{
-			ID:        stationDTO.ID,
-			Name:      stationDTO.Name,
-			Initial:   stationDTO.Initial,
-			CreatedAt: stationDTO.CreatedAt,
-			UpdatedAt: stationDTO.UpdatedAt,
+	trainResponse := dtos.TrainResponse{
+		TrainID:         train.TrainID,
+		StationOriginID: train.StationOriginID,
+		StationOrigin: dtos.StationInput{
+			Origin:  train.StationOrigin.Origin,
+			Name:    train.StationOrigin.Name,
+			Initial: train.StationOrigin.Initial,
 		},
-	})
+		StationDestinationID: train.StationDestinationID,
+		StationDestination: dtos.StationInput{
+			Origin:  train.StationDestination.Origin,
+			Name:    train.StationDestination.Name,
+			Initial: train.StationDestination.Initial,
+		},
+		DepartureTime: train.DepartureTime,
+		ArriveTime:    train.ArriveTime,
+		Name:          train.Name,
+		Route:         train.Route,
+		Status:        train.Status,
+	}
+
+	return ctx.JSON(
+		http.StatusCreated,
+		helpers.NewResponse(
+			http.StatusCreated,
+			"Successfully to created a train",
+			trainResponse,
+		),
+	)
 }
 
-func (c *stationController) UpdateStation(ctx echo.Context) error {
-	id := ctx.Param("id")
+func (c *trainController) UpdateTrain(ctx echo.Context) error {
 
-	var stationDTO dtos.TrainStationDTO
-	if err := ctx.Bind(&stationDTO); err != nil {
+	var trainInput dtos.TrainInput
+	if err := ctx.Bind(&trainInput); err != nil {
 		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
 			Message: err.Error(),
 		})
 	}
 
-	station, err := c.stationUsecase.GetStationByID(id)
-	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+	id, _ := strconv.Atoi(ctx.Param("id"))
+
+	train, err := c.trainUsecase.GetTrainByID(uint(id))
+	if train.TrainID == 0 {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to get train by id",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
-	station.Name = stationDTO.Name
-	station.Initial = stationDTO.Initial
-
-	err = c.stationUsecase.UpdateStation(&station)
+	trainResp, err := c.trainUsecase.UpdateTrain(uint(id), trainInput)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to updated a train",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
-	return ctx.JSON(http.StatusOK, dtos.TrainStationDTOsResponse{
-		Message: "Successfully updated station.",
-		Data: dtos.TrainStationDTO{
-			ID:        stationDTO.ID,
-			Name:      stationDTO.Name,
-			Initial:   stationDTO.Initial,
-			CreatedAt: stationDTO.CreatedAt,
-			UpdatedAt: stationDTO.UpdatedAt,
+
+	trainResponse := dtos.TrainResponse{
+		TrainID:         trainResp.TrainID,
+		StationOriginID: trainResp.StationOriginID,
+		StationOrigin: dtos.StationInput{
+			Origin:  trainResp.StationOrigin.Origin,
+			Name:    trainResp.StationOrigin.Name,
+			Initial: trainResp.StationOrigin.Initial,
 		},
-	})
+		StationDestinationID: trainResp.StationDestinationID,
+		StationDestination: dtos.StationInput{
+			Origin:  trainResp.StationDestination.Origin,
+			Name:    trainResp.StationDestination.Name,
+			Initial: trainResp.StationDestination.Initial,
+		},
+		DepartureTime: trainResp.DepartureTime,
+		ArriveTime:    trainResp.ArriveTime,
+		Name:          trainResp.Name,
+		Route:         trainResp.Route,
+		Status:        trainResp.Status,
+		UpdateAt:      trainResp.UpdateAt,
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewResponse(
+			http.StatusOK,
+			"Successfully updated train",
+			trainResponse,
+		),
+	)
 }
 
-func (c *stationController) DeleteStation(ctx echo.Context) error {
-	id := ctx.Param("id")
+func (c *trainController) DeleteTrain(ctx echo.Context) error {
+	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	err := c.stationUsecase.DeleteStation(id)
+	err := c.trainUsecase.DeleteTrain(uint(id))
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
 			Message: err.Error(),
 		})
 	}
-	return ctx.JSON(http.StatusOK, dtos.ErrorDTO{
-		Message: "Successfully deleted station.",
-	})
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewResponse(
+			http.StatusOK,
+			"Successfully deleted train",
+			nil,
+		),
+	)
 }
