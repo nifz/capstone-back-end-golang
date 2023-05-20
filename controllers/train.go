@@ -29,7 +29,19 @@ func NewTrainController(trainUsecase usecases.TrainUsecase) TrainController {
 // Implementasi fungsi-fungsi dari interface ItemController
 
 func (c *trainController) GetAllTrains(ctx echo.Context) error {
-	trains, err := c.trainUsecase.GetAllTrains()
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
+
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 10
+	}
+
+	trains, count, err := c.trainUsecase.GetAllTrains(page, limit)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
@@ -43,10 +55,13 @@ func (c *trainController) GetAllTrains(ctx echo.Context) error {
 
 	return ctx.JSON(
 		http.StatusOK,
-		helpers.NewResponse(
+		helpers.NewPaginationResponse(
 			http.StatusOK,
 			"Successfully get all trains",
 			trains,
+			page,
+			limit,
+			count,
 		),
 	)
 }
@@ -97,33 +112,12 @@ func (c *trainController) CreateTrain(ctx echo.Context) error {
 		)
 	}
 
-	trainResponse := dtos.TrainResponse{
-		TrainID:         train.TrainID,
-		StationOriginID: train.StationOriginID,
-		StationOrigin: dtos.StationInput{
-			Origin:  train.StationOrigin.Origin,
-			Name:    train.StationOrigin.Name,
-			Initial: train.StationOrigin.Initial,
-		},
-		StationDestinationID: train.StationDestinationID,
-		StationDestination: dtos.StationInput{
-			Origin:  train.StationDestination.Origin,
-			Name:    train.StationDestination.Name,
-			Initial: train.StationDestination.Initial,
-		},
-		DepartureTime: train.DepartureTime,
-		ArriveTime:    train.ArriveTime,
-		Name:          train.Name,
-		Route:         train.Route,
-		Status:        train.Status,
-	}
-
 	return ctx.JSON(
 		http.StatusCreated,
 		helpers.NewResponse(
 			http.StatusCreated,
 			"Successfully to created a train",
-			trainResponse,
+			train,
 		),
 	)
 }
@@ -163,34 +157,12 @@ func (c *trainController) UpdateTrain(ctx echo.Context) error {
 		)
 	}
 
-	trainResponse := dtos.TrainResponse{
-		TrainID:         trainResp.TrainID,
-		StationOriginID: trainResp.StationOriginID,
-		StationOrigin: dtos.StationInput{
-			Origin:  trainResp.StationOrigin.Origin,
-			Name:    trainResp.StationOrigin.Name,
-			Initial: trainResp.StationOrigin.Initial,
-		},
-		StationDestinationID: trainResp.StationDestinationID,
-		StationDestination: dtos.StationInput{
-			Origin:  trainResp.StationDestination.Origin,
-			Name:    trainResp.StationDestination.Name,
-			Initial: trainResp.StationDestination.Initial,
-		},
-		DepartureTime: trainResp.DepartureTime,
-		ArriveTime:    trainResp.ArriveTime,
-		Name:          trainResp.Name,
-		Route:         trainResp.Route,
-		Status:        trainResp.Status,
-		UpdateAt:      trainResp.UpdateAt,
-	}
-
 	return ctx.JSON(
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
 			"Successfully updated train",
-			trainResponse,
+			trainResp,
 		),
 	)
 }

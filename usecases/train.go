@@ -8,7 +8,7 @@ import (
 )
 
 type TrainUsecase interface {
-	GetAllTrains() ([]dtos.TrainResponse, error)
+	GetAllTrains(page, limit int) ([]dtos.TrainResponse, int, error)
 	GetTrainByID(id uint) (dtos.TrainResponse, error)
 	CreateTrain(train *dtos.TrainInput) (dtos.TrainResponse, error)
 	UpdateTrain(id uint, trainInput dtos.TrainInput) (dtos.TrainResponse, error)
@@ -23,11 +23,27 @@ func NewTrainUsecase(TrainRepo repositories.TrainRepository) TrainUsecase {
 	return &trainUsecase{TrainRepo}
 }
 
-func (u *trainUsecase) GetAllTrains() ([]dtos.TrainResponse, error) {
+// GetAllTrains godoc
+// @Summary      Get all train
+// @Description  Get all train
+// @Tags         Train
+// @Accept       json
+// @Produce      json
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Success      200 {object} dtos.GetAllTrainStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/train [get]
+// @Security BearerAuth
+func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponse, int, error) {
 
-	trains, err := u.trainRepo.GetAllTrains()
+	trains, count, err := u.trainRepo.GetAllTrains(page, limit)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var trainResponses []dtos.TrainResponse
@@ -35,12 +51,12 @@ func (u *trainUsecase) GetAllTrains() ([]dtos.TrainResponse, error) {
 
 		stationOrigin, err := u.trainRepo.GetStationByID2(train.StationOriginID)
 		if err != nil {
-			return trainResponses, err
+			return trainResponses, 0, err
 		}
 
 		stationDestination, err := u.trainRepo.GetStationByID2(train.StationDestinationID)
 		if err != nil {
-			return trainResponses, err
+			return trainResponses, 0, err
 		}
 		trainResponse := dtos.TrainResponse{
 			TrainID:         train.ID,
@@ -61,13 +77,30 @@ func (u *trainUsecase) GetAllTrains() ([]dtos.TrainResponse, error) {
 			Name:          train.Name,
 			Route:         train.Route,
 			Status:        train.Status,
+			CreatedAt:     train.CreatedAt,
+			UpdatedAt:     train.UpdatedAt,
 		}
 		trainResponses = append(trainResponses, trainResponse)
 	}
 	fmt.Println(trainResponses)
-	return trainResponses, nil
+	return trainResponses, count, nil
 }
 
+// GetTrainByID godoc
+// @Summary      Get train by ID
+// @Description  Get train by ID
+// @Tags         Train
+// @Accept       json
+// @Produce      json
+// @Param id path integer true "ID train"
+// @Success      200 {object} dtos.TrainStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/train/{id} [get]
+// @Security BearerAuth
 func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponse, error) {
 	var trainResponses dtos.TrainResponse
 	train, err := u.trainRepo.GetTrainByID(id)
@@ -104,10 +137,27 @@ func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponse, error) {
 		Name:          train.Name,
 		Route:         train.Route,
 		Status:        train.Status,
+		CreatedAt:     train.CreatedAt,
+		UpdatedAt:     train.UpdatedAt,
 	}
 	return trainResponse, nil
 }
 
+// CreateTrain godoc
+// @Summary      Create a new train
+// @Description  Create a new train
+// @Tags         Train
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.TrainInput true "Payload Body [RAW]"
+// @Success      200 {object} dtos.TrainStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/train [post]
+// @Security BearerAuth
 func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponse, error) {
 	var trainResponsee dtos.TrainResponse
 
@@ -155,10 +205,28 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponse, 
 		Name:          createdTrain.Name,
 		Route:         createdTrain.Route,
 		Status:        createdTrain.Status,
+		CreatedAt:     createdTrain.CreatedAt,
+		UpdatedAt:     createdTrain.UpdatedAt,
 	}
 	return trainResponse, nil
 }
 
+// UpdateTrain godoc
+// @Summary      Update train
+// @Description  Update train
+// @Tags         Train
+// @Accept       json
+// @Produce      json
+// @Param id path integer true "ID train"
+// @Param        request body dtos.TrainInput true "Payload Body [RAW]"
+// @Success      200 {object} dtos.TrainStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/train [put]
+// @Security BearerAuth
 func (u *trainUsecase) UpdateTrain(id uint, trainInput dtos.TrainInput) (dtos.TrainResponse, error) {
 	var train models.Train
 	var trainResponse dtos.TrainResponse
@@ -208,12 +276,28 @@ func (u *trainUsecase) UpdateTrain(id uint, trainInput dtos.TrainInput) (dtos.Tr
 	trainResponse.Name = train.Name
 	trainResponse.Route = train.Route
 	trainResponse.Status = train.Status
-	trainResponse.UpdateAt = train.UpdatedAt
+	trainResponse.CreatedAt = train.CreatedAt
+	trainResponse.UpdatedAt = train.UpdatedAt
 
 	return trainResponse, nil
 
 }
 
+// DeleteTrain godoc
+// @Summary      Delete a train
+// @Description  Delete a train
+// @Tags         Train
+// @Accept       json
+// @Produce      json
+// @Param id path integer true "ID train"
+// @Success      200 {object} dtos.StatusOKDeletedResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/train/{id} [delete]
+// @Security BearerAuth
 func (u *trainUsecase) DeleteTrain(id uint) error {
 	train, err := u.trainRepo.GetTrainByID(id)
 

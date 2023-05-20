@@ -29,7 +29,19 @@ func NewStationController(stationUsecase usecases.StationUsecase) StationControl
 // Implementasi fungsi-fungsi dari interface ItemController
 
 func (c *stationController) GetAllStations(ctx echo.Context) error {
-	stations, err := c.stationUsecase.GetAllStations()
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
+
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 10
+	}
+
+	stations, count, err := c.stationUsecase.GetAllStations(page, limit)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
 			Message: err.Error(),
@@ -38,10 +50,13 @@ func (c *stationController) GetAllStations(ctx echo.Context) error {
 
 	return ctx.JSON(
 		http.StatusOK,
-		helpers.NewResponse(
+		helpers.NewPaginationResponse(
 			http.StatusOK,
 			"Successfully get all stations",
 			stations,
+			page,
+			limit,
+			count,
 		),
 	)
 }
@@ -92,19 +107,12 @@ func (c *stationController) CreateStation(ctx echo.Context) error {
 		)
 	}
 
-	stationResponse := dtos.StationResponse{
-		StationID: station.StationID,
-		Origin:    station.Origin,
-		Name:      station.Name,
-		Initial:   station.Initial,
-	}
-
 	return ctx.JSON(
 		http.StatusCreated,
 		helpers.NewResponse(
 			http.StatusCreated,
 			"Successfully to created a station",
-			stationResponse,
+			station,
 		),
 	)
 }
@@ -139,19 +147,12 @@ func (c *stationController) UpdateStation(ctx echo.Context) error {
 		})
 	}
 
-	stationResponse := dtos.StationResponse{
-		StationID: stationResp.StationID,
-		Origin:    stationResp.Origin,
-		Name:      stationResp.Name,
-		Initial:   stationResp.Initial,
-	}
-
 	return ctx.JSON(
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
 			"Successfully updated station",
-			stationResponse,
+			stationResp,
 		),
 	)
 }

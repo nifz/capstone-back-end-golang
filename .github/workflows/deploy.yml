@@ -1,11 +1,14 @@
 name: Deploy
-on: [push]
+on:
+  push:
+    branches:
+      - production
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: pull-test-deploy
+      - name: pull-production-deploy
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -14,5 +17,5 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd back-end-golang
-            git pull origin main
+            git pull origin production
             docker-compose down && docker-compose up --build --force-recreate --no-deps -d
