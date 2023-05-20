@@ -8,7 +8,7 @@ import (
 )
 
 type StationUsecase interface {
-	GetAllStations() ([]dtos.StationResponse, error)
+	GetAllStations(page, limit int) ([]dtos.StationResponse, int, error)
 	GetStationByID(id uint) (dtos.StationResponse, error)
 	CreateStation(station *dtos.StationInput) (dtos.StationResponse, error)
 	UpdateStation(id uint, station dtos.StationInput) (dtos.StationResponse, error)
@@ -23,10 +23,26 @@ func NewStationUsecase(StationRepo repositories.StationRepository) StationUsecas
 	return &stationUsecase{StationRepo}
 }
 
-func (u *stationUsecase) GetAllStations() ([]dtos.StationResponse, error) {
-	stations, err := u.stationRepo.GetAllStations()
+// GetAllStations godoc
+// @Summary      Get all stations
+// @Description  Get all stations
+// @Tags         Station
+// @Accept       json
+// @Produce      json
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Success      200 {object} dtos.GetAllStationStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/station [get]
+// @Security BearerAuth
+func (u *stationUsecase) GetAllStations(page, limit int) ([]dtos.StationResponse, int, error) {
+	stations, count, err := u.stationRepo.GetAllStations(page, limit)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var stationResponses []dtos.StationResponse
@@ -36,14 +52,30 @@ func (u *stationUsecase) GetAllStations() ([]dtos.StationResponse, error) {
 			Origin:    station.Origin,
 			Name:      station.Name,
 			Initial:   station.Initial,
-			UpdateAt:  station.UpdatedAt,
+			CreatedAt: station.CreatedAt,
+			UpdatedAt: station.UpdatedAt,
 		}
 		stationResponses = append(stationResponses, stationResponse)
 	}
 
-	return stationResponses, nil
+	return stationResponses, count, nil
 }
 
+// GetStationByID godoc
+// @Summary      Get station by ID
+// @Description  Get station by ID
+// @Tags         Station
+// @Accept       json
+// @Produce      json
+// @Param id path integer true "ID station"
+// @Success      200 {object} dtos.StationStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/station/{id} [get]
+// @Security BearerAuth
 func (u *stationUsecase) GetStationByID(id uint) (dtos.StationResponse, error) {
 	var stationResponses dtos.StationResponse
 	station, err := u.stationRepo.GetStationByID(id)
@@ -55,11 +87,27 @@ func (u *stationUsecase) GetStationByID(id uint) (dtos.StationResponse, error) {
 		Origin:    station.Origin,
 		Name:      station.Name,
 		Initial:   station.Initial,
-		UpdateAt:  station.UpdatedAt,
+		CreatedAt: station.CreatedAt,
+		UpdatedAt: station.UpdatedAt,
 	}
 	return stationResponse, nil
 }
 
+// CreateStation godoc
+// @Summary      Create a new station
+// @Description  Create a new station
+// @Tags         Station
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.StationInput true "Payload Body [RAW]"
+// @Success      200 {object} dtos.StationStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/station [post]
+// @Security BearerAuth
 func (u *stationUsecase) CreateStation(station *dtos.StationInput) (dtos.StationResponse, error) {
 	var stationResponses dtos.StationResponse
 	createStation := models.Station{
@@ -78,11 +126,28 @@ func (u *stationUsecase) CreateStation(station *dtos.StationInput) (dtos.Station
 		Origin:    createdStation.Origin,
 		Name:      createdStation.Name,
 		Initial:   createdStation.Initial,
-		UpdateAt:  createStation.UpdatedAt,
+		CreatedAt: createdStation.CreatedAt,
+		UpdatedAt: createdStation.UpdatedAt,
 	}
 	return stationResponse, nil
 }
 
+// UpdateStation godoc
+// @Summary      Update station
+// @Description  Update station
+// @Tags         Station
+// @Accept       json
+// @Produce      json
+// @Param id path integer true "ID station"
+// @Param        request body dtos.StationInput true "Payload Body [RAW]"
+// @Success      200 {object} dtos.StationStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/station [put]
+// @Security BearerAuth
 func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) (dtos.StationResponse, error) {
 	var station models.Station
 	var stationResponse dtos.StationResponse
@@ -107,12 +172,28 @@ func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) 
 	stationResponse.Origin = station.Origin
 	stationResponse.Name = station.Name
 	stationResponse.Initial = station.Initial
-	stationResponse.UpdateAt = station.UpdatedAt
+	stationResponse.CreatedAt = station.CreatedAt
+	stationResponse.UpdatedAt = station.UpdatedAt
 
 	return stationResponse, nil
 
 }
 
+// DeleteStation godoc
+// @Summary      Delete a station
+// @Description  Delete a station
+// @Tags         Station
+// @Accept       json
+// @Produce      json
+// @Param id path integer true "ID station"
+// @Success      200 {object} dtos.StatusOKDeletedResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/station/{id} [delete]
+// @Security BearerAuth
 func (u *stationUsecase) DeleteStation(id uint) error {
 	station, err := u.stationRepo.GetStationByID(id)
 

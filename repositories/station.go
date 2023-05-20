@@ -7,7 +7,7 @@ import (
 )
 
 type StationRepository interface {
-	GetAllStations() ([]models.Station, error)
+	GetAllStations(page, limit int) ([]models.Station, int, error)
 	GetStationByID(id uint) (models.Station, error)
 	CreateStation(station models.Station) (models.Station, error)
 	UpdateStation(station models.Station) (models.Station, error)
@@ -24,10 +24,21 @@ func NewStationRepository(db *gorm.DB) StationRepository {
 
 // Implementasi fungsi-fungsi dari interface ItemRepository
 
-func (r *stationRepository) GetAllStations() ([]models.Station, error) {
-	var stations []models.Station
-	err := r.db.Find(&stations).Error
-	return stations, err
+func (r *stationRepository) GetAllStations(page, limit int) ([]models.Station, int, error) {
+	var (
+		stations []models.Station
+		count    int64
+	)
+	err := r.db.Find(&stations).Count(&count).Error
+	if err != nil {
+		return stations, int(count), err
+	}
+
+	offset := (page - 1) * limit
+
+	err = r.db.Limit(limit).Offset(offset).Find(&stations).Error
+
+	return stations, int(count), err
 }
 
 func (r *stationRepository) GetStationByID(id uint) (models.Station, error) {
