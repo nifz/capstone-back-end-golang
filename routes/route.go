@@ -24,6 +24,8 @@ func Init(e *echo.Echo, db *gorm.DB) {
 		log.Fatal("Error loading .env file")
 	}
 
+	// USER
+
 	userRepository := repositories.NewUserRepository(db)
 	userUsecase := usecases.NewUserUsecase(userRepository)
 	userController := controllers.NewUserController(userUsecase)
@@ -38,4 +40,38 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.PATCH("/update-information", userController.UserUpdateInformation)
 	user.PUT("/update-password", userController.UserUpdatePassword)
 	user.PUT("/update-profile", userController.UserUpdateProfile)
+
+	// ADMIN
+
+	stationRepository := repositories.NewStationRepository(db)
+	stationUsecase := usecases.NewStationUsecase(stationRepository)
+	stationController := controllers.NewStationController(stationUsecase)
+
+	trainRepository := repositories.NewTrainRepository(db)
+	trainUsecase := usecases.NewTrainUsecase(trainRepository)
+	trainController := controllers.NewTrainController(trainUsecase)
+
+	trainPeronRepository := repositories.NewTrainPeronRepository(db)
+	trainPeronUsecase := usecases.NewTrainPeronUsecase(trainPeronRepository)
+	trainPeronController := controllers.NewTrainPeronController(trainPeronUsecase)
+
+	admin := api.Group("/admin")
+	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("admin"))
+	admin.GET("/station", stationController.GetAllStations)
+	admin.GET("/station/:id", stationController.GetStationByID)
+	admin.PUT("/station/:id", stationController.UpdateStation)
+	admin.POST("/station", stationController.CreateStation)
+	admin.DELETE("/station/:id", stationController.DeleteStation)
+
+	admin.GET("/train", trainController.GetAllTrains)
+	admin.GET("/train/:id", trainController.GetTrainByID)
+	admin.PUT("/train/:id", trainController.UpdateTrain)
+	admin.POST("/train", trainController.CreateTrain)
+	admin.DELETE("/train/:id", trainController.DeleteTrain)
+
+	admin.GET("/train-peron", trainPeronController.GetAllTrainPerons)
+	admin.GET("/train-peron/:id", trainPeronController.GetTrainPeronByID)
+	admin.PUT("/train-peron/:id", trainPeronController.UpdateTrainPeron)
+	admin.POST("/train-peron", trainPeronController.CreateTrainPeron)
+	admin.DELETE("/train-peron/:id", trainPeronController.DeleteTrainPeron)
 }
