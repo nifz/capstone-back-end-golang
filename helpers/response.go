@@ -20,10 +20,10 @@ type PaginationResponse struct {
 }
 
 type Meta struct {
-	CurrentPage int         `json:"current_page"`
-	PrevPage    int         `json:"prev_page"`
+	CurrentPage int         `json:"current_page" example:"1"`
+	PrevPage    int         `json:"prev_page" example:"1"`
 	NextPage    interface{} `json:"next_page"`
-	Total       int         `json:"total"`
+	Total       int         `json:"total" example:"1"`
 }
 
 func NewResponse(statusCode int, message string, data interface{}) Response {
