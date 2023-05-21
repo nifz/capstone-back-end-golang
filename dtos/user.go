@@ -62,12 +62,12 @@ type UserInformationResponse struct {
 	FullName       string    `json:"full_name" example:"Mochammad Hanif"`
 	Email          string    `json:"email" example:"me@hanifz.com"`
 	PhoneNumber    string    `json:"phone_number" example:"0851555555151"`
-	Gender         *string   `json:"gender,omitempty" example:"Laki-Laki"`
-	BirthDate      string    `json:"birth_date,omitempty" example:"2002-09-12"`
+	Gender         *string   `json:"gender" example:"Laki-Laki"`
+	BirthDate      string    `json:"birth_date" example:"2002-09-12"`
 	ProfilePicture string    `json:"profile_picture_url" example:"https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"`
 	Citizen        string    `json:"citizen" example:"Indonesia"`
 	Role           string    `json:"role" example:"user"`
-	Token          *string   `json:"token,omitempty" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2ODQ0MDYzMzMsInJvbGUiOiJ1c2VyIiwidXNlcklkIjozfQ.B8vBlMIiU4iZR0YHe4-Mo3DpJ2nwlTV3PuhEJc31pMo"`
+	Token          *string   `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2ODQ0MDYzMzMsInJvbGUiOiJ1c2VyIiwidXNlcklkIjozfQ.B8vBlMIiU4iZR0YHe4-Mo3DpJ2nwlTV3PuhEJc31pMo"`
 	CreatedAt      time.Time `json:"created_at" example:"2023-05-17T15:07:16.504+07:00"`
 	UpdatedAt      time.Time `json:"updated_at" example:"2023-05-17T15:07:16.504+07:00"`
 }

@@ -20,6 +20,9 @@ import (
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
+// ec2-3-26-30-178.ap-southeast-2.compute.amazonaws.com:8088
+// localhost:8088
+
 // @host      ec2-3-26-30-178.ap-southeast-2.compute.amazonaws.com:8088
 // @BasePath  /api/v1
 
@@ -42,6 +45,11 @@ func main() {
 	}
 
 	err = configs.MigrateDB(db)
+	if err != nil {
+		panic(err)
+	}
+
+	err = configs.DBSeeder(db)
 	if err != nil {
 		panic(err)
 	}

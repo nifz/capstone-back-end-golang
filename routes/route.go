@@ -24,6 +24,8 @@ func Init(e *echo.Echo, db *gorm.DB) {
 		log.Fatal("Error loading .env file")
 	}
 
+	// USER
+
 	userRepository := repositories.NewUserRepository(db)
 	userUsecase := usecases.NewUserUsecase(userRepository)
 	userController := controllers.NewUserController(userUsecase)

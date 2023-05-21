@@ -39,6 +39,7 @@ func NewUserUsecase(userRepo repositories.UserRepository) UserUsecase {
 // @Success      200 {object} dtos.UserStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /login [post]
@@ -89,6 +90,7 @@ func (u *userUsecase) UserLogin(input dtos.UserLoginInput) (dtos.UserInformation
 // @Success      201 {object} dtos.UserCreeatedResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /register [post]
@@ -156,6 +158,7 @@ func (u *userUsecase) UserRegister(input dtos.UserRegisterInput) (dtos.UserInfor
 // @Success      200 {object} dtos.UserStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/update-information [patch]
@@ -207,6 +210,7 @@ func (u *userUsecase) UserUpdateInformation(userId uint, input dtos.UserUpdateIn
 // @Success      200 {object} dtos.UserStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/update-password [put]
@@ -276,6 +280,7 @@ func (u *userUsecase) UserUpdatePassword(userId uint, input dtos.UserUpdatePassw
 // @Success      200 {object} dtos.UserStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/update-profile [put]
@@ -328,6 +333,7 @@ func (u *userUsecase) UserUpdateProfile(userId uint, input dtos.UserUpdateProfil
 // @Success      200 {object} dtos.UserStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user [get]
