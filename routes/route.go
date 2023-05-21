@@ -40,6 +40,8 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.PATCH("/update-information", userController.UserUpdateInformation)
 	user.PUT("/update-password", userController.UserUpdatePassword)
 	user.PUT("/update-profile", userController.UserUpdateProfile)
+	user.PUT("/update-photo-profile", userController.UserUpdatePhotoProfile)
+	user.DELETE("/delete-photo-profile", userController.UserDeletePhotoProfile)
 
 	// ADMIN
 
