@@ -17,6 +17,8 @@ type UserUsecase interface {
 	UserUpdatePassword(userId uint, input dtos.UserUpdatePasswordInput) (dtos.UserInformationResponse, error)
 	UserUpdateProfile(userId uint, input dtos.UserUpdateProfileInput) (dtos.UserInformationResponse, error)
 	UserCredential(userId uint) (dtos.UserInformationResponse, error)
+	UserUpdatePhotoProfile(userId uint, input dtos.UserUpdatePhotoProfileInput) (dtos.UserInformationResponse, error)
+	UserDeletePhotoProfile(userId uint) (dtos.UserInformationResponse, error)
 }
 
 type userUsecase struct {
@@ -118,7 +120,7 @@ func (u *userUsecase) UserRegister(input dtos.UserRegisterInput) (dtos.UserInfor
 	user.Email = input.Email
 	user.Password = password
 	user.PhoneNumber = input.PhoneNumber
-	user.ProfilePicture = "default.jpg"
+	user.ProfilePicture = "https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"
 	user.Citizen = "Indonesia"
 	user.Role = "user"
 
@@ -148,7 +150,9 @@ func (u *userUsecase) UserRegister(input dtos.UserRegisterInput) (dtos.UserInfor
 // @Tags         User
 // @Accept       json
 // @Produce      json
-// @Param        request body dtos.UserUpdateInformationInput true "Payload Body [RAW]"
+// @Param        file formData file false "Photo file"
+// @Param        gender formData string false "Jenis kelamin"
+// @Param        birth_date formData string false "Tanggal lahir"
 // @Success      200 {object} dtos.UserStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -337,6 +341,101 @@ func (u *userUsecase) UserCredential(userId uint) (dtos.UserInformationResponse,
 	user, err := u.userRepo.UserGetById(userId)
 	if err != nil {
 		return userResponse, errors.New("User not found")
+	}
+
+	userResponse.ID = user.ID
+	userResponse.FullName = user.FullName
+	userResponse.Email = user.Email
+	userResponse.PhoneNumber = user.PhoneNumber
+	userResponse.Gender = user.Gender
+	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
+	userResponse.ProfilePicture = user.ProfilePicture
+	userResponse.Citizen = user.Citizen
+	userResponse.Role = user.Role
+	userResponse.CreatedAt = user.CreatedAt
+	userResponse.UpdatedAt = user.UpdatedAt
+
+	return userResponse, err
+}
+
+// UserUpdatePhotoProfile godoc
+// @Summary      Update Photo Profile
+// @Description  User update an photo profile
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Param        file formData file false "Photo file"
+// @Success      200 {object} dtos.UserStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user/update-photo-profile [put]
+// @Security BearerAuth
+func (u *userUsecase) UserUpdatePhotoProfile(userId uint, input dtos.UserUpdatePhotoProfileInput) (dtos.UserInformationResponse, error) {
+	var (
+		user         models.User
+		userResponse dtos.UserInformationResponse
+	)
+
+	user, err := u.userRepo.UserGetById(userId)
+	if err != nil {
+		return userResponse, errors.New("User not found")
+	}
+
+	user.ProfilePicture = input.ProfilePicture
+
+	user, err = u.userRepo.UserUpdate(user)
+	if err != nil {
+		return userResponse, err
+	}
+
+	userResponse.ID = user.ID
+	userResponse.FullName = user.FullName
+	userResponse.Email = user.Email
+	userResponse.PhoneNumber = user.PhoneNumber
+	userResponse.Gender = user.Gender
+	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
+	userResponse.ProfilePicture = user.ProfilePicture
+	userResponse.Citizen = user.Citizen
+	userResponse.Role = user.Role
+	userResponse.CreatedAt = user.CreatedAt
+	userResponse.UpdatedAt = user.UpdatedAt
+
+	return userResponse, err
+}
+
+// UserDeletePhotoProfile godoc
+// @Summary      Update Information
+// @Description  User update an information
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} dtos.UserStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user/delete-photo-profile [delete]
+// @Security BearerAuth
+func (u *userUsecase) UserDeletePhotoProfile(userId uint) (dtos.UserInformationResponse, error) {
+	var (
+		user         models.User
+		userResponse dtos.UserInformationResponse
+	)
+
+	user, err := u.userRepo.UserGetById(userId)
+	if err != nil {
+		return userResponse, errors.New("User not found")
+	}
+
+	user.ProfilePicture = "https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"
+
+	user, err = u.userRepo.UserUpdate(user)
+	if err != nil {
+		return userResponse, err
 	}
 
 	userResponse.ID = user.ID
