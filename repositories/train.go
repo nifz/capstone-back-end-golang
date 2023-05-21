@@ -7,7 +7,7 @@ import (
 )
 
 type TrainRepository interface {
-	GetAllTrains() ([]models.Train, error)
+	GetAllTrains(page, limit int) ([]models.Train, int, error)
 	GetTrainByID(id uint) (models.Train, error)
 	GetStationByID2(id uint) (models.Station, error)
 	CreateTrain(train models.Train) (models.Train, error)
@@ -25,10 +25,21 @@ func NewTrainRepository(db *gorm.DB) TrainRepository {
 
 // Implementasi fungsi-fungsi dari interface ItemRepository
 
-func (r *trainRepository) GetAllTrains() ([]models.Train, error) {
-	var trains []models.Train
-	err := r.db.Find(&trains).Error
-	return trains, err
+func (r *trainRepository) GetAllTrains(page, limit int) ([]models.Train, int, error) {
+	var (
+		trains []models.Train
+		count  int64
+	)
+	err := r.db.Find(&trains).Count(&count).Error
+	if err != nil {
+		return trains, int(count), err
+	}
+
+	offset := (page - 1) * limit
+
+	err = r.db.Limit(limit).Offset(offset).Find(&trains).Error
+
+	return trains, int(count), err
 }
 
 func (r *trainRepository) GetTrainByID(id uint) (models.Train, error) {

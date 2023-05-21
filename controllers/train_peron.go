@@ -29,7 +29,18 @@ func NewTrainPeronController(trainPeronUsecase usecases.TrainPeronUsecase) Train
 // Implementasi fungsi-fungsi dari interface ItemController
 
 func (c *trainPeronController) GetAllTrainPerons(ctx echo.Context) error {
-	trainPerons, err := c.trainPeronUsecase.GetAllTrainPerons()
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
+
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 10
+	}
+	trainPerons, count, err := c.trainPeronUsecase.GetAllTrainPerons(page, limit)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
@@ -43,10 +54,13 @@ func (c *trainPeronController) GetAllTrainPerons(ctx echo.Context) error {
 
 	return ctx.JSON(
 		http.StatusOK,
-		helpers.NewResponse(
+		helpers.NewPaginationResponse(
 			http.StatusOK,
 			"Successfully get all train peron",
 			trainPerons,
+			page,
+			limit,
+			count,
 		),
 	)
 }
@@ -97,31 +111,12 @@ func (c *trainPeronController) CreateTrainPeron(ctx echo.Context) error {
 		)
 	}
 
-	trainPeronResponse := dtos.TrainPeronResponse{
-		TrainPeronID: trainPeron.TrainPeronID,
-		TrainID:      trainPeron.TrainID,
-		Train: dtos.TrainInput{
-			StationOriginID:      trainPeron.Train.StationOriginID,
-			StationDestinationID: trainPeron.Train.StationDestinationID,
-			DepartureTime:        trainPeron.Train.DepartureTime,
-			ArriveTime:           trainPeron.Train.ArriveTime,
-			Name:                 trainPeron.Train.Name,
-			Route:                trainPeron.Train.Route,
-			Status:               trainPeron.Train.Status,
-		},
-		Class:    trainPeron.Class,
-		Name:     trainPeron.Name,
-		Price:    trainPeron.Price,
-		Status:   trainPeron.Status,
-		UpdateAt: trainPeron.UpdateAt,
-	}
-
 	return ctx.JSON(
 		http.StatusCreated,
 		helpers.NewResponse(
 			http.StatusCreated,
 			"Successfully to created a train peron",
-			trainPeronResponse,
+			trainPeron,
 		),
 	)
 }
@@ -161,31 +156,12 @@ func (c *trainPeronController) UpdateTrainPeron(ctx echo.Context) error {
 		)
 	}
 
-	trainPeronResponse := dtos.TrainPeronResponse{
-		TrainPeronID: trainPeronResp.TrainPeronID,
-		TrainID:      trainPeronResp.TrainID,
-		Train: dtos.TrainInput{
-			StationOriginID:      trainPeronResp.Train.StationOriginID,
-			StationDestinationID: trainPeronResp.Train.StationDestinationID,
-			DepartureTime:        trainPeronResp.Train.DepartureTime,
-			ArriveTime:           trainPeronResp.Train.ArriveTime,
-			Name:                 trainPeronResp.Train.Name,
-			Route:                trainPeronResp.Train.Route,
-			Status:               trainPeronResp.Train.Status,
-		},
-		Class:    trainPeronResp.Class,
-		Name:     trainPeronResp.Name,
-		Price:    trainPeronResp.Price,
-		Status:   trainPeronResp.Status,
-		UpdateAt: trainPeronResp.UpdateAt,
-	}
-
 	return ctx.JSON(
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
 			"Successfully updated train peron",
-			trainPeronResponse,
+			trainPeronResp,
 		),
 	)
 }

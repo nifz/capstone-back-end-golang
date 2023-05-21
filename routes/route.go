@@ -24,6 +24,8 @@ func Init(e *echo.Echo, db *gorm.DB) {
 		log.Fatal("Error loading .env file")
 	}
 
+	// USER
+
 	userRepository := repositories.NewUserRepository(db)
 	userUsecase := usecases.NewUserUsecase(userRepository)
 	userController := controllers.NewUserController(userUsecase)
@@ -39,33 +41,43 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.PUT("/update-password", userController.UserUpdatePassword)
 	user.PUT("/update-profile", userController.UserUpdateProfile)
 
+	// ADMIN
+
 	stationRepository := repositories.NewStationRepository(db)
 	stationUsecase := usecases.NewStationUsecase(stationRepository)
 	stationController := controllers.NewStationController(stationUsecase)
-
-	api.GET("/admin/stations", stationController.GetAllStations)
-	api.GET("/admin/stations/:id", stationController.GetStationByID)
-	api.PUT("/admin/stations/:id", stationController.UpdateStation)
-	api.POST("/admin/stations", stationController.CreateStation)
-	api.DELETE("/admin/stations/:id", stationController.DeleteStation)
 
 	trainRepository := repositories.NewTrainRepository(db)
 	trainUsecase := usecases.NewTrainUsecase(trainRepository)
 	trainController := controllers.NewTrainController(trainUsecase)
 
-	api.GET("/admin/trains", trainController.GetAllTrains)
-	api.GET("/admin/trains/:id", trainController.GetTrainByID)
-	api.PUT("/admin/trains/:id", trainController.UpdateTrain)
-	api.POST("/admin/trains", trainController.CreateTrain)
-	api.DELETE("/admin/trains/:id", trainController.DeleteTrain)
-
 	trainPeronRepository := repositories.NewTrainPeronRepository(db)
 	trainPeronUsecase := usecases.NewTrainPeronUsecase(trainPeronRepository)
 	trainPeronController := controllers.NewTrainPeronController(trainPeronUsecase)
 
-	api.GET("/admin/train-peron", trainPeronController.GetAllTrainPerons)
-	api.GET("/admin/train-peron/:id", trainPeronController.GetTrainPeronByID)
-	api.PUT("/admin/train-peron/:id", trainPeronController.UpdateTrainPeron)
-	api.POST("/admin/train-peron", trainPeronController.CreateTrainPeron)
-	api.DELETE("/admin/train-peron/:id", trainPeronController.DeleteTrainPeron)
+	reservationRepository := repositories.NewReservationRepository(db)
+	reservationUsecase := usecases.NewReservationUsecase(reservationRepository)
+	reservationController := controllers.NewReservationController(reservationUsecase)
+
+	admin := api.Group("/admin")
+	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("admin"))
+	admin.GET("/station", stationController.GetAllStations)
+	admin.GET("/station/:id", stationController.GetStationByID)
+	admin.PUT("/station/:id", stationController.UpdateStation)
+	admin.POST("/station", stationController.CreateStation)
+	admin.DELETE("/station/:id", stationController.DeleteStation)
+
+	admin.GET("/train", trainController.GetAllTrains)
+	admin.GET("/train/:id", trainController.GetTrainByID)
+	admin.PUT("/train/:id", trainController.UpdateTrain)
+	admin.POST("/train", trainController.CreateTrain)
+	admin.DELETE("/train/:id", trainController.DeleteTrain)
+
+	admin.GET("/train-peron", trainPeronController.GetAllTrainPerons)
+	admin.GET("/train-peron/:id", trainPeronController.GetTrainPeronByID)
+	admin.PUT("/train-peron/:id", trainPeronController.UpdateTrainPeron)
+	admin.POST("/train-peron", trainPeronController.CreateTrainPeron)
+	admin.DELETE("/train-peron/:id", trainPeronController.DeleteTrainPeron)
+
+	api.POST("/reservations", reservationController.AdminCreateReservation)
 }
