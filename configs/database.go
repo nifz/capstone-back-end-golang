@@ -107,5 +107,9 @@ func MigrateDB(db *gorm.DB) error {
 		&models.Train{},
 		&models.TrainPeron{},
 		&models.TrainSeat{},
+		models.ReservationCheckouts{},
+		models.ReservationImages{},
+		models.Reservations{},
+		models.ReservationImages{},
 	)
 }

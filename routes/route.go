@@ -40,6 +40,8 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.PATCH("/update-information", userController.UserUpdateInformation)
 	user.PUT("/update-password", userController.UserUpdatePassword)
 	user.PUT("/update-profile", userController.UserUpdateProfile)
+	user.PUT("/update-photo-profile", userController.UserUpdatePhotoProfile)
+	user.DELETE("/delete-photo-profile", userController.UserDeletePhotoProfile)
 
 	// ADMIN
 
@@ -54,6 +56,10 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	trainPeronRepository := repositories.NewTrainPeronRepository(db)
 	trainPeronUsecase := usecases.NewTrainPeronUsecase(trainPeronRepository)
 	trainPeronController := controllers.NewTrainPeronController(trainPeronUsecase)
+
+	reservationRepository := repositories.NewReservationRepository(db)
+	reservationUsecase := usecases.NewReservationUsecase(reservationRepository)
+	reservationController := controllers.NewReservationController(reservationUsecase)
 
 	admin := api.Group("/admin")
 	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("admin"))
@@ -74,4 +80,6 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.PUT("/train-peron/:id", trainPeronController.UpdateTrainPeron)
 	admin.POST("/train-peron", trainPeronController.CreateTrainPeron)
 	admin.DELETE("/train-peron/:id", trainPeronController.DeleteTrainPeron)
+
+	api.POST("/reservations", reservationController.AdminCreateReservation)
 }
