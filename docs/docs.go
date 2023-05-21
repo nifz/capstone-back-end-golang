@@ -192,6 +192,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/delete-photo-profile": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "User update an information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update Information",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UserStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/update-information": {
             "patch": {
                 "security": [
@@ -212,13 +270,22 @@ const docTemplate = `{
                 "summary": "Update Information",
                 "parameters": [
                     {
-                        "description": "Payload Body [RAW]",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UserUpdateInformationInput"
-                        }
+                        "type": "file",
+                        "description": "Photo file",
+                        "name": "file",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Jenis kelamin",
+                        "name": "gender",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tanggal lahir",
+                        "name": "birth_date",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -301,6 +368,72 @@ const docTemplate = `{
                         "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/update-photo-profile": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "User update an photo profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update Photo Profile",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Photo file",
+                        "name": "file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UserStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
                         }
                     },
                     "404": {
@@ -490,9 +623,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "0851555555151"
                 },
-                "profile_picture": {
+                "profile_picture_url": {
                     "type": "string",
-                    "example": "default.jpg"
+                    "example": "https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"
                 },
                 "role": {
                     "type": "string",
@@ -563,23 +696,6 @@ const docTemplate = `{
                 "status_code": {
                     "type": "integer",
                     "example": 200
-                }
-            }
-        },
-        "dtos.UserUpdateInformationInput": {
-            "type": "object",
-            "properties": {
-                "birth_date": {
-                    "type": "string",
-                    "example": "2002-09-09"
-                },
-                "gender": {
-                    "type": "string",
-                    "example": "Laki-Laki"
-                },
-                "profile_picture": {
-                    "type": "string",
-                    "example": "default.jpg"
                 }
             }
         },
