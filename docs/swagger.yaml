@@ -77,8 +77,8 @@ definitions:
       phone_number:
         example: "0851555555151"
         type: string
-      profile_picture:
-        example: default.jpg
+      profile_picture_url:
+        example: https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg
         type: string
       role:
         example: user
@@ -130,18 +130,6 @@ definitions:
       status_code:
         example: 200
         type: integer
-    type: object
-  dtos.UserUpdateInformationInput:
-    properties:
-      birth_date:
-        example: "2002-09-09"
-        type: string
-      gender:
-        example: Laki-Laki
-        type: string
-      profile_picture:
-        example: default.jpg
-        type: string
     type: object
   dtos.UserUpdatePasswordInput:
     properties:
@@ -294,18 +282,61 @@ paths:
       summary: Get Credentials
       tags:
       - User
+  /user/delete-photo-profile:
+    delete:
+      consumes:
+      - application/json
+      description: User update an information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.UserStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Information
+      tags:
+      - User
   /user/update-information:
     patch:
       consumes:
       - application/json
       description: User update an information
       parameters:
-      - description: Payload Body [RAW]
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dtos.UserUpdateInformationInput'
+      - description: Photo file
+        in: formData
+        name: file
+        type: file
+      - description: Jenis kelamin
+        in: formData
+        name: gender
+        type: string
+      - description: Tanggal lahir
+        in: formData
+        name: birth_date
+        type: string
       produces:
       - application/json
       responses:
@@ -372,6 +403,48 @@ paths:
       security:
       - BearerAuth: []
       summary: Update Password
+      tags:
+      - User
+  /user/update-photo-profile:
+    put:
+      consumes:
+      - application/json
+      description: User update an photo profile
+      parameters:
+      - description: Photo file
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.UserStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Photo Profile
       tags:
       - User
   /user/update-profile:
