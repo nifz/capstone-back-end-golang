@@ -70,6 +70,10 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	reservationUsecase := usecases.NewReservationUsecase(reservationRepository)
 	reservationController := controllers.NewReservationController(reservationUsecase)
 
+	articleRepository := repositories.NewArticleRepository(db)
+	articleUsecase := usecases.NewArticleUsecase(articleRepository)
+	articleController := controllers.NewArticleController(articleUsecase)
+
 	admin := api.Group("/admin")
 	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("admin"))
 	admin.GET("/station", stationController.GetAllStations)
@@ -89,6 +93,12 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.PUT("/train-peron/:id", trainPeronController.UpdateTrainPeron)
 	admin.POST("/train-peron", trainPeronController.CreateTrainPeron)
 	admin.DELETE("/train-peron/:id", trainPeronController.DeleteTrainPeron)
+
+	admin.GET("/article", articleController.GetAllArticles)
+	admin.GET("/article/:id", articleController.GetArticleByID)
+	admin.PUT("/article/:id", articleController.UpdateArticle)
+	admin.POST("/article", articleController.CreateArticle)
+	admin.DELETE("/article/:id", articleController.DeleteArticle)
 
 	api.POST("/reservations", reservationController.AdminCreateReservation)
 }
