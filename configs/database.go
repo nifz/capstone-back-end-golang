@@ -112,5 +112,6 @@ func MigrateDB(db *gorm.DB) error {
 		models.Reservations{},
 		models.ReservationImages{},
 		&models.Article{},
+		&models.Recomendation{},
 	)
 }
