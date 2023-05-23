@@ -14,9 +14,11 @@ type ReservationCreateInput struct {
 	Description   string `form:"description" json:"description" binding:"required"`
 	Tags          string `form:"tags" json:"tags" binding:"required"`
 	Status        string `form:"status" json:"status" binding:"required"`
+	ImageFile     string `form:"image" json:"image"`
 }
 
 type ReservationCreateResponse struct {
+	ID            uint   `json:"id"`
 	Name          string `json:"name"`
 	Province_name string `json:"province_name"`
 	Regency_name  string `json:"regency_name"`
@@ -30,4 +32,23 @@ type ReservationCreateResponse struct {
 	Description   string `json:"description"`
 	Tags          string `json:"tags"`
 	Status        string `json:"status"`
+	Image         string `json:"image"`
+}
+
+type ReservationResponse struct {
+	ReservationID uint   `json:"reservation_id"`
+	Name          string `json:"name"`
+	Province_name string `json:"province_name"`
+	Regency_name  string `json:"regency_name"`
+	District_name string `json:"district_name"`
+	Village_name  string `json:"village_name"`
+	Postal_code   string `json:"postal_code"`
+	Full_address  string `json:"full_address"`
+	Type          string `json:"type"`
+	Price         int32  `json:"price"`
+	Thumbnail     string `json:"thumbnail"`
+	Description   string `json:"description"`
+	Tags          string `json:"tags"`
+	Status        string `json:"status"`
+	Image         string `json:"image"`
 }

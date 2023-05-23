@@ -8,8 +8,7 @@ import (
 
 type ReservationRepository interface {
 	AdminCreateReservation(reservation models.Reservations) (models.Reservations, error)
-	// GetAllReservation() ([]models.Reservations, error)
-	// GetReservationById(id int) (models.Reservations, error)
+	GetAllReservation(page, limit int) ([]models.Reservations, int, error)
 }
 
 type reservationRepository struct {
@@ -24,3 +23,38 @@ func (r *reservationRepository) AdminCreateReservation(reservation models.Reserv
 	err := r.db.Create(&reservation).Error
 	return reservation, err
 }
+
+func (r *reservationRepository) GetAllReservation(page, limit int) ([]models.Reservations, int, error) {
+	var (
+		reservations []models.Reservations
+		count        int64
+	)
+
+	err := r.db.Model(&models.Reservations{}).Count(&count).Error
+	if err != nil {
+		return reservations, int(count), err
+	}
+
+	offset := (page - 1) * limit
+
+	err = r.db.Limit(limit).Offset(offset).Find(&reservations).Error
+
+	return reservations, int(count), err
+}
+
+// func (r *reservationRepository) GetAllReservation(reservation models.Reservations) (models.Reservations, error) {
+// 	var (
+// 		reservations []models.Reservations
+// 		count        int64
+// 	)
+
+// 	err := r.db.Find(&reservations).Count(&count).Error
+// 	if err != nil {
+// 		return reservations,int(count), err
+// 	}
+// 	offset := (page - 1) * limit
+
+// 	err = r.db.Limit(limit).Offset(offset).Find(&reservations).Error
+
+// 	return reservations, int(count), err
+// }
