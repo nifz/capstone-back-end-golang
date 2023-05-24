@@ -6,6 +6,8 @@ import (
 	"back-end-golang/repositories"
 	"back-end-golang/usecases"
 	"log"
+	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -67,8 +69,17 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	trainPeronController := controllers.NewTrainPeronController(trainPeronUsecase)
 
 	reservationRepository := repositories.NewReservationRepository(db)
-	reservationUsecase := usecases.NewReservationUsecase(reservationRepository)
-	reservationController := controllers.NewReservationController(reservationUsecase)
+	reservationImageRepository := repositories.NewReservationImageRepository(db)
+	reservationUsecase := usecases.NewReservationUsecase(reservationRepository, reservationImageRepository)
+	reservationController := controllers.NewReservationController(reservationUsecase, reservationImageRepository)
+
+	articleRepository := repositories.NewArticleRepository(db)
+	articleUsecase := usecases.NewArticleUsecase(articleRepository)
+	articleController := controllers.NewArticleController(articleUsecase)
+
+	recommendationRepository := repositories.NewRecommendationRepository(db)
+	recommendationUsecase := usecases.NewRecommendationUsecase(recommendationRepository)
+	recommendationController := controllers.NewRecommendationController(recommendationUsecase)
 
 	admin := api.Group("/admin")
 	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("admin"))
@@ -90,5 +101,31 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.POST("/train-peron", trainPeronController.CreateTrainPeron)
 	admin.DELETE("/train-peron/:id", trainPeronController.DeleteTrainPeron)
 
+	admin.GET("/article", articleController.GetAllArticles)
+	admin.GET("/article/:id", articleController.GetArticleByID)
+	admin.PUT("/article/:id", articleController.UpdateArticle)
+	admin.POST("/article", articleController.CreateArticle)
+	admin.DELETE("/article/:id", articleController.DeleteArticle)
+
+	admin.GET("/recommendation", recommendationController.GetAllRecommendations)
+	admin.GET("/recommendation/:id", recommendationController.GetRecommendationByID)
+	admin.PUT("/recommendation/:id", recommendationController.UpdateRecommendation)
+	admin.POST("/recommendation", recommendationController.CreateRecommendation)
+	admin.DELETE("/recommendation/:id", recommendationController.DeleteRecommendation)
+
 	api.POST("/reservations", reservationController.AdminCreateReservation)
+	admin.GET("/reservations", reservationController.GetAllReservation)
+	admin.POST("/reservations", reservationController.AdminCreateReservation)
+	admin.GET("/images/:imageName", func(c echo.Context) error {
+		imageName := c.Param("imageName")
+		imagePath := "./images/" + imageName
+		// Check if the image file exists
+		if _, err := os.Stat(imagePath); os.IsNotExist(err) {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"message": "Image not found",
+			})
+		}
+		// Return the image file
+		return c.File(imagePath)
+	})
 }
