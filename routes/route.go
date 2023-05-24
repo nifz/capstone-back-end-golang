@@ -43,6 +43,15 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.PUT("/update-photo-profile", userController.UserUpdatePhotoProfile)
 	user.DELETE("/delete-photo-profile", userController.UserDeletePhotoProfile)
 
+	historySearchRepository := repositories.NewHistorySearchRepository(db)
+	historySearchUsecase := usecases.NewHistorySearchUsecase(historySearchRepository, userRepository)
+	historySearchController := controllers.NewHistorySearchController(historySearchUsecase)
+
+	user.GET("/history-search", historySearchController.HistorySearchGetById)
+	user.POST("/history-search", historySearchController.HistorySearchCreate)
+	user.PUT("/history-search", historySearchController.HistorySearchUpdate)
+	user.DELETE("/history-search", historySearchController.HistorySearchDelete)
+
 	// ADMIN
 
 	stationRepository := repositories.NewStationRepository(db)
