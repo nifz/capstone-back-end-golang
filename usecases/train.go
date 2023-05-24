@@ -10,10 +10,10 @@ import (
 
 type TrainUsecase interface {
 	// admin
-	GetAllTrains(page, limit int) ([]dtos.TrainResponse, int, error)
-	GetTrainByID(id uint) (dtos.TrainResponse, error)
-	CreateTrain(train *dtos.TrainInput) (dtos.TrainResponse, error)
-	UpdateTrain(id uint, trainInput dtos.TrainInput) (dtos.TrainResponse, error)
+	GetAllTrains(page, limit int) ([]dtos.TrainResponses, int, error)
+	GetTrainByID(id uint) (dtos.TrainResponses, error)
+	CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses, error)
+	UpdateTrain(id uint, trainInput dtos.TrainInput) (dtos.TrainResponses, error)
 	DeleteTrain(id uint) error
 
 	// user
@@ -21,14 +21,15 @@ type TrainUsecase interface {
 }
 
 type trainUsecase struct {
-	trainRepo repositories.TrainRepository
+	trainRepo        repositories.TrainRepository
+	trainStationRepo repositories.TrainStationRepository
 }
 
-func NewTrainUsecase(TrainRepo repositories.TrainRepository) TrainUsecase {
-	return &trainUsecase{TrainRepo}
+func NewTrainUsecase(TrainRepo repositories.TrainRepository, TrainStationRepo repositories.TrainStationRepository) TrainUsecase {
+	return &trainUsecase{TrainRepo, TrainStationRepo}
 }
 
-// =============================== ADMIN END ================================== \\
+// =============================== ADMIN ================================== \\
 
 // GetAllTrains godoc
 // @Summary      Get all train
@@ -38,7 +39,7 @@ func NewTrainUsecase(TrainRepo repositories.TrainRepository) TrainUsecase {
 // @Produce      json
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
-// @Success      200 {object} dtos.GetAllTrainStatusOKResponse
+// @Success      200 {object} dtos.GetAllTrainStatusOKResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
@@ -46,19 +47,16 @@ func NewTrainUsecase(TrainRepo repositories.TrainRepository) TrainUsecase {
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/train [get]
 // @Security BearerAuth
-func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponse, int, error) {
+func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int, error) {
 
-	trains, count, err := u.trainRepo.GetAllTrains(page, limit)
+	trains, count, err := u.trainRepo.GetAllTrain(page, limit)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	// Track train IDs and classes
-	trainMap := make(map[uint]map[string]bool)
-
-	var trainResponses []dtos.TrainResponse
+	var trainResponses []dtos.TrainResponses
 	for _, train := range trains {
-		getTrain, err := u.trainRepo.GetTrainByID(train.TrainID)
+		getTrain, err := u.trainRepo.GetTrainByID(train.ID)
 		if err != nil {
 			return trainResponses, count, err
 		}
@@ -67,20 +65,6 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponse, int,
 		if err != nil {
 			return trainResponses, count, err
 		}
-
-		// Check if train ID exists in the map
-		if classMap, ok := trainMap[getTrain.ID]; ok {
-			// Check if class already exists for the train ID
-			if classMap[train.Class] {
-				continue
-			}
-		} else {
-			// Create a new class map for the train ID
-			trainMap[getTrain.ID] = make(map[string]bool)
-		}
-
-		// Add class to the train ID map
-		trainMap[getTrain.ID][train.Class] = true
 
 		var trainStationResponses []dtos.TrainStationResponse
 
@@ -103,12 +87,10 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponse, int,
 			trainStationResponses = append(trainStationResponses, trainStationResponse)
 		}
 
-		trainResponse := dtos.TrainResponse{
+		trainResponse := dtos.TrainResponses{
 			TrainID:   getTrain.ID,
 			CodeTrain: getTrain.CodeTrain,
 			Name:      getTrain.Name,
-			Class:     train.Class,
-			Price:     train.Price,
 			Route:     trainStationResponses,
 			Status:    getTrain.Status,
 			CreatedAt: getTrain.CreatedAt,
@@ -126,7 +108,7 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponse, int,
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID train"
-// @Success      200 {object} dtos.TrainStatusOKResponse
+// @Success      200 {object} dtos.TrainStatusOKResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
@@ -134,14 +116,14 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponse, int,
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/train/{id} [get]
 // @Security BearerAuth
-func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponse, error) {
-	var trainResponses dtos.TrainResponse
+func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponses, error) {
+	var trainResponses dtos.TrainResponses
 	train, err := u.trainRepo.GetTrainByID(id)
 	if err != nil {
 		return trainResponses, err
 	}
 
-	trainResponse := dtos.TrainResponse{
+	trainResponse := dtos.TrainResponses{
 		TrainID:   train.ID,
 		CodeTrain: train.CodeTrain,
 		Name:      train.Name,
@@ -159,7 +141,7 @@ func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponse, error) {
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.TrainInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.TrainStatusOKResponse
+// @Success      200 {object} dtos.TrainStatusOKResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
@@ -167,8 +149,8 @@ func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponse, error) {
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/train [post]
 // @Security BearerAuth
-func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponse, error) {
-	var trainResponsee dtos.TrainResponse
+func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses, error) {
+	var trainResponse dtos.TrainResponses
 
 	createTrain := models.Train{
 		CodeTrain: train.CodeTrain,
@@ -178,40 +160,40 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponse, 
 
 	createdTrain, err := u.trainRepo.CreateTrain(createTrain)
 	if err != nil {
-		return trainResponsee, err
+		return trainResponse, err
 	}
 
 	for _, train := range train.Route {
 		station, err := u.trainRepo.GetStationByID2(train.StationID)
 		if err != nil {
-			return trainResponsee, err
+			return trainResponse, err
 		}
 		trainStation := models.TrainStation{
 			TrainID:    createdTrain.ID,
 			StationID:  station.ID,
 			ArriveTime: train.ArriveTime,
 		}
-		_, err = u.trainRepo.CreateTrainStation(trainStation)
+		_, err = u.trainStationRepo.CreateTrainStation(trainStation)
 		if err != nil {
-			return trainResponsee, err
+			return trainResponse, err
 		}
 	}
 
 	getTrain, err := u.trainRepo.GetTrainByID(createdTrain.ID)
 	if err != nil {
-		return trainResponsee, err
+		return trainResponse, err
 	}
 
 	getTrainStation, err := u.trainRepo.GetTrainStationByTrainID(getTrain.ID)
 	if err != nil {
-		return trainResponsee, err
+		return trainResponse, err
 	}
 
 	var trainStationResponses []dtos.TrainStationResponse
 	for _, train := range getTrainStation {
 		getStation, err := u.trainRepo.GetStationByID2(train.StationID)
 		if err != nil {
-			return trainResponsee, err
+			return trainResponse, err
 		}
 		trainStationResponse := dtos.TrainStationResponse{
 			StationID: train.StationID,
@@ -225,7 +207,7 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponse, 
 		trainStationResponses = append(trainStationResponses, trainStationResponse)
 	}
 
-	trainResponse := dtos.TrainResponse{
+	trainResponse = dtos.TrainResponses{
 		TrainID:   getTrain.ID,
 		CodeTrain: getTrain.CodeTrain,
 		Name:      getTrain.Name,
@@ -245,7 +227,7 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponse, 
 // @Produce      json
 // @Param id path integer true "ID train"
 // @Param        request body dtos.TrainInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.TrainStatusOKResponse
+// @Success      200 {object} dtos.TrainStatusOKResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
@@ -253,33 +235,109 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponse, 
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/train/{id} [put]
 // @Security BearerAuth
-func (u *trainUsecase) UpdateTrain(id uint, trainInput dtos.TrainInput) (dtos.TrainResponse, error) {
-	var train models.Train
-	var trainResponse dtos.TrainResponse
+func (u *trainUsecase) UpdateTrain(id uint, train dtos.TrainInput) (dtos.TrainResponses, error) {
+	var trains models.Train
+	var trainResponse dtos.TrainResponses
 
-	train, err := u.trainRepo.GetTrainByID(id)
-
+	trains, err := u.trainRepo.GetTrainByID(id)
 	if err != nil {
 		return trainResponse, err
 	}
 
-	train.CodeTrain = trainInput.CodeTrain
-	train.Name = trainInput.Name
-	train.Status = trainInput.Status
+	trains.CodeTrain = train.CodeTrain
+	trains.Name = train.Name
+	trains.Status = train.Status
 
-	train, err = u.trainRepo.UpdateTrain(train)
-
+	createdTrain, err := u.trainRepo.UpdateTrain(trains)
 	if err != nil {
 		return trainResponse, err
 	}
 
-	trainResponse.TrainID = train.ID
-	trainResponse.CodeTrain = train.CodeTrain
-	trainResponse.Name = train.Name
-	trainResponse.Status = train.Status
-	trainResponse.CreatedAt = train.CreatedAt
-	trainResponse.UpdatedAt = train.UpdatedAt
+	// trainStation, err := u.trainStationRepo.GetTrainStationByID(trains.ID)
 
+	err = u.trainStationRepo.DeleteTrainStationById(trains.ID)
+	if err != nil {
+		return trainResponse, err
+	}
+
+	for _, train := range train.Route {
+		station, err := u.trainRepo.GetStationByID2(train.StationID)
+		if err != nil {
+			return trainResponse, err
+		}
+		trainStation := models.TrainStation{
+			TrainID:    createdTrain.ID,
+			StationID:  station.ID,
+			ArriveTime: train.ArriveTime,
+		}
+		_, err = u.trainStationRepo.CreateTrainStation(trainStation)
+		if err != nil {
+			return trainResponse, err
+		}
+	}
+
+	// for _, trainRoute := range train.Route {
+	// 	trainStation, err := u.trainStationRepo.GetTrainStationByID(trains.ID)
+	// 	if err != nil {
+	// 		return trainResponse, err
+	// 	}
+	// 	if trainRoute.StationID != trainStation.StationID {
+	// 		trainStation = models.TrainStation{
+	// 			TrainID:    createdTrain.ID,
+	// 			StationID:  trainRoute.StationID,
+	// 			ArriveTime: trainRoute.ArriveTime,
+	// 		}
+	// 		_, err = u.trainStationRepo.CreateTrainStation(trainStation)
+	// 		if err != nil {
+	// 			return trainResponse, err
+	// 		}
+	// 	} else {
+	// 		trainStation.StationID = trainRoute.StationID
+	// 		trainStation.ArriveTime = trainRoute.ArriveTime
+	// 		_, err = u.trainStationRepo.UpdateTrainStation(trainStation)
+	// 		if err != nil {
+	// 			return trainResponse, err
+	// 		}
+	// 	}
+	// }
+
+	getTrain, err := u.trainRepo.GetTrainByID(createdTrain.ID)
+	if err != nil {
+		return trainResponse, err
+	}
+
+	getTrainStation, err := u.trainRepo.GetTrainStationByTrainID(getTrain.ID)
+	if err != nil {
+		return trainResponse, err
+	}
+
+	var trainStationResponses []dtos.TrainStationResponse
+	for _, train := range getTrainStation {
+		getStation, err := u.trainRepo.GetStationByID2(train.StationID)
+		if err != nil {
+			return trainResponse, err
+		}
+		trainStationResponse := dtos.TrainStationResponse{
+			StationID: train.StationID,
+			Station: dtos.StationInput{
+				Origin:  getStation.Origin,
+				Name:    getStation.Name,
+				Initial: getStation.Initial,
+			},
+			ArriveTime: train.ArriveTime,
+		}
+		trainStationResponses = append(trainStationResponses, trainStationResponse)
+	}
+
+	trainResponse = dtos.TrainResponses{
+		TrainID:   getTrain.ID,
+		CodeTrain: getTrain.CodeTrain,
+		Name:      getTrain.Name,
+		Route:     trainStationResponses,
+		Status:    getTrain.Status,
+		CreatedAt: getTrain.CreatedAt,
+		UpdatedAt: getTrain.UpdatedAt,
+	}
 	return trainResponse, nil
 }
 

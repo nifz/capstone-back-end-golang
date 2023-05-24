@@ -4,7 +4,6 @@ import (
 	"back-end-golang/dtos"
 	"back-end-golang/models"
 	"back-end-golang/repositories"
-	"fmt"
 )
 
 type StationUsecase interface {
@@ -153,7 +152,6 @@ func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) 
 	var stationResponse dtos.StationResponse
 
 	station, err := u.stationRepo.GetStationByID(id)
-	fmt.Println(station)
 	if err != nil {
 		return stationResponse, err
 	}
