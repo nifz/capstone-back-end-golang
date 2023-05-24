@@ -7,11 +7,11 @@ import (
 )
 
 type RecommendationRepository interface {
-	GetAllRecommendations(page, limit int) ([]models.Recomendation, int, error)
-	GetRecommendationByID(id uint) (models.Recomendation, error)
-	CreateRecommendation(recommendation models.Recomendation) (models.Recomendation, error)
-	UpdateRecommendation(recommendation models.Recomendation) (models.Recomendation, error)
-	DeleteRecommendation(recommendation models.Recomendation) error
+	GetAllRecommendations(page, limit int) ([]models.Recommendation, int, error)
+	GetRecommendationByID(id uint) (models.Recommendation, error)
+	CreateRecommendation(recommendation models.Recommendation) (models.Recommendation, error)
+	UpdateRecommendation(recommendation models.Recommendation) (models.Recommendation, error)
+	DeleteRecommendation(recommendation models.Recommendation) error
 }
 
 type recommendationRepository struct {
@@ -24,9 +24,9 @@ func NewRecommendationRepository(db *gorm.DB) RecommendationRepository {
 
 // Implementasi fungsi-fungsi dari interface ItemRepository
 
-func (r *recommendationRepository) GetAllRecommendations(page, limit int) ([]models.Recomendation, int, error) {
+func (r *recommendationRepository) GetAllRecommendations(page, limit int) ([]models.Recommendation, int, error) {
 	var (
-		recommendations []models.Recomendation
+		recommendations []models.Recommendation
 		count           int64
 	)
 	err := r.db.Find(&recommendations).Count(&count).Error
@@ -41,23 +41,23 @@ func (r *recommendationRepository) GetAllRecommendations(page, limit int) ([]mod
 	return recommendations, int(count), err
 }
 
-func (r *recommendationRepository) GetRecommendationByID(id uint) (models.Recomendation, error) {
-	var recommendation models.Recomendation
+func (r *recommendationRepository) GetRecommendationByID(id uint) (models.Recommendation, error) {
+	var recommendation models.Recommendation
 	err := r.db.Where("id = ?", id).First(&recommendation).Error
 	return recommendation, err
 }
 
-func (r *recommendationRepository) CreateRecommendation(recommendation models.Recomendation) (models.Recomendation, error) {
+func (r *recommendationRepository) CreateRecommendation(recommendation models.Recommendation) (models.Recommendation, error) {
 	err := r.db.Create(&recommendation).Error
 	return recommendation, err
 }
 
-func (r *recommendationRepository) UpdateRecommendation(recommendation models.Recomendation) (models.Recomendation, error) {
+func (r *recommendationRepository) UpdateRecommendation(recommendation models.Recommendation) (models.Recommendation, error) {
 	err := r.db.Save(&recommendation).Error
 	return recommendation, err
 }
 
-func (r *recommendationRepository) DeleteRecommendation(recommendation models.Recomendation) error {
+func (r *recommendationRepository) DeleteRecommendation(recommendation models.Recommendation) error {
 	err := r.db.Delete(&recommendation).Error
 	return err
 }
