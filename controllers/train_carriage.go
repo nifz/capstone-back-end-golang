@@ -10,25 +10,25 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type TrainPeronController interface {
-	GetAllTrainPerons(c echo.Context) error
-	GetTrainPeronByID(c echo.Context) error
-	CreateTrainPeron(c echo.Context) error
-	UpdateTrainPeron(c echo.Context) error
-	DeleteTrainPeron(c echo.Context) error
+type TrainCarriageController interface {
+	GetAllTrainCarriages(c echo.Context) error
+	GetTrainCarriageByID(c echo.Context) error
+	CreateTrainCarriage(c echo.Context) error
+	UpdateTrainCarriage(c echo.Context) error
+	DeleteTrainCarriage(c echo.Context) error
 }
 
-type trainPeronController struct {
-	trainPeronUsecase usecases.TrainPeronUsecase
+type trainCarriageController struct {
+	trainCarriageUsecase usecases.TrainCarriageUsecase
 }
 
-func NewTrainPeronController(trainPeronUsecase usecases.TrainPeronUsecase) TrainPeronController {
-	return &trainPeronController{trainPeronUsecase}
+func NewTrainCarriageController(trainCarriageUsecase usecases.TrainCarriageUsecase) TrainCarriageController {
+	return &trainCarriageController{trainCarriageUsecase}
 }
 
 // Implementasi fungsi-fungsi dari interface ItemController
 
-func (c *trainPeronController) GetAllTrainPerons(ctx echo.Context) error {
+func (c *trainCarriageController) GetAllTrainCarriages(ctx echo.Context) error {
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -40,7 +40,7 @@ func (c *trainPeronController) GetAllTrainPerons(ctx echo.Context) error {
 	if err != nil {
 		limit = 10
 	}
-	trainPerons, count, err := c.trainPeronUsecase.GetAllTrainPerons(page, limit)
+	trainCarriages, count, err := c.trainCarriageUsecase.GetAllTrainCarriages(page, limit)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
@@ -57,7 +57,7 @@ func (c *trainPeronController) GetAllTrainPerons(ctx echo.Context) error {
 		helpers.NewPaginationResponse(
 			http.StatusOK,
 			"Successfully get all train peron",
-			trainPerons,
+			trainCarriages,
 			page,
 			limit,
 			count,
@@ -65,9 +65,9 @@ func (c *trainPeronController) GetAllTrainPerons(ctx echo.Context) error {
 	)
 }
 
-func (c *trainPeronController) GetTrainPeronByID(ctx echo.Context) error {
+func (c *trainCarriageController) GetTrainCarriageByID(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	trainPeron, err := c.trainPeronUsecase.GetTrainPeronByID(uint(id))
+	trainCarriage, err := c.trainCarriageUsecase.GetTrainCarriageByID(uint(id))
 
 	if err != nil {
 		return ctx.JSON(
@@ -85,21 +85,26 @@ func (c *trainPeronController) GetTrainPeronByID(ctx echo.Context) error {
 		helpers.NewResponse(
 			http.StatusOK,
 			"Successfully to get train peron by id",
-			trainPeron,
+			trainCarriage,
 		),
 	)
 
 }
 
-func (c *trainPeronController) CreateTrainPeron(ctx echo.Context) error {
-	var trainPeronDTO dtos.TrainPeronInput
-	if err := ctx.Bind(&trainPeronDTO); err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+func (c *trainCarriageController) CreateTrainCarriage(ctx echo.Context) error {
+	var trainCarriageDTO []dtos.TrainCarriageInput
+	if err := ctx.Bind(&trainCarriageDTO); err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding train carriage",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
-	trainPeron, err := c.trainPeronUsecase.CreateTrainPeron(&trainPeronDTO)
+	trainCarriage, err := c.trainCarriageUsecase.CreateTrainCarriage(trainCarriageDTO)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
@@ -116,24 +121,29 @@ func (c *trainPeronController) CreateTrainPeron(ctx echo.Context) error {
 		helpers.NewResponse(
 			http.StatusCreated,
 			"Successfully to created a train peron",
-			trainPeron,
+			trainCarriage,
 		),
 	)
 }
 
-func (c *trainPeronController) UpdateTrainPeron(ctx echo.Context) error {
+func (c *trainCarriageController) UpdateTrainCarriage(ctx echo.Context) error {
 
-	var trainPeronInput dtos.TrainPeronInput
-	if err := ctx.Bind(&trainPeronInput); err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+	var trainCarriageInput dtos.TrainCarriageInput
+	if err := ctx.Bind(&trainCarriageInput); err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding train carriage",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	trainPeron, err := c.trainPeronUsecase.GetTrainPeronByID(uint(id))
-	if trainPeron.TrainPeronID == 0 {
+	trainCarriage, err := c.trainCarriageUsecase.GetTrainCarriageByID(uint(id))
+	if trainCarriage.TrainCarriageID == 0 {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
@@ -144,7 +154,7 @@ func (c *trainPeronController) UpdateTrainPeron(ctx echo.Context) error {
 		)
 	}
 
-	trainPeronResp, err := c.trainPeronUsecase.UpdateTrainPeron(uint(id), trainPeronInput)
+	trainCarriageResp, err := c.trainCarriageUsecase.UpdateTrainCarriage(uint(id), trainCarriageInput)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
@@ -161,19 +171,24 @@ func (c *trainPeronController) UpdateTrainPeron(ctx echo.Context) error {
 		helpers.NewResponse(
 			http.StatusOK,
 			"Successfully updated train peron",
-			trainPeronResp,
+			trainCarriageResp,
 		),
 	)
 }
 
-func (c *trainPeronController) DeleteTrainPeron(ctx echo.Context) error {
+func (c *trainCarriageController) DeleteTrainCarriage(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	err := c.trainPeronUsecase.DeleteTrainPeron(uint(id))
+	err := c.trainCarriageUsecase.DeleteTrainCarriage(uint(id))
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding train carriage",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 	return ctx.JSON(
 		http.StatusOK,

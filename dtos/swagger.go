@@ -52,23 +52,74 @@ type TrainCreeatedResponse struct {
 	Data       TrainResponse `json:"data"`
 }
 
-type GetAllTrainPeronStatusOKResponse struct {
-	StatusCode int                `json:"status_code" example:"200"`
-	Message    string             `json:"message" example:"Successfully get train peron"`
-	Data       TrainPeronResponse `json:"data"`
-	Meta       helpers.Meta       `json:"meta"`
+type GetAllTrainCarriageStatusOKResponse struct {
+	StatusCode int                   `json:"status_code" example:"200"`
+	Message    string                `json:"message" example:"Successfully get train peron"`
+	Data       TrainCarriageResponse `json:"data"`
+	Meta       helpers.Meta          `json:"meta"`
 }
 
-type TrainPeronStatusOKResponse struct {
-	StatusCode int                `json:"status_code" example:"200"`
-	Message    string             `json:"message" example:"Successfully get train peron"`
-	Data       TrainPeronResponse `json:"data"`
+type TrainCarriageStatusOKResponse struct {
+	StatusCode int                   `json:"status_code" example:"200"`
+	Message    string                `json:"message" example:"Successfully get train peron"`
+	Data       TrainCarriageResponse `json:"data"`
 }
 
-type TrainPeronCreeatedResponse struct {
-	StatusCode int                `json:"status_code" example:"201"`
-	Message    string             `json:"message" example:"Successfully created train peron"`
-	Data       TrainPeronResponse `json:"data"`
+type TrainCarriageCreeatedResponse struct {
+	StatusCode int                   `json:"status_code" example:"201"`
+	Message    string                `json:"message" example:"Successfully created train peron"`
+	Data       TrainCarriageResponse `json:"data"`
+}
+
+type GetAllArticleStatusOKResponse struct {
+	StatusCode int             `json:"status_code" example:"200"`
+	Message    string          `json:"message" example:"Successfully get article"`
+	Data       ArticleResponse `json:"data"`
+	Meta       helpers.Meta    `json:"meta"`
+}
+
+type ArticleStatusOKResponse struct {
+	StatusCode int             `json:"status_code" example:"200"`
+	Message    string          `json:"message" example:"Successfully get article"`
+	Data       ArticleResponse `json:"data"`
+}
+
+type ArticleCreeatedResponse struct {
+	StatusCode int             `json:"status_code" example:"201"`
+	Message    string          `json:"message" example:"Successfully created article"`
+	Data       ArticleResponse `json:"data"`
+}
+
+type GetAllRecommendationStatusOKResponse struct {
+	StatusCode int                    `json:"status_code" example:"200"`
+	Message    string                 `json:"message" example:"Successfully get recommendation"`
+	Data       RecommendationResponse `json:"data"`
+	Meta       helpers.Meta           `json:"meta"`
+}
+
+type RecommendationStatusOKResponse struct {
+	StatusCode int                    `json:"status_code" example:"200"`
+	Message    string                 `json:"message" example:"Successfully get recommendation"`
+	Data       RecommendationResponse `json:"data"`
+}
+
+type RecommendationCreeatedResponse struct {
+	StatusCode int                    `json:"status_code" example:"201"`
+	Message    string                 `json:"message" example:"Successfully created recommendation"`
+	Data       RecommendationResponse `json:"data"`
+}
+
+
+type HistorySearchStatusOKResponse struct {
+	StatusCode int                    `json:"status_code" example:"200"`
+	Message    string                 `json:"message" example:"Successfully get history search"`
+	Data       HistorySearchResponse `json:"data"`
+}
+
+type HistorySearchCreeatedResponse struct {
+	StatusCode int                    `json:"status_code" example:"201"`
+	Message    string                 `json:"message" example:"Successfully created history search"`
+	Data       HistorySearchResponse `json:"data"`
 }
 
 type StatusOKDeletedResponse struct {

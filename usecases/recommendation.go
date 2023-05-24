@@ -7,10 +7,10 @@ import (
 )
 
 type RecommendationUsecase interface {
-	GetAllRecommendations(page, limit int) ([]dtos.RecomendationResponse, int, error)
-	GetRecommendationByID(id uint) (dtos.RecomendationResponse, error)
-	CreateRecommendation(recommendationInput *dtos.RecomendationInput) (dtos.RecomendationResponse, error)
-	UpdateRecommendation(id uint, recommendationInput dtos.RecomendationInput) (dtos.RecomendationResponse, error)
+	GetAllRecommendations(page, limit int) ([]dtos.RecommendationResponse, int, error)
+	GetRecommendationByID(id uint) (dtos.RecommendationResponse, error)
+	CreateRecommendation(recommendationInput *dtos.RecommendationInput) (dtos.RecommendationResponse, error)
+	UpdateRecommendation(id uint, recommendationInput dtos.RecommendationInput) (dtos.RecommendationResponse, error)
 	DeleteRecommendation(id uint) error
 }
 
@@ -25,12 +25,12 @@ func NewRecommendationUsecase(RecommendationRepo repositories.RecommendationRepo
 // GetAllRecommendations godoc
 // @Summary      Get all recommendation
 // @Description  Get all recommendation
-// @Tags         Recommendation
+// @Tags         Admin - Recommendation
 // @Accept       json
 // @Produce      json
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
-// @Success      200 {object} dtos.GetRecommendationStatusOKResponse
+// @Success      200 {object} dtos.GetAllRecommendationStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
@@ -38,15 +38,15 @@ func NewRecommendationUsecase(RecommendationRepo repositories.RecommendationRepo
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/recommendation [get]
 // @Security BearerAuth
-func (u *recommendationUsecase) GetAllRecommendations(page, limit int) ([]dtos.RecomendationResponse, int, error) {
+func (u *recommendationUsecase) GetAllRecommendations(page, limit int) ([]dtos.RecommendationResponse, int, error) {
 	recommendations, count, err := u.recommendationRepo.GetAllRecommendations(page, limit)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	var recommendationResponses []dtos.RecomendationResponse
+	var recommendationResponses []dtos.RecommendationResponse
 	for _, recommendation := range recommendations {
-		recommendationResponse := dtos.RecomendationResponse{
+		recommendationResponse := dtos.RecommendationResponse{
 			RecommendationID: recommendation.ID,
 			Tag:              recommendation.Tag,
 			CreatedAt:        recommendation.CreatedAt,
@@ -61,7 +61,7 @@ func (u *recommendationUsecase) GetAllRecommendations(page, limit int) ([]dtos.R
 // GetRecommendationByID godoc
 // @Summary      Get recommendation by ID
 // @Description  Get recommendation by ID
-// @Tags         Recommendation
+// @Tags         Admin - Recommendation
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID recommendation"
@@ -73,13 +73,13 @@ func (u *recommendationUsecase) GetAllRecommendations(page, limit int) ([]dtos.R
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/recommendation/{id} [get]
 // @Security BearerAuth
-func (u *recommendationUsecase) GetRecommendationByID(id uint) (dtos.RecomendationResponse, error) {
-	var recommendationResponses dtos.RecomendationResponse
+func (u *recommendationUsecase) GetRecommendationByID(id uint) (dtos.RecommendationResponse, error) {
+	var recommendationResponses dtos.RecommendationResponse
 	recommendation, err := u.recommendationRepo.GetRecommendationByID(id)
 	if err != nil {
 		return recommendationResponses, err
 	}
-	recommendationResponse := dtos.RecomendationResponse{
+	recommendationResponse := dtos.RecommendationResponse{
 		RecommendationID: recommendation.ID,
 		Tag:              recommendation.Tag,
 		CreatedAt:        recommendation.CreatedAt,
@@ -91,11 +91,11 @@ func (u *recommendationUsecase) GetRecommendationByID(id uint) (dtos.Recomendati
 // CreateRecommendation godoc
 // @Summary      Create a new recommendation
 // @Description  Create a new recommendation
-// @Tags         Recommendation
+// @Tags         Admin - Recommendation
 // @Accept       json
 // @Produce      json
-// @Param        request body dtos.RecomendationInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.StationStatusOKResponse
+// @Param        request body dtos.RecommendationInput true "Payload Body [RAW]"
+// @Success      201 {object} dtos.RecommendationCreeatedResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
@@ -103,9 +103,9 @@ func (u *recommendationUsecase) GetRecommendationByID(id uint) (dtos.Recomendati
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/recommendation [post]
 // @Security BearerAuth
-func (u *recommendationUsecase) CreateRecommendation(recommendationInput *dtos.RecomendationInput) (dtos.RecomendationResponse, error) {
-	var recommendationResponses dtos.RecomendationResponse
-	createRecommendation := models.Recomendation{
+func (u *recommendationUsecase) CreateRecommendation(recommendationInput *dtos.RecommendationInput) (dtos.RecommendationResponse, error) {
+	var recommendationResponses dtos.RecommendationResponse
+	createRecommendation := models.Recommendation{
 		Tag: recommendationInput.Tag,
 	}
 
@@ -114,7 +114,7 @@ func (u *recommendationUsecase) CreateRecommendation(recommendationInput *dtos.R
 		return recommendationResponses, err
 	}
 
-	recommendationResponse := dtos.RecomendationResponse{
+	recommendationResponse := dtos.RecommendationResponse{
 		RecommendationID: createdRecommendation.ID,
 		Tag:              createdRecommendation.Tag,
 		CreatedAt:        createdRecommendation.CreatedAt,
@@ -126,22 +126,22 @@ func (u *recommendationUsecase) CreateRecommendation(recommendationInput *dtos.R
 // UpdateRecommendation godoc
 // @Summary      Update recommendation
 // @Description  Update recommendation
-// @Tags         Recommendation
+// @Tags         Admin - Recommendation
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID recommendation"
-// @Param        request body dtos.RecomendationInput true "Payload Body [RAW]"
+// @Param        request body dtos.RecommendationInput true "Payload Body [RAW]"
 // @Success      200 {object} dtos.RecommendationStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/recommendation [put]
+// @Router       /admin/recommendation/{id} [put]
 // @Security BearerAuth
-func (u *recommendationUsecase) UpdateRecommendation(id uint, recommendationInput dtos.RecomendationInput) (dtos.RecomendationResponse, error) {
-	var recommendation models.Recomendation
-	var recommendationResponse dtos.RecomendationResponse
+func (u *recommendationUsecase) UpdateRecommendation(id uint, recommendationInput dtos.RecommendationInput) (dtos.RecommendationResponse, error) {
+	var recommendation models.Recommendation
+	var recommendationResponse dtos.RecommendationResponse
 
 	recommendation, err := u.recommendationRepo.GetRecommendationByID(id)
 	if err != nil {
@@ -168,7 +168,7 @@ func (u *recommendationUsecase) UpdateRecommendation(id uint, recommendationInpu
 // DeleteRecommendation godoc
 // @Summary      Delete a recommendation
 // @Description  Delete a recommendation
-// @Tags         Recommendation
+// @Tags         Admin - Recommendation
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID recommendation"

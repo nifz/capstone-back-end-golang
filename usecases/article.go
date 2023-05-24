@@ -27,7 +27,7 @@ func NewArticleUsecase(ArticleRepo repositories.ArticleRepository) ArticleUsecas
 // GetAllArticles godoc
 // @Summary      Get all articles
 // @Description  Get all articles
-// @Tags         Article
+// @Tags         Admin - Article
 // @Accept       json
 // @Produce      json
 // @Param page query int false "Page number"
@@ -67,7 +67,7 @@ func (u *articleUsecase) GetAllArticles(page, limit int) ([]dtos.ArticleResponse
 // GetArticleByID godoc
 // @Summary      Get article by ID
 // @Description  Get article by ID
-// @Tags         Article
+// @Tags         Admin - Article
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID article"
@@ -101,11 +101,11 @@ func (u *articleUsecase) GetArticleByID(id uint) (dtos.ArticleResponse, error) {
 // CreateArticle godoc
 // @Summary      Create a new article
 // @Description  Create a new article
-// @Tags         Article
+// @Tags         Admin - Article
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.ArticleInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.StationStatusOKResponse
+// @Success      201 {object} dtos.ArticleCreeatedResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
@@ -146,7 +146,7 @@ func (u *articleUsecase) CreateArticle(articleInput *dtos.ArticleInput) (dtos.Ar
 // UpdateArticle godoc
 // @Summary      Update article
 // @Description  Update article
-// @Tags         Article
+// @Tags         Admin - Article
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID article"
@@ -198,7 +198,7 @@ func (u *articleUsecase) UpdateArticle(id uint, articleInput dtos.ArticleInput) 
 // DeleteArticle godoc
 // @Summary      Delete a article
 // @Description  Delete a article
-// @Tags         Article
+// @Tags         Admin - Article
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID article"

@@ -43,9 +43,15 @@ func (c *articleController) GetAllArticles(ctx echo.Context) error {
 
 	articles, count, err := c.articleUsecase.GetAllArticles(page, limit)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+
+		return ctx.JSON(
+			http.StatusInternalServerError,
+			helpers.NewErrorResponse(
+				http.StatusInternalServerError,
+				"Failed fetching articles",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	return ctx.JSON(
@@ -90,9 +96,14 @@ func (c *articleController) GetArticleByID(ctx echo.Context) error {
 func (c *articleController) CreateArticle(ctx echo.Context) error {
 	var articleDTO dtos.ArticleInput
 	if err := ctx.Bind(&articleDTO); err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding article",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	article, err := c.articleUsecase.CreateArticle(&articleDTO)
@@ -121,9 +132,14 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 
 	var articleInput dtos.ArticleInput
 	if err := ctx.Bind(&articleInput); err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding article",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
@@ -142,9 +158,14 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 
 	articleResp, err := c.articleUsecase.UpdateArticle(uint(id), articleInput)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding article",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	return ctx.JSON(
@@ -162,9 +183,14 @@ func (c *articleController) DeleteArticle(ctx echo.Context) error {
 
 	err := c.articleUsecase.DeleteArticle(uint(id))
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding article",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 	return ctx.JSON(
 		http.StatusOK,
