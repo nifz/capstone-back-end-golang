@@ -43,9 +43,14 @@ func (c *stationController) GetAllStations(ctx echo.Context) error {
 
 	stations, count, err := c.stationUsecase.GetAllStations(page, limit)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusInternalServerError,
+			helpers.NewErrorResponse(
+				http.StatusInternalServerError,
+				"Failed fetching station",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	return ctx.JSON(
@@ -90,9 +95,14 @@ func (c *stationController) GetStationByID(ctx echo.Context) error {
 func (c *stationController) CreateStation(ctx echo.Context) error {
 	var stationDTO dtos.StationInput
 	if err := ctx.Bind(&stationDTO); err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding station",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	station, err := c.stationUsecase.CreateStation(&stationDTO)
@@ -121,9 +131,14 @@ func (c *stationController) UpdateStation(ctx echo.Context) error {
 
 	var stationInput dtos.StationInput
 	if err := ctx.Bind(&stationInput); err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed fetching station",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
@@ -142,9 +157,14 @@ func (c *stationController) UpdateStation(ctx echo.Context) error {
 
 	stationResp, err := c.stationUsecase.UpdateStation(uint(id), stationInput)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusInternalServerError,
+			helpers.NewErrorResponse(
+				http.StatusInternalServerError,
+				"Failed update station",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	return ctx.JSON(
@@ -162,9 +182,14 @@ func (c *stationController) DeleteStation(ctx echo.Context) error {
 
 	err := c.stationUsecase.DeleteStation(uint(id))
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to delete station",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 	return ctx.JSON(
 		http.StatusOK,
