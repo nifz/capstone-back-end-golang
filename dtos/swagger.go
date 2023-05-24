@@ -40,16 +40,35 @@ type GetAllTrainStatusOKResponse struct {
 	Meta       helpers.Meta  `json:"meta"`
 }
 
+type GetAllTrainStatusOKResponses struct {
+	StatusCode int            `json:"status_code" example:"200"`
+	Message    string         `json:"message" example:"Successfully get train"`
+	Data       TrainResponses `json:"data"`
+	Meta       helpers.Meta   `json:"meta"`
+}
+
 type TrainStatusOKResponse struct {
 	StatusCode int           `json:"status_code" example:"200"`
 	Message    string        `json:"message" example:"Successfully get train"`
 	Data       TrainResponse `json:"data"`
 }
 
+type TrainStatusOKResponses struct {
+	StatusCode int            `json:"status_code" example:"200"`
+	Message    string         `json:"message" example:"Successfully get train"`
+	Data       TrainResponses `json:"data"`
+}
+
 type TrainCreeatedResponse struct {
 	StatusCode int           `json:"status_code" example:"201"`
 	Message    string        `json:"message" example:"Successfully created train"`
 	Data       TrainResponse `json:"data"`
+}
+
+type TrainCreeatedResponses struct {
+	StatusCode int            `json:"status_code" example:"201"`
+	Message    string         `json:"message" example:"Successfully created train"`
+	Data       TrainResponses `json:"data"`
 }
 
 type GetAllTrainCarriageStatusOKResponse struct {
@@ -109,16 +128,15 @@ type RecommendationCreeatedResponse struct {
 	Data       RecommendationResponse `json:"data"`
 }
 
-
 type HistorySearchStatusOKResponse struct {
-	StatusCode int                    `json:"status_code" example:"200"`
-	Message    string                 `json:"message" example:"Successfully get history search"`
+	StatusCode int                   `json:"status_code" example:"200"`
+	Message    string                `json:"message" example:"Successfully get history search"`
 	Data       HistorySearchResponse `json:"data"`
 }
 
 type HistorySearchCreeatedResponse struct {
-	StatusCode int                    `json:"status_code" example:"201"`
-	Message    string                 `json:"message" example:"Successfully created history search"`
+	StatusCode int                   `json:"status_code" example:"201"`
+	Message    string                `json:"message" example:"Successfully created history search"`
 	Data       HistorySearchResponse `json:"data"`
 }
 
