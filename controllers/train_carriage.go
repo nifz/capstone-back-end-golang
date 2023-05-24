@@ -46,7 +46,7 @@ func (c *trainCarriageController) GetAllTrainCarriages(ctx echo.Context) error {
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get all train peron",
+				"Failed to get all train carriage",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -56,7 +56,7 @@ func (c *trainCarriageController) GetAllTrainCarriages(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewPaginationResponse(
 			http.StatusOK,
-			"Successfully get all train peron",
+			"Successfully get all train carriage",
 			trainCarriages,
 			page,
 			limit,
@@ -74,7 +74,7 @@ func (c *trainCarriageController) GetTrainCarriageByID(ctx echo.Context) error {
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get train peron by id",
+				"Failed to get train carriage by id",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -84,7 +84,7 @@ func (c *trainCarriageController) GetTrainCarriageByID(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully to get train peron by id",
+			"Successfully to get train carriage by id",
 			trainCarriage,
 		),
 	)
@@ -110,7 +110,7 @@ func (c *trainCarriageController) CreateTrainCarriage(ctx echo.Context) error {
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to created a train peron",
+				"Failed to created a train carriage",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -120,7 +120,7 @@ func (c *trainCarriageController) CreateTrainCarriage(ctx echo.Context) error {
 		http.StatusCreated,
 		helpers.NewResponse(
 			http.StatusCreated,
-			"Successfully to created a train peron",
+			"Successfully to created a train carriage",
 			trainCarriage,
 		),
 	)
@@ -148,7 +148,7 @@ func (c *trainCarriageController) UpdateTrainCarriage(ctx echo.Context) error {
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get train peron by id",
+				"Failed to get train carriage by id",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -160,7 +160,7 @@ func (c *trainCarriageController) UpdateTrainCarriage(ctx echo.Context) error {
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to updated a train peron",
+				"Failed to updated a train carriage",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -170,7 +170,7 @@ func (c *trainCarriageController) UpdateTrainCarriage(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully updated train peron",
+			"Successfully updated train carriage",
 			trainCarriageResp,
 		),
 	)
@@ -194,7 +194,7 @@ func (c *trainCarriageController) DeleteTrainCarriage(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully deleted train peron",
+			"Successfully deleted train carriage",
 			nil,
 		),
 	)

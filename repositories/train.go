@@ -76,9 +76,9 @@ func (r *trainRepository) GetAllTrains(page, limit int) ([]models.TrainCarriage,
 		return trains, int(count), err
 	}
 
-	offset := (page - 1) * limit
+	// offset := (page - 1) * limit
 
-	err = r.db.Limit(limit).Offset(offset).Find(&trains).Error
+	// err = r.db.Limit(limit).Offset(offset).Find(&trains).Error
 
 	return trains, int(count), err
 }
