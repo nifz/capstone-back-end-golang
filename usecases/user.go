@@ -177,7 +177,10 @@ func (u *userUsecase) UserUpdateInformation(userId uint, input dtos.UserUpdateIn
 		return userResponse, errors.New("User not found")
 	}
 
-	birthDateParse := helpers.FormatStringToDate(input.BirthDate)
+	birthDateParse, err := helpers.FormatStringToDate(input.BirthDate)
+	if err != nil {
+		return userResponse, errors.New("Failed to parse birth date")
+	}
 
 	user.Gender = &input.Gender
 	user.BirthDate = &birthDateParse
