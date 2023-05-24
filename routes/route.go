@@ -73,6 +73,14 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	reservationUsecase := usecases.NewReservationUsecase(reservationRepository, reservationImageRepository)
 	reservationController := controllers.NewReservationController(reservationUsecase, reservationImageRepository)
 
+	articleRepository := repositories.NewArticleRepository(db)
+	articleUsecase := usecases.NewArticleUsecase(articleRepository)
+	articleController := controllers.NewArticleController(articleUsecase)
+
+	recommendationRepository := repositories.NewRecommendationRepository(db)
+	recommendationUsecase := usecases.NewRecommendationUsecase(recommendationRepository)
+	recommendationController := controllers.NewRecommendationController(recommendationUsecase)
+
 	admin := api.Group("/admin")
 	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("admin"))
 	admin.GET("/station", stationController.GetAllStations)
@@ -93,6 +101,19 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.POST("/train-peron", trainPeronController.CreateTrainPeron)
 	admin.DELETE("/train-peron/:id", trainPeronController.DeleteTrainPeron)
 
+	admin.GET("/article", articleController.GetAllArticles)
+	admin.GET("/article/:id", articleController.GetArticleByID)
+	admin.PUT("/article/:id", articleController.UpdateArticle)
+	admin.POST("/article", articleController.CreateArticle)
+	admin.DELETE("/article/:id", articleController.DeleteArticle)
+
+	admin.GET("/recommendation", recommendationController.GetAllRecommendations)
+	admin.GET("/recommendation/:id", recommendationController.GetRecommendationByID)
+	admin.PUT("/recommendation/:id", recommendationController.UpdateRecommendation)
+	admin.POST("/recommendation", recommendationController.CreateRecommendation)
+	admin.DELETE("/recommendation/:id", recommendationController.DeleteRecommendation)
+
+	api.POST("/reservations", reservationController.AdminCreateReservation)
 	admin.GET("/reservations", reservationController.GetAllReservation)
 	admin.POST("/reservations", reservationController.AdminCreateReservation)
 	admin.GET("/images/:imageName", func(c echo.Context) error {
