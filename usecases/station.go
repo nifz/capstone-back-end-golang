@@ -26,7 +26,7 @@ func NewStationUsecase(StationRepo repositories.StationRepository) StationUsecas
 // GetAllStations godoc
 // @Summary      Get all stations
 // @Description  Get all stations
-// @Tags         Station
+// @Tags         Admin - Station
 // @Accept       json
 // @Produce      json
 // @Param page query int false "Page number"
@@ -64,7 +64,7 @@ func (u *stationUsecase) GetAllStations(page, limit int) ([]dtos.StationResponse
 // GetStationByID godoc
 // @Summary      Get station by ID
 // @Description  Get station by ID
-// @Tags         Station
+// @Tags         Admin - Station
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID station"
@@ -96,7 +96,7 @@ func (u *stationUsecase) GetStationByID(id uint) (dtos.StationResponse, error) {
 // CreateStation godoc
 // @Summary      Create a new station
 // @Description  Create a new station
-// @Tags         Station
+// @Tags         Admin - Station
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.StationInput true "Payload Body [RAW]"
@@ -135,7 +135,7 @@ func (u *stationUsecase) CreateStation(station *dtos.StationInput) (dtos.Station
 // UpdateStation godoc
 // @Summary      Update station
 // @Description  Update station
-// @Tags         Station
+// @Tags         Admin - Station
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID station"
@@ -182,7 +182,7 @@ func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) 
 // DeleteStation godoc
 // @Summary      Delete a station
 // @Description  Delete a station
-// @Tags         Station
+// @Tags         Admin - Station
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID station"

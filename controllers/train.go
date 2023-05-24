@@ -11,11 +11,15 @@ import (
 )
 
 type TrainController interface {
+	//admin
 	GetAllTrains(c echo.Context) error
 	GetTrainByID(c echo.Context) error
 	CreateTrain(c echo.Context) error
 	UpdateTrain(c echo.Context) error
 	DeleteTrain(c echo.Context) error
+
+	//user
+	SearchTrainAvailable(c echo.Context) error
 }
 
 type trainController struct {
@@ -27,6 +31,8 @@ func NewTrainController(trainUsecase usecases.TrainUsecase) TrainController {
 }
 
 // Implementasi fungsi-fungsi dari interface ItemController
+
+// ============================= ADMIN ==================================== \\
 
 func (c *trainController) GetAllTrains(ctx echo.Context) error {
 	pageParam := ctx.QueryParam("page")
@@ -95,9 +101,14 @@ func (c *trainController) GetTrainByID(ctx echo.Context) error {
 func (c *trainController) CreateTrain(ctx echo.Context) error {
 	var trainDTO dtos.TrainInput
 	if err := ctx.Bind(&trainDTO); err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding train carriage",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	train, err := c.trainUsecase.CreateTrain(&trainDTO)
@@ -126,9 +137,14 @@ func (c *trainController) UpdateTrain(ctx echo.Context) error {
 
 	var trainInput dtos.TrainInput
 	if err := ctx.Bind(&trainInput); err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding train carriage",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
@@ -172,9 +188,14 @@ func (c *trainController) DeleteTrain(ctx echo.Context) error {
 
 	err := c.trainUsecase.DeleteTrain(uint(id))
 	if err != nil {
-		return ctx.JSON(http.StatusBadRequest, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding train carriage",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 	return ctx.JSON(
 		http.StatusOK,
@@ -182,6 +203,62 @@ func (c *trainController) DeleteTrain(ctx echo.Context) error {
 			http.StatusOK,
 			"Successfully deleted train",
 			nil,
+		),
+	)
+}
+
+// =============================== ADMIN END ================================== \\
+
+// =============================== USER ================================== \\
+
+func (c *trainController) SearchTrainAvailable(ctx echo.Context) error {
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
+
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 10
+	}
+
+	classParam := ctx.QueryParam("sort_by_class")
+
+	sortByPriceParam := ctx.QueryParam("sort_by_price")
+	sortByArriveTimeParam := ctx.QueryParam("sort_by_arrive_time")
+
+	sortByTrainIdParam := ctx.QueryParam("sort_by_train_id")
+	sortByTrainId, _ := strconv.Atoi(sortByTrainIdParam)
+
+	stationOriginIdParam := ctx.QueryParam("station_origin_id")
+	stationOriginId, _ := strconv.Atoi(stationOriginIdParam)
+
+	stationDestinationIdParam := ctx.QueryParam("station_destination_id")
+	stationDestinationId, _ := strconv.Atoi(stationDestinationIdParam)
+
+	trains, count, err := c.trainUsecase.SearchTrainAvailable(page, limit, stationOriginId, stationDestinationId, sortByTrainId, classParam, sortByPriceParam, sortByArriveTimeParam)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to get all train",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewPaginationResponse(
+			http.StatusOK,
+			"Successfully get all trains",
+			trains,
+			page,
+			limit,
+			count,
 		),
 	)
 }

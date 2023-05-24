@@ -10,25 +10,25 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type StationController interface {
-	GetAllStations(c echo.Context) error
-	GetStationByID(c echo.Context) error
-	CreateStation(c echo.Context) error
-	UpdateStation(c echo.Context) error
-	DeleteStation(c echo.Context) error
+type ArticleController interface {
+	GetAllArticles(c echo.Context) error
+	GetArticleByID(c echo.Context) error
+	CreateArticle(c echo.Context) error
+	UpdateArticle(c echo.Context) error
+	DeleteArticle(c echo.Context) error
 }
 
-type stationController struct {
-	stationUsecase usecases.StationUsecase
+type articleController struct {
+	articleUsecase usecases.ArticleUsecase
 }
 
-func NewStationController(stationUsecase usecases.StationUsecase) StationController {
-	return &stationController{stationUsecase}
+func NewArticleController(articleUsecase usecases.ArticleUsecase) ArticleController {
+	return &articleController{articleUsecase}
 }
 
 // Implementasi fungsi-fungsi dari interface ItemController
 
-func (c *stationController) GetAllStations(ctx echo.Context) error {
+func (c *articleController) GetAllArticles(ctx echo.Context) error {
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -41,13 +41,14 @@ func (c *stationController) GetAllStations(ctx echo.Context) error {
 		limit = 10
 	}
 
-	stations, count, err := c.stationUsecase.GetAllStations(page, limit)
+	articles, count, err := c.articleUsecase.GetAllArticles(page, limit)
 	if err != nil {
+
 		return ctx.JSON(
 			http.StatusInternalServerError,
 			helpers.NewErrorResponse(
 				http.StatusInternalServerError,
-				"Failed fetching station",
+				"Failed fetching articles",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -57,8 +58,8 @@ func (c *stationController) GetAllStations(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewPaginationResponse(
 			http.StatusOK,
-			"Successfully get all stations",
-			stations,
+			"Successfully get all article",
+			articles,
 			page,
 			limit,
 			count,
@@ -66,16 +67,16 @@ func (c *stationController) GetAllStations(ctx echo.Context) error {
 	)
 }
 
-func (c *stationController) GetStationByID(ctx echo.Context) error {
+func (c *articleController) GetArticleByID(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	station, err := c.stationUsecase.GetStationByID(uint(id))
+	article, err := c.articleUsecase.GetArticleByID(uint(id))
 
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get station by id",
+				"Failed to get article by id",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -85,33 +86,33 @@ func (c *stationController) GetStationByID(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully to get station by id",
-			station,
+			"Successfully to get article by id",
+			article,
 		),
 	)
 
 }
 
-func (c *stationController) CreateStation(ctx echo.Context) error {
-	var stationDTO dtos.StationInput
-	if err := ctx.Bind(&stationDTO); err != nil {
+func (c *articleController) CreateArticle(ctx echo.Context) error {
+	var articleDTO dtos.ArticleInput
+	if err := ctx.Bind(&articleDTO); err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding station",
+				"Failed binding article",
 				helpers.GetErrorData(err),
 			),
 		)
 	}
 
-	station, err := c.stationUsecase.CreateStation(&stationDTO)
+	article, err := c.articleUsecase.CreateArticle(&articleDTO)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to created a station",
+				"Failed to created a article",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -121,21 +122,21 @@ func (c *stationController) CreateStation(ctx echo.Context) error {
 		http.StatusCreated,
 		helpers.NewResponse(
 			http.StatusCreated,
-			"Successfully to created a station",
-			station,
+			"Successfully to created a article",
+			article,
 		),
 	)
 }
 
-func (c *stationController) UpdateStation(ctx echo.Context) error {
+func (c *articleController) UpdateArticle(ctx echo.Context) error {
 
-	var stationInput dtos.StationInput
-	if err := ctx.Bind(&stationInput); err != nil {
+	var articleInput dtos.ArticleInput
+	if err := ctx.Bind(&articleInput); err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed fetching station",
+				"Failed binding article",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -143,25 +144,25 @@ func (c *stationController) UpdateStation(ctx echo.Context) error {
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	station, err := c.stationUsecase.GetStationByID(uint(id))
-	if station.StationID == 0 {
+	article, err := c.articleUsecase.GetArticleByID(uint(id))
+	if article.ArticleID == 0 {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get station by id",
+				"Failed to get article by id",
 				helpers.GetErrorData(err),
 			),
 		)
 	}
 
-	stationResp, err := c.stationUsecase.UpdateStation(uint(id), stationInput)
+	articleResp, err := c.articleUsecase.UpdateArticle(uint(id), articleInput)
 	if err != nil {
 		return ctx.JSON(
-			http.StatusInternalServerError,
+			http.StatusBadRequest,
 			helpers.NewErrorResponse(
-				http.StatusInternalServerError,
-				"Failed update station",
+				http.StatusBadRequest,
+				"Failed binding article",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -171,22 +172,22 @@ func (c *stationController) UpdateStation(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully updated station",
-			stationResp,
+			"Successfully updated article",
+			articleResp,
 		),
 	)
 }
 
-func (c *stationController) DeleteStation(ctx echo.Context) error {
+func (c *articleController) DeleteArticle(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	err := c.stationUsecase.DeleteStation(uint(id))
+	err := c.articleUsecase.DeleteArticle(uint(id))
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to delete station",
+				"Failed binding article",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -195,7 +196,7 @@ func (c *stationController) DeleteStation(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully deleted station",
+			"Successfully deleted article",
 			nil,
 		),
 	)

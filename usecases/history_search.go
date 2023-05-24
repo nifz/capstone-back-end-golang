@@ -1,0 +1,123 @@
+package usecases
+
+import (
+	"back-end-golang/dtos"
+	"back-end-golang/models"
+	"back-end-golang/repositories"
+)
+
+type HistorySearchUseCase interface {
+	HistorySearchGetAll(userId uint) ([]dtos.HistorySearchResponse, error)
+	HistorySearchCreate(userId uint, input dtos.HistorySearchInput) (dtos.HistorySearchResponse, error)
+	HistorySearchDelete(userId, id uint) (models.HistorySearch, error)
+}
+
+type historySearchUsecase struct {
+	historySearchRepository repositories.HistorySearchRepository
+	userRepo                repositories.UserRepository
+}
+
+func NewHistorySearchUsecase(historySearchRepository repositories.HistorySearchRepository, userRepo repositories.UserRepository) HistorySearchUseCase {
+	return &historySearchUsecase{historySearchRepository, userRepo}
+}
+
+// HistorySearchGetAll godoc
+// @Summary      Get all history search
+// @Description  Get all history search
+// @Tags         User - History Search
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} dtos.HistorySearchStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user/history-search [get]
+// @Security BearerAuth
+func (u *historySearchUsecase) HistorySearchGetAll(userId uint) ([]dtos.HistorySearchResponse, error) {
+	var historySearchResponses []dtos.HistorySearchResponse
+
+	histories, err := u.historySearchRepository.HistorySearchGetByUserId(userId)
+	if err != nil {
+		return historySearchResponses, err
+	}
+
+	for _, history := range histories {
+		historySearchResponse := dtos.HistorySearchResponse{
+			ID:     history.ID,
+			UserID: history.UserID,
+			Name:   history.Name,
+		}
+		historySearchResponses = append(historySearchResponses, historySearchResponse)
+	}
+
+	return historySearchResponses, nil
+}
+
+// HistorySearchCreate godoc
+// @Summary      Create a new history search
+// @Description  Create a new history search
+// @Tags         User - History Search
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.HistorySearchInput true "Payload Body [RAW]"
+// @Success      201 {object} dtos.HistorySearchCreeatedResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user/history-search [post]
+// @Security BearerAuth
+func (u *historySearchUsecase) HistorySearchCreate(userId uint, input dtos.HistorySearchInput) (dtos.HistorySearchResponse, error) {
+	var (
+		history         models.HistorySearch
+		historyResponse dtos.HistorySearchResponse
+	)
+
+	history.UserID = userId
+	history.Name = input.Name
+
+	history, err := u.historySearchRepository.HistorySearchCreate(history)
+	if err != nil {
+		return historyResponse, err
+	}
+
+	historyResponse.ID = history.ID
+	historyResponse.UserID = history.UserID
+	historyResponse.Name = history.Name
+
+	return historyResponse, nil
+}
+
+// HistorySearchDelete godoc
+// @Summary      Delete a history search
+// @Description  Delete a history search
+// @Tags         User - History Search
+// @Accept       json
+// @Produce      json
+// @Param id path integer true "ID history search"
+// @Success      200 {object} dtos.StatusOKDeletedResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user/history-search/{id} [delete]
+// @Security BearerAuth
+func (u *historySearchUsecase) HistorySearchDelete(userId, id uint) (models.HistorySearch, error) {
+	var history models.HistorySearch
+
+	history, err := u.historySearchRepository.HistorySearchGetById(userId, id)
+	if err != nil {
+		return history, err
+	}
+
+	history, err = u.historySearchRepository.HistorySearchDelete(history)
+	if err != nil {
+		return history, err
+	}
+
+	return history, nil
+}

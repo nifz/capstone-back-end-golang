@@ -7,6 +7,7 @@ import (
 	"back-end-golang/models"
 	"back-end-golang/repositories"
 	"errors"
+	"strings"
 	"time"
 )
 
@@ -32,7 +33,7 @@ func NewUserUsecase(userRepo repositories.UserRepository) UserUsecase {
 // UserLogin godoc
 // @Summary      Login
 // @Description  Login an account
-// @Tags         User
+// @Tags         User - Account
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.UserLoginInput true "Payload Body [RAW]"
@@ -48,6 +49,8 @@ func (u *userUsecase) UserLogin(input dtos.UserLoginInput) (dtos.UserInformation
 		userResponse dtos.UserInformationResponse
 		accessToken  string
 	)
+
+	input.Email = strings.ToLower(input.Email)
 
 	user, err := u.userRepo.UserGetByEmail(input.Email)
 	if err != nil {
@@ -83,7 +86,7 @@ func (u *userUsecase) UserLogin(input dtos.UserLoginInput) (dtos.UserInformation
 // UserRegister godoc
 // @Summary      Register
 // @Description  Register an account
-// @Tags         User
+// @Tags         User - Account
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.UserRegisterInput true "Payload Body [RAW]"
@@ -99,6 +102,8 @@ func (u *userUsecase) UserRegister(input dtos.UserRegisterInput) (dtos.UserInfor
 		user         models.User
 		userResponse dtos.UserInformationResponse
 	)
+
+	input.Email = strings.ToLower(input.Email)
 
 	user, err := u.userRepo.UserGetByEmail(input.Email)
 	if user.ID > 0 {
@@ -149,12 +154,10 @@ func (u *userUsecase) UserRegister(input dtos.UserRegisterInput) (dtos.UserInfor
 // UserUpdateInformation godoc
 // @Summary      Update Information
 // @Description  User update an information
-// @Tags         User
+// @Tags         User - Account
 // @Accept       json
 // @Produce      json
-// @Param        file formData file false "Photo file"
-// @Param        gender formData string false "Jenis kelamin"
-// @Param        birth_date formData string false "Tanggal lahir"
+// @Param        request body dtos.UserUpdateInformationInput true "Payload Body [RAW]"
 // @Success      200 {object} dtos.UserStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -176,7 +179,6 @@ func (u *userUsecase) UserUpdateInformation(userId uint, input dtos.UserUpdateIn
 
 	birthDateParse := helpers.FormatStringToDate(input.BirthDate)
 
-	user.ProfilePicture = input.ProfilePicture
 	user.Gender = &input.Gender
 	user.BirthDate = &birthDateParse
 
@@ -203,7 +205,7 @@ func (u *userUsecase) UserUpdateInformation(userId uint, input dtos.UserUpdateIn
 // UserUpdatePassword godoc
 // @Summary      Update Password
 // @Description  User update an password
-// @Tags         User
+// @Tags         User - Account
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.UserUpdatePasswordInput true "Payload Body [RAW]"
@@ -273,7 +275,7 @@ func (u *userUsecase) UserUpdatePassword(userId uint, input dtos.UserUpdatePassw
 // UserUpdateProfile godoc
 // @Summary      Update Profile
 // @Description  User update an profile
-// @Tags         User
+// @Tags         User - Account
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.UserUpdateProfileInput true "Payload Body [RAW]"
@@ -327,7 +329,7 @@ func (u *userUsecase) UserUpdateProfile(userId uint, input dtos.UserUpdateProfil
 // UserCredential godoc
 // @Summary      Get Credentials
 // @Description  User get credentials
-// @Tags         User
+// @Tags         User - Account
 // @Accept       json
 // @Produce      json
 // @Success      200 {object} dtos.UserStatusOKResponse
@@ -367,7 +369,7 @@ func (u *userUsecase) UserCredential(userId uint) (dtos.UserInformationResponse,
 // UserUpdatePhotoProfile godoc
 // @Summary      Update Photo Profile
 // @Description  User update an photo profile
-// @Tags         User
+// @Tags         User - Account
 // @Accept       json
 // @Produce      json
 // @Param        file formData file false "Photo file"
@@ -415,7 +417,7 @@ func (u *userUsecase) UserUpdatePhotoProfile(userId uint, input dtos.UserUpdateP
 // UserDeletePhotoProfile godoc
 // @Summary      Update Information
 // @Description  User update an information
-// @Tags         User
+// @Tags         User - Account
 // @Accept       json
 // @Produce      json
 // @Success      200 {object} dtos.UserStatusOKResponse
