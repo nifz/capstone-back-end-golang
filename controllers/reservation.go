@@ -108,9 +108,14 @@ func (c *reservationController) GetAllReservation(ctx echo.Context) error {
 
 	reservations, total, err := c.reservationUsecase.GetAllReservation(page, limit)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, dtos.ErrorDTO{
-			Message: err.Error(),
-		})
+		return ctx.JSON(
+			http.StatusInternalServerError,
+			helpers.NewErrorResponse(
+				http.StatusInternalServerError,
+				"Failed fetching recommendations",
+				helpers.GetErrorData(err),
+			),
+		)
 	}
 	baseURL := ctx.Scheme() + "://" + ctx.Request().Host + "/api/v1/admin"
 	// Menambahkan URL gambar dengan URL dasar aplikasi menggunakan ctx.BaseURL()
