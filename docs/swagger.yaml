@@ -118,7 +118,7 @@ definitions:
       data:
         $ref: '#/definitions/dtos.TrainCarriageResponse'
       message:
-        example: Successfully get train peron
+        example: Successfully get train carriage
         type: string
       meta:
         $ref: '#/definitions/helpers.Meta'
@@ -343,7 +343,7 @@ definitions:
       data:
         $ref: '#/definitions/dtos.TrainCarriageResponse'
       message:
-        example: Successfully get train peron
+        example: Successfully get train carriage
         type: string
       status_code:
         example: 200
