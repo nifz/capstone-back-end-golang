@@ -1095,7 +1095,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.GetAllTrainStatusOKResponse"
+                            "$ref": "#/definitions/dtos.GetAllTrainStatusOKResponses"
                         }
                     },
                     "400": {
@@ -1162,7 +1162,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.TrainStatusOKResponse"
+                            "$ref": "#/definitions/dtos.TrainStatusOKResponses"
                         }
                     },
                     "400": {
@@ -1577,7 +1577,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.TrainStatusOKResponse"
+                            "$ref": "#/definitions/dtos.TrainStatusOKResponses"
                         }
                     },
                     "400": {
@@ -1651,7 +1651,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.TrainStatusOKResponse"
+                            "$ref": "#/definitions/dtos.TrainStatusOKResponses"
                         }
                     },
                     "400": {
@@ -2776,6 +2776,25 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.GetAllTrainStatusOKResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.TrainResponses"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get train"
+                },
+                "meta": {
+                    "$ref": "#/definitions/helpers.Meta"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
         "dtos.HistorySearchCreeatedResponse": {
             "type": "object",
             "properties": {
@@ -3127,6 +3146,41 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.TrainResponses": {
+            "type": "object",
+            "properties": {
+                "code_train": {
+                    "type": "string",
+                    "example": "TRAIN001"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Bengawan"
+                },
+                "route": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.TrainStationResponse"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "example": "available"
+                },
+                "train_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
         "dtos.TrainSeatResponse": {
             "type": "object",
             "properties": {
@@ -3164,11 +3218,11 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.TrainStatusOKResponse": {
+        "dtos.TrainStatusOKResponses": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/dtos.TrainResponse"
+                    "$ref": "#/definitions/dtos.TrainResponses"
                 },
                 "message": {
                     "type": "string",
