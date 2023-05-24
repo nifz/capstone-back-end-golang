@@ -8,6 +8,7 @@ import (
 	"back-end-golang/repositories"
 	"errors"
 	"strings"
+	"time"
 )
 
 type UserUsecase interface {
@@ -297,7 +298,8 @@ func (u *userUsecase) UserUpdateProfile(userId uint, input dtos.UserUpdateProfil
 		return userResponse, errors.New("User not found")
 	}
 
-	birthDateParse, err := helpers.FormatStringToDate(input.BirthDate)
+	dateNow := "2006-01-02"
+	birthDateParse, err := time.Parse(dateNow, input.BirthDate)
 	if err != nil {
 		return userResponse, errors.New("Failed to parse birth date")
 	}
