@@ -276,31 +276,6 @@ func (u *trainUsecase) UpdateTrain(id uint, train dtos.TrainInput) (dtos.TrainRe
 		}
 	}
 
-	// for _, trainRoute := range train.Route {
-	// 	trainStation, err := u.trainStationRepo.GetTrainStationByID(trains.ID)
-	// 	if err != nil {
-	// 		return trainResponse, err
-	// 	}
-	// 	if trainRoute.StationID != trainStation.StationID {
-	// 		trainStation = models.TrainStation{
-	// 			TrainID:    createdTrain.ID,
-	// 			StationID:  trainRoute.StationID,
-	// 			ArriveTime: trainRoute.ArriveTime,
-	// 		}
-	// 		_, err = u.trainStationRepo.CreateTrainStation(trainStation)
-	// 		if err != nil {
-	// 			return trainResponse, err
-	// 		}
-	// 	} else {
-	// 		trainStation.StationID = trainRoute.StationID
-	// 		trainStation.ArriveTime = trainRoute.ArriveTime
-	// 		_, err = u.trainStationRepo.UpdateTrainStation(trainStation)
-	// 		if err != nil {
-	// 			return trainResponse, err
-	// 		}
-	// 	}
-	// }
-
 	getTrain, err := u.trainRepo.GetTrainByID(createdTrain.ID)
 	if err != nil {
 		return trainResponse, err
@@ -409,7 +384,7 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 			return trainResponses, count, err
 		}
 
-		getTrainStation, err := u.trainRepo.SearchTrainAvailable(getTrain.ID, uint(stationOriginId), uint(stationDestinationId))
+		getTrainStation, err := u.trainRepo.SearchTrainAvailable(train.TrainID, uint(stationOriginId), uint(stationDestinationId))
 		if err != nil {
 			return trainResponses, count, err
 		}

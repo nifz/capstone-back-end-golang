@@ -221,7 +221,7 @@ func (c *trainController) SearchTrainAvailable(ctx echo.Context) error {
 	limitParam := ctx.QueryParam("limit")
 	limit, err := strconv.Atoi(limitParam)
 	if err != nil {
-		limit = 10
+		limit = 1000
 	}
 
 	classParam := ctx.QueryParam("sort_by_class")

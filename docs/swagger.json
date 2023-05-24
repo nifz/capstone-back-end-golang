@@ -2738,7 +2738,7 @@
                 },
                 "message": {
                     "type": "string",
-                    "example": "Successfully get train peron"
+                    "example": "Successfully get train carriage"
                 },
                 "meta": {
                     "$ref": "#/definitions/helpers.Meta"
@@ -3064,7 +3064,7 @@
                 },
                 "message": {
                     "type": "string",
-                    "example": "Successfully get train peron"
+                    "example": "Successfully get train carriage"
                 },
                 "status_code": {
                     "type": "integer",

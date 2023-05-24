@@ -2746,7 +2746,7 @@ const docTemplate = `{
                 },
                 "message": {
                     "type": "string",
-                    "example": "Successfully get train peron"
+                    "example": "Successfully get train carriage"
                 },
                 "meta": {
                     "$ref": "#/definitions/helpers.Meta"
@@ -3072,7 +3072,7 @@ const docTemplate = `{
                 },
                 "message": {
                     "type": "string",
-                    "example": "Successfully get train peron"
+                    "example": "Successfully get train carriage"
                 },
                 "status_code": {
                     "type": "integer",

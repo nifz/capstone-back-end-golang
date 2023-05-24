@@ -73,20 +73,20 @@ type TrainCreeatedResponses struct {
 
 type GetAllTrainCarriageStatusOKResponse struct {
 	StatusCode int                   `json:"status_code" example:"200"`
-	Message    string                `json:"message" example:"Successfully get train peron"`
+	Message    string                `json:"message" example:"Successfully get train carriage"`
 	Data       TrainCarriageResponse `json:"data"`
 	Meta       helpers.Meta          `json:"meta"`
 }
 
 type TrainCarriageStatusOKResponse struct {
 	StatusCode int                   `json:"status_code" example:"200"`
-	Message    string                `json:"message" example:"Successfully get train peron"`
+	Message    string                `json:"message" example:"Successfully get train carriage"`
 	Data       TrainCarriageResponse `json:"data"`
 }
 
 type TrainCarriageCreeatedResponse struct {
 	StatusCode int                   `json:"status_code" example:"201"`
-	Message    string                `json:"message" example:"Successfully created train peron"`
+	Message    string                `json:"message" example:"Successfully created train carriage"`
 	Data       TrainCarriageResponse `json:"data"`
 }
 

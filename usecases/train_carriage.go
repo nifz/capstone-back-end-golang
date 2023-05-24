@@ -238,11 +238,36 @@ func (u *trainCarriageUsecase) CreateTrainCarriage(trainCarriages []dtos.TrainCa
 		}
 
 		var trainSeatResponses []dtos.TrainSeatResponse
+		var trainStationResponses []dtos.TrainStationResponse
 		for _, trainSeat := range trainSeats {
 			trainSeatResponse := dtos.TrainSeatResponse{
 				Name: trainSeat.Name,
 			}
 			trainSeatResponses = append(trainSeatResponses, trainSeatResponse)
+		}
+
+		getTrainStation, err := u.trainRepo.GetTrainStationByTrainID(train.ID)
+		if err != nil {
+			return trainCarriageResponses, err
+		}
+
+		for _, train := range getTrainStation {
+			getStation, err := u.trainRepo.GetStationByID2(train.StationID)
+			if err != nil {
+				return trainCarriageResponses, err
+			}
+
+			trainStationResponse := dtos.TrainStationResponse{
+				StationID: train.StationID,
+				Station: dtos.StationInput{
+					Origin:  getStation.Origin,
+					Name:    getStation.Name,
+					Initial: getStation.Initial,
+				},
+				ArriveTime: train.ArriveTime,
+			}
+
+			trainStationResponses = append(trainStationResponses, trainStationResponse)
 		}
 
 		trainCarriageResponse := dtos.TrainCarriageResponse{
@@ -253,6 +278,7 @@ func (u *trainCarriageUsecase) CreateTrainCarriage(trainCarriages []dtos.TrainCa
 				Name:      train.Name,
 				Class:     createdTrainCarriage.Class,
 				Price:     createdTrainCarriage.Price,
+				Route:     trainStationResponses,
 				Status:    train.Status,
 			},
 			Name:      createTrainCarriage.Name,
