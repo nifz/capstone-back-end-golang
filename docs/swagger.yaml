@@ -139,6 +139,19 @@ definitions:
         example: 200
         type: integer
     type: object
+  dtos.GetAllTrainStatusOKResponses:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.TrainResponses'
+      message:
+        example: Successfully get train
+        type: string
+      meta:
+        $ref: '#/definitions/helpers.Meta'
+      status_code:
+        example: 200
+        type: integer
+    type: object
   dtos.HistorySearchCreeatedResponse:
     properties:
       data:
@@ -383,6 +396,31 @@ definitions:
         example: "2023-05-17T15:07:16.504+07:00"
         type: string
     type: object
+  dtos.TrainResponses:
+    properties:
+      code_train:
+        example: TRAIN001
+        type: string
+      created_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+      name:
+        example: Bengawan
+        type: string
+      route:
+        items:
+          $ref: '#/definitions/dtos.TrainStationResponse'
+        type: array
+      status:
+        example: available
+        type: string
+      train_id:
+        example: 1
+        type: integer
+      updated_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+    type: object
   dtos.TrainSeatResponse:
     properties:
       name:
@@ -408,10 +446,10 @@ definitions:
         example: 1
         type: integer
     type: object
-  dtos.TrainStatusOKResponse:
+  dtos.TrainStatusOKResponses:
     properties:
       data:
-        $ref: '#/definitions/dtos.TrainResponse'
+        $ref: '#/definitions/dtos.TrainResponses'
       message:
         example: Successfully get train
         type: string
@@ -1270,7 +1308,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dtos.GetAllTrainStatusOKResponse'
+            $ref: '#/definitions/dtos.GetAllTrainStatusOKResponses'
         "400":
           description: Bad Request
           schema:
@@ -1313,7 +1351,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dtos.TrainStatusOKResponse'
+            $ref: '#/definitions/dtos.TrainStatusOKResponses'
         "400":
           description: Bad Request
           schema:
@@ -1622,7 +1660,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dtos.TrainStatusOKResponse'
+            $ref: '#/definitions/dtos.TrainStatusOKResponses'
         "400":
           description: Bad Request
           schema:
@@ -1670,7 +1708,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dtos.TrainStatusOKResponse'
+            $ref: '#/definitions/dtos.TrainStatusOKResponses'
         "400":
           description: Bad Request
           schema:

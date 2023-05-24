@@ -34,8 +34,12 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	stationUsecase := usecases.NewStationUsecase(stationRepository)
 	stationController := controllers.NewStationController(stationUsecase)
 
+	trainStationRepository := repositories.NewTrainStationRepository(db)
+	// trainStationUsecase := usecases.NewTrainStationUsecase(trainStationRepository)
+	// trainStationController := controllers.NewTrainStationController(trainStationUsecase)
+
 	trainRepository := repositories.NewTrainRepository(db)
-	trainUsecase := usecases.NewTrainUsecase(trainRepository)
+	trainUsecase := usecases.NewTrainUsecase(trainRepository, trainStationRepository)
 	trainController := controllers.NewTrainController(trainUsecase)
 
 	trainCarriageRepository := repositories.NewTrainCarriageRepository(db)

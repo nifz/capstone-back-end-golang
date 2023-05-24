@@ -9,6 +9,7 @@ import (
 )
 
 type TrainRepository interface {
+	GetAllTrain(page, limit int) ([]models.Train, int, error)
 	GetAllTrains(page, limit int) ([]models.TrainCarriage, int, error)
 	GetTrainByID(id uint) (models.Train, error)
 	TrainStationByTrainID(id uint) (models.TrainStation, error)
@@ -16,7 +17,6 @@ type TrainRepository interface {
 	SearchTrainAvailable(trainId, originId, destinationId uint) ([]models.TrainStation, error)
 	GetStationByID2(id uint) (models.Station, error)
 	CreateTrain(train models.Train) (models.Train, error)
-	CreateTrainStation(train models.TrainStation) (models.TrainStation, error)
 	UpdateTrain(train models.Train) (models.Train, error)
 	DeleteTrain(train models.Train) error
 }
@@ -30,6 +30,26 @@ func NewTrainRepository(db *gorm.DB) TrainRepository {
 }
 
 // Implementasi fungsi-fungsi dari interface ItemRepository
+
+func (r *trainRepository) GetAllTrain(page, limit int) ([]models.Train, int, error) {
+	var (
+		trains []models.Train
+		count  int64
+	)
+	err := r.db.Find(&trains).Count(&count).Error
+
+	// Gunakan slice trainCarriages yang berisi hasil query
+
+	if err != nil {
+		return trains, int(count), err
+	}
+
+	offset := (page - 1) * limit
+
+	err = r.db.Limit(limit).Offset(offset).Find(&trains).Error
+
+	return trains, int(count), err
+}
 
 func (r *trainRepository) GetAllTrains(page, limit int) ([]models.TrainCarriage, int, error) {
 	var (
@@ -120,11 +140,6 @@ func (r *trainRepository) CreateTrain(train models.Train) (models.Train, error) 
 	return train, err
 }
 
-func (r *trainRepository) CreateTrainStation(train models.TrainStation) (models.TrainStation, error) {
-	err := r.db.Create(&train).Error
-	return train, err
-}
-
 func (r *trainRepository) UpdateTrain(train models.Train) (models.Train, error) {
 	err := r.db.Save(&train).Error
 	return train, err
@@ -132,5 +147,25 @@ func (r *trainRepository) UpdateTrain(train models.Train) (models.Train, error) 
 
 func (r *trainRepository) DeleteTrain(train models.Train) error {
 	err := r.db.Delete(&train).Error
-	return err
+	if err != nil {
+		return err
+	}
+
+	trainStation := models.TrainStation{
+		TrainID: train.ID,
+	}
+	err = r.db.Where("train_id = ?", trainStation.TrainID).Delete(&trainStation).Error
+	if err != nil {
+		return err
+	}
+
+	trainCarriage := models.TrainCarriage{
+		TrainID: train.ID,
+	}
+	err = r.db.Where("train_id = ?", trainCarriage.TrainID).Delete(&trainCarriage).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
