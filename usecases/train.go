@@ -373,9 +373,6 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 		return nil, 0, err
 	}
 
-	// Track train IDs and classes
-	trainMap := make(map[uint]map[string]bool)
-
 	var trainResponses []dtos.TrainResponse
 
 	for _, train := range trains {
@@ -384,7 +381,7 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 			return trainResponses, count, err
 		}
 
-		getTrainStation, err := u.trainRepo.SearchTrainAvailable(train.TrainID, uint(stationOriginId), uint(stationDestinationId))
+		getTrainStation, err := u.trainRepo.SearchTrainAvailable(getTrain.ID, uint(stationOriginId), uint(stationDestinationId))
 		if err != nil {
 			return trainResponses, count, err
 		}
@@ -394,24 +391,15 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 			continue
 		}
 
-		// Check if train ID exists in the map
-		if classMap, ok := trainMap[getTrain.ID]; ok {
-			// Check if class already exists for the train ID
-			if classMap[strings.ToLower(train.Class)] || (sortClassName != "" && strings.ToLower(train.Class) != strings.ToLower(sortClassName)) {
-				continue
-			}
-		} else {
-			// Create a new class map for the train ID
-			trainMap[getTrain.ID] = make(map[string]bool)
-		}
-
 		// Check if class has already been added or doesn't match the filterClass
 		if getTrain.ID != uint(sortByTrainId) && sortByTrainId != 0 {
 			continue
 		}
 
-		// Add class to the train ID map
-		trainMap[getTrain.ID][strings.ToLower(train.Class)] = true
+		// Check if class name matches the desired class filter
+		if strings.ToLower(sortClassName) != "" && strings.ToLower(train.Class) != strings.ToLower(sortClassName) {
+			continue
+		}
 
 		var trainStationResponses []dtos.TrainStationResponse
 
