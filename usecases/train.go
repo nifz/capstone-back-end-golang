@@ -251,7 +251,7 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponse, 
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/train [put]
+// @Router       /admin/train/{id} [put]
 // @Security BearerAuth
 func (u *trainUsecase) UpdateTrain(id uint, trainInput dtos.TrainInput) (dtos.TrainResponse, error) {
 	var train models.Train

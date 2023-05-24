@@ -48,7 +48,7 @@ func (r *trainRepository) GetAllTrains(page, limit int) ([]models.TrainCarriage,
 		FROM train_carriages
 		GROUP BY class, train_id
 	);
-`).Scan(&trains).Count(&count).Error
+`).Scan(&trains).Error
 
 	// Gunakan slice trainCarriages yang berisi hasil query
 

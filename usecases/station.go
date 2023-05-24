@@ -146,7 +146,7 @@ func (u *stationUsecase) CreateStation(station *dtos.StationInput) (dtos.Station
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/station [put]
+// @Router       /admin/station/{id} [put]
 // @Security BearerAuth
 func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) (dtos.StationResponse, error) {
 	var station models.Station
