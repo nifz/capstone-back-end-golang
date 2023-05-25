@@ -49,7 +49,7 @@ func NewTrainUsecase(TrainRepo repositories.TrainRepository, TrainStationRepo re
 // @Security BearerAuth
 func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int, error) {
 
-	trains, count, err := u.trainRepo.GetAllTrain(page, limit)
+	trains, err := u.trainRepo.GetAllTrain()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -58,12 +58,16 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int
 	for _, train := range trains {
 		getTrain, err := u.trainRepo.GetTrainByID(train.ID)
 		if err != nil {
-			return trainResponses, count, err
+			return trainResponses, 0, err
+		}
+
+		if getTrain.Status != "available" {
+			continue
 		}
 
 		getTrainStation, err := u.trainRepo.GetTrainStationByTrainID(getTrain.ID)
 		if err != nil {
-			return trainResponses, count, err
+			return trainResponses, 0, err
 		}
 
 		var trainStationResponses []dtos.TrainStationResponse
@@ -71,7 +75,7 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int
 		for _, train := range getTrainStation {
 			getStation, err := u.trainRepo.GetStationByID2(train.StationID)
 			if err != nil {
-				return trainResponses, count, err
+				return trainResponses, 0, err
 			}
 
 			trainStationResponse := dtos.TrainStationResponse{
@@ -98,7 +102,23 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int
 		}
 		trainResponses = append(trainResponses, trainResponse)
 	}
-	return trainResponses, count, nil
+	// Apply offset and limit to trainResponses
+	start := (page - 1) * limit
+	end := start + limit
+
+	// Ensure that `start` is within the range of trainResponses
+	if start >= len(trainResponses) {
+		return nil, 0, nil
+	}
+
+	// Ensure that `end` does not exceed the length of trainResponses
+	if end > len(trainResponses) {
+		end = len(trainResponses)
+	}
+
+	subsetTrainResponses := trainResponses[start:end]
+
+	return subsetTrainResponses, len(trainResponses), nil
 }
 
 // GetTrainByID godoc
@@ -368,7 +388,7 @@ func (u *trainUsecase) DeleteTrain(id uint) error {
 // @Router       /user/train/search [get]
 // @Security BearerAuth
 func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, stationDestinationId, sortByTrainId int, sortClassName, sortByPrice, sortByArriveTime string) ([]dtos.TrainResponse, int, error) {
-	trains, count, err := u.trainRepo.GetAllTrains(page, limit)
+	trains, err := u.trainRepo.GetAllTrains(sortClassName, sortByTrainId)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -378,12 +398,16 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 	for _, train := range trains {
 		getTrain, err := u.trainRepo.GetTrainByID(train.TrainID)
 		if err != nil {
-			return trainResponses, count, err
+			return trainResponses, 0, err
 		}
 
 		getTrainStation, err := u.trainRepo.SearchTrainAvailable(getTrain.ID, uint(stationOriginId), uint(stationDestinationId))
 		if err != nil {
-			return trainResponses, count, err
+			return trainResponses, 0, err
+		}
+
+		if getTrain.Status != "available" {
+			continue
 		}
 
 		// Check if route[0] matches stationOriginId and route[1] matches stationDestinationId
@@ -406,7 +430,7 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 		for _, trainStation := range getTrainStation {
 			getStation, err := u.trainRepo.GetStationByID2(trainStation.StationID)
 			if err != nil {
-				return trainResponses, count, err
+				return trainResponses, 0, err
 			}
 
 			trainStationResponse := dtos.TrainStationResponse{
@@ -457,5 +481,21 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 			})
 		}
 	}
-	return trainResponses, len(trainResponses), nil
+	// Apply offset and limit to trainResponses
+	start := (page - 1) * limit
+	end := start + limit
+
+	// Ensure that `start` is within the range of trainResponses
+	if start >= len(trainResponses) {
+		return nil, 0, nil
+	}
+
+	// Ensure that `end` does not exceed the length of trainResponses
+	if end > len(trainResponses) {
+		end = len(trainResponses)
+	}
+
+	subsetTrainResponses := trainResponses[start:end]
+
+	return subsetTrainResponses, len(trainResponses), nil
 }
