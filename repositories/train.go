@@ -9,8 +9,8 @@ import (
 )
 
 type TrainRepository interface {
-	GetAllTrain(page, limit int) ([]models.Train, int, error)
-	GetAllTrains(page, limit int) ([]models.TrainCarriage, int, error)
+	GetAllTrain() ([]models.Train, error)
+	GetAllTrains(sortClassName string, sortByTrainId int) ([]models.TrainCarriage, error)
 	GetTrainByID(id uint) (models.Train, error)
 	TrainStationByTrainID(id uint) (models.TrainStation, error)
 	GetTrainStationByTrainID(id uint) ([]models.TrainStation, error)
@@ -31,56 +31,74 @@ func NewTrainRepository(db *gorm.DB) TrainRepository {
 
 // Implementasi fungsi-fungsi dari interface ItemRepository
 
-func (r *trainRepository) GetAllTrain(page, limit int) ([]models.Train, int, error) {
+func (r *trainRepository) GetAllTrain() ([]models.Train, error) {
 	var (
 		trains []models.Train
 		count  int64
 	)
+
 	err := r.db.Find(&trains).Count(&count).Error
 
-	// Gunakan slice trainCarriages yang berisi hasil query
-
-	if err != nil {
-		return trains, int(count), err
-	}
-
-	offset := (page - 1) * limit
-
-	err = r.db.Limit(limit).Offset(offset).Find(&trains).Error
-
-	return trains, int(count), err
+	return trains, err
 }
 
-func (r *trainRepository) GetAllTrains(page, limit int) ([]models.TrainCarriage, int, error) {
+func (r *trainRepository) GetAllTrains(sortClassName string, sortByTrainId int) ([]models.TrainCarriage, error) {
 	var (
 		trains []models.TrainCarriage
-		count  int64
+		err    error
 	)
-	// err := r.db.Joins("JOIN trains ON train_carriages.train_id = trains.id").Preload("Train").Find(&trains).Count(&count).Error
-	// var trainCarriages []models.TrainCarriage
 
-	err := r.db.Raw(`
-	SELECT tc.*
-	FROM train_carriages tc
-	JOIN trains t ON tc.train_id = t.id
-	WHERE tc.id IN (
-		SELECT MIN(id)
-		FROM train_carriages
-		GROUP BY class, train_id
-	);
-`).Scan(&trains).Error
-
-	// Gunakan slice trainCarriages yang berisi hasil query
-
-	if err != nil {
-		return trains, int(count), err
+	if sortClassName != "" && sortByTrainId != 0 {
+		err = r.db.Raw(`
+		SELECT tc.*
+		FROM train_carriages tc
+		JOIN trains t ON tc.train_id = t.id
+		WHERE tc.class = ? AND train_id = ? AND t.status = 'available' AND tc.id IN (
+			SELECT MIN(id)
+			FROM train_carriages
+			GROUP BY class, train_id
+		);
+	`, sortClassName, sortByTrainId).Scan(&trains).Error
+	} else if sortClassName != "" && sortByTrainId == 0 {
+		err = r.db.Raw(`
+		SELECT tc.*
+		FROM train_carriages tc
+		JOIN trains t ON tc.train_id = t.id
+		WHERE tc.class = ? AND t.status = 'available' AND tc.id IN (
+			SELECT MIN(id)
+			FROM train_carriages
+			GROUP BY class, train_id
+		);
+	`, sortClassName).Scan(&trains).Error
+	} else if sortClassName == "" && sortByTrainId != 0 {
+		err = r.db.Raw(`
+		SELECT tc.*
+		FROM train_carriages tc
+		JOIN trains t ON tc.train_id = t.id
+		WHERE train_id = ? AND t.status = 'available' AND tc.id IN (
+			SELECT MIN(id)
+			FROM train_carriages
+			GROUP BY class, train_id
+		);
+	`, sortByTrainId).Scan(&trains).Error
+	} else {
+		err = r.db.Raw(`
+		SELECT tc.*
+		FROM train_carriages tc
+		JOIN trains t ON tc.train_id = t.id
+		WHERE t.status = 'available' AND tc.id IN (
+			SELECT MIN(id)
+			FROM train_carriages
+			GROUP BY class, train_id
+		);
+		`).Scan(&trains).Error
 	}
 
-	// offset := (page - 1) * limit
+	if err != nil {
+		return trains, err
+	}
 
-	// err = r.db.Limit(limit).Offset(offset).Find(&trains).Error
-
-	return trains, int(count), err
+	return trains, err
 }
 
 func (r *trainRepository) GetTrainByID(id uint) (models.Train, error) {
