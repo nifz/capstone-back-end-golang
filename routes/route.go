@@ -63,6 +63,10 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	historySearchUsecase := usecases.NewHistorySearchUsecase(historySearchRepository, userRepository)
 	historySearchController := controllers.NewHistorySearchController(historySearchUsecase)
 
+	userByAdminRepository := repositories.NewUserRepository(db)
+	userByAdminUsecase := usecases.NewUserByAdminUsecase(userByAdminRepository)
+	userByAdminController := controllers.NewUserByAdminController(userByAdminUsecase)
+
 	api := e.Group("/api/v1")
 
 	// USER
@@ -123,6 +127,12 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.PUT("/recommendation/:id", recommendationController.UpdateRecommendation)
 	admin.POST("/recommendation", recommendationController.CreateRecommendation)
 	admin.DELETE("/recommendation/:id", recommendationController.DeleteRecommendation)
+
+	admin.GET("/user", userByAdminController.GetAllUserByAdmin)
+	admin.GET("/user/:id", userByAdminController.GetUserByAdminByID)
+	admin.PUT("/user/:id", userByAdminController.UpdateUserByAdmin)
+	admin.POST("/user", userByAdminController.CreateUserByAdmin)
+	admin.DELETE("/user/:id", userByAdminController.DeleteUserByAdmin)
 
 	api.POST("/reservations", reservationController.AdminCreateReservation)
 	admin.GET("/reservations", reservationController.GetAllReservation)
