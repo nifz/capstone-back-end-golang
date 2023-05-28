@@ -49,7 +49,12 @@ func main() {
 		panic(err)
 	}
 
-	err = configs.DBSeeder(db)
+	err = configs.TrainSeatSeeder(db)
+	if err != nil {
+		panic(err)
+	}
+
+	err = configs.AccountSeeder(db)
 	if err != nil {
 		panic(err)
 	}

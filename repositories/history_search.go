@@ -7,10 +7,10 @@ import (
 )
 
 type HistorySearchRepository interface {
-	HistorySearchGetById(id uint) (models.HistorySearch, error)
+	HistorySearchGetById(userId, id uint) (models.HistorySearch, error)
 	HistorySearchGetByUserId(userId uint) ([]models.HistorySearch, error)
 	HistorySearchCreate(historySearch models.HistorySearch) (models.HistorySearch, error)
-	HistorySearchUpdate(historySearch models.HistorySearch) (models.HistorySearch, error)
+	HistorySearchDelete(historySearch models.HistorySearch) (models.HistorySearch, error)
 }
 
 type historySearchRepository struct {
@@ -21,9 +21,9 @@ func NewHistorySearchRepository(db *gorm.DB) HistorySearchRepository {
 	return &historySearchRepository{db}
 }
 
-func (r *historySearchRepository) HistorySearchGetById(id uint) (models.HistorySearch, error) {
+func (r *historySearchRepository) HistorySearchGetById(userId, id uint) (models.HistorySearch, error) {
 	var historySearch models.HistorySearch
-	err := r.db.Where("id = ?", id).First(&historySearch).Error
+	err := r.db.Where("id = ? AND user_id = ?", id, userId).First(&historySearch).Error
 	return historySearch, err
 }
 
@@ -38,7 +38,7 @@ func (r *historySearchRepository) HistorySearchCreate(historySearch models.Histo
 	return historySearch, err
 }
 
-func (r *historySearchRepository) HistorySearchUpdate(historySearch models.HistorySearch) (models.HistorySearch, error) {
-	err := r.db.Save(&historySearch).Error
+func (r *historySearchRepository) HistorySearchDelete(historySearch models.HistorySearch) (models.HistorySearch, error) {
+	err := r.db.Delete(&historySearch).Error
 	return historySearch, err
 }

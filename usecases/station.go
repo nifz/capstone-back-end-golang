@@ -4,7 +4,6 @@ import (
 	"back-end-golang/dtos"
 	"back-end-golang/models"
 	"back-end-golang/repositories"
-	"fmt"
 )
 
 type StationUsecase interface {
@@ -26,7 +25,7 @@ func NewStationUsecase(StationRepo repositories.StationRepository) StationUsecas
 // GetAllStations godoc
 // @Summary      Get all stations
 // @Description  Get all stations
-// @Tags         Station
+// @Tags         Admin - Station
 // @Accept       json
 // @Produce      json
 // @Param page query int false "Page number"
@@ -64,7 +63,7 @@ func (u *stationUsecase) GetAllStations(page, limit int) ([]dtos.StationResponse
 // GetStationByID godoc
 // @Summary      Get station by ID
 // @Description  Get station by ID
-// @Tags         Station
+// @Tags         Admin - Station
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID station"
@@ -96,7 +95,7 @@ func (u *stationUsecase) GetStationByID(id uint) (dtos.StationResponse, error) {
 // CreateStation godoc
 // @Summary      Create a new station
 // @Description  Create a new station
-// @Tags         Station
+// @Tags         Admin - Station
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.StationInput true "Payload Body [RAW]"
@@ -135,7 +134,7 @@ func (u *stationUsecase) CreateStation(station *dtos.StationInput) (dtos.Station
 // UpdateStation godoc
 // @Summary      Update station
 // @Description  Update station
-// @Tags         Station
+// @Tags         Admin - Station
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID station"
@@ -146,14 +145,13 @@ func (u *stationUsecase) CreateStation(station *dtos.StationInput) (dtos.Station
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/station [put]
+// @Router       /admin/station/{id} [put]
 // @Security BearerAuth
 func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) (dtos.StationResponse, error) {
 	var station models.Station
 	var stationResponse dtos.StationResponse
 
 	station, err := u.stationRepo.GetStationByID(id)
-	fmt.Println(station)
 	if err != nil {
 		return stationResponse, err
 	}
@@ -182,7 +180,7 @@ func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) 
 // DeleteStation godoc
 // @Summary      Delete a station
 // @Description  Delete a station
-// @Tags         Station
+// @Tags         Admin - Station
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID station"

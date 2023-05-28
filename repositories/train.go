@@ -1,14 +1,20 @@
 package repositories
 
 import (
+	"back-end-golang/dtos"
 	"back-end-golang/models"
+	"errors"
 
 	"gorm.io/gorm"
 )
 
 type TrainRepository interface {
-	GetAllTrains(page, limit int) ([]models.Train, int, error)
+	GetAllTrain() ([]models.Train, error)
+	GetAllTrains(sortClassName string, sortByTrainId int) ([]models.TrainCarriage, error)
 	GetTrainByID(id uint) (models.Train, error)
+	TrainStationByTrainID(id uint) (models.TrainStation, error)
+	GetTrainStationByTrainID(id uint) ([]models.TrainStation, error)
+	SearchTrainAvailable(trainId, originId, destinationId uint) ([]models.TrainStation, error)
 	GetStationByID2(id uint) (models.Station, error)
 	CreateTrain(train models.Train) (models.Train, error)
 	UpdateTrain(train models.Train) (models.Train, error)
@@ -25,27 +31,120 @@ func NewTrainRepository(db *gorm.DB) TrainRepository {
 
 // Implementasi fungsi-fungsi dari interface ItemRepository
 
-func (r *trainRepository) GetAllTrains(page, limit int) ([]models.Train, int, error) {
+func (r *trainRepository) GetAllTrain() ([]models.Train, error) {
 	var (
 		trains []models.Train
 		count  int64
 	)
+
 	err := r.db.Find(&trains).Count(&count).Error
-	if err != nil {
-		return trains, int(count), err
+
+	return trains, err
+}
+
+func (r *trainRepository) GetAllTrains(sortClassName string, sortByTrainId int) ([]models.TrainCarriage, error) {
+	var (
+		trains []models.TrainCarriage
+		err    error
+	)
+
+	if sortClassName != "" && sortByTrainId != 0 {
+		err = r.db.Raw(`
+		SELECT tc.*
+		FROM train_carriages tc
+		JOIN trains t ON tc.train_id = t.id
+		WHERE tc.class = ? AND train_id = ? AND t.status = 'available' AND tc.id IN (
+			SELECT MIN(id)
+			FROM train_carriages
+			GROUP BY class, train_id
+		);
+	`, sortClassName, sortByTrainId).Scan(&trains).Error
+	} else if sortClassName != "" && sortByTrainId == 0 {
+		err = r.db.Raw(`
+		SELECT tc.*
+		FROM train_carriages tc
+		JOIN trains t ON tc.train_id = t.id
+		WHERE tc.class = ? AND t.status = 'available' AND tc.id IN (
+			SELECT MIN(id)
+			FROM train_carriages
+			GROUP BY class, train_id
+		);
+	`, sortClassName).Scan(&trains).Error
+	} else if sortClassName == "" && sortByTrainId != 0 {
+		err = r.db.Raw(`
+		SELECT tc.*
+		FROM train_carriages tc
+		JOIN trains t ON tc.train_id = t.id
+		WHERE train_id = ? AND t.status = 'available' AND tc.id IN (
+			SELECT MIN(id)
+			FROM train_carriages
+			GROUP BY class, train_id
+		);
+	`, sortByTrainId).Scan(&trains).Error
+	} else {
+		err = r.db.Raw(`
+		SELECT tc.*
+		FROM train_carriages tc
+		JOIN trains t ON tc.train_id = t.id
+		WHERE t.status = 'available' AND tc.id IN (
+			SELECT MIN(id)
+			FROM train_carriages
+			GROUP BY class, train_id
+		);
+		`).Scan(&trains).Error
 	}
 
-	offset := (page - 1) * limit
+	if err != nil {
+		return trains, err
+	}
 
-	err = r.db.Limit(limit).Offset(offset).Find(&trains).Error
-
-	return trains, int(count), err
+	return trains, err
 }
 
 func (r *trainRepository) GetTrainByID(id uint) (models.Train, error) {
 	var train models.Train
 	err := r.db.Where("id = ?", id).First(&train).Error
 	return train, err
+}
+
+func (r *trainRepository) GetTrainStationByTrainID(id uint) ([]models.TrainStation, error) {
+	var train []models.TrainStation
+	err := r.db.Where("train_id = ?", id).Find(&train).Error
+	return train, err
+}
+
+func (r *trainRepository) TrainStationByTrainID(id uint) (models.TrainStation, error) {
+	var train models.TrainStation
+	err := r.db.Where("train_id = ?", id).First(&train).Error
+	return train, err
+}
+
+func (r *trainRepository) SearchTrainAvailable(trainId, originId, destinationId uint) ([]models.TrainStation, error) {
+	var (
+		train []models.TrainStation
+		count int64
+	)
+	err := r.db.Where("train_id = ?", trainId).Where("station_id = ? OR station_id = ?", originId, destinationId).Find(&train).Count(&count).Error
+	// Cek apakah ada data dengan 'arrive time' yang descending
+	for i := 0; i < len(train)-1; i++ {
+		if train[i].ArriveTime > train[i+1].ArriveTime {
+			err = errors.New("Train not available")
+			train = nil // Reset data jika ada 'arrive time' descending
+			break
+		}
+	}
+
+	if err != nil {
+		return train, err
+	}
+
+	return train, err
+}
+
+func (r *trainRepository) GetStationByID(id uint) (dtos.StationInput, error) {
+	var station dtos.StationInput
+	err := r.db.Where("id = ?", id).Find(&station).Error
+	return station, err
 }
 
 func (r *trainRepository) GetStationByID2(id uint) (models.Station, error) {
@@ -66,5 +165,25 @@ func (r *trainRepository) UpdateTrain(train models.Train) (models.Train, error) 
 
 func (r *trainRepository) DeleteTrain(train models.Train) error {
 	err := r.db.Delete(&train).Error
-	return err
+	if err != nil {
+		return err
+	}
+
+	trainStation := models.TrainStation{
+		TrainID: train.ID,
+	}
+	err = r.db.Where("train_id = ?", trainStation.TrainID).Delete(&trainStation).Error
+	if err != nil {
+		return err
+	}
+
+	trainCarriage := models.TrainCarriage{
+		TrainID: train.ID,
+	}
+	err = r.db.Where("train_id = ?", trainCarriage.TrainID).Delete(&trainCarriage).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

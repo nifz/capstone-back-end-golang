@@ -4,19 +4,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type typeReservation string
+type TypeReservation string
 
 const (
-	Hotels    typeReservation = "hotels"
-	Villa     typeReservation = "villa"
-	GustHouse typeReservation = "guest_house"
+	Hotels    TypeReservation = "hotels"
+	Villa     TypeReservation = "villa"
+	GustHouse TypeReservation = "guest_house"
 )
 
-type status string
+type Status string
 
 const (
-	Avaliable   status = "avaliable"
-	Unavaliable status = "unavaliable"
+	Avaliable   Status = "available"
+	Unavaliable Status = "unavailable"
 )
 
 type Reservations struct {
@@ -28,12 +28,12 @@ type Reservations struct {
 	Village_name  string          `form:"village_name" json:"village_name"`
 	Postal_code   string          `form:"postal_code" json:"postal_code"`
 	Full_address  string          `form:"full_address" json:"full_address"`
-	Type          typeReservation `form:"type" json:"type" gorm:"type:ENUM('hotels', 'villa', 'guest_house')"`
+	Type          TypeReservation `form:"type" json:"type" gorm:"type:ENUM('hotels', 'villa', 'guest_house')"`
 	Price         int32           `form:"price" json:"price"`
 	Thumbnail     string          `form:"thumbnail" json:"thumbnail"`
 	Description   string          `form:"description" json:"description"`
 	Tags          string          `form:"tags" json:"tags"`
-	Status        status          `form:"status" json:"status" gorm:"type:ENUM('avaliable', 'unavaliable')"`
+	Status        Status          `form:"status" json:"status" gorm:"type:ENUM('available', 'unavailable')"`
 	// Created_at    string          `form:"created_at" json:"created_at" gorm:"autoCreateTime"`
 	// Updated_at    string          `form:"updated_at" json:"updated_at" gorm:"autoUpdateTime"`
 }

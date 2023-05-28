@@ -17,9 +17,8 @@ type UserLoginInput struct {
 }
 
 type UserUpdateInformationInput struct {
-	Gender         string `form:"gender" json:"gender" example:"Laki-Laki"`
-	BirthDate      string `form:"birth_date" json:"birth_date" example:"2002-09-09"`
-	ProfilePicture string `form:"file" json:"profile_picture_url" example:"https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"`
+	Gender    string `form:"gender" json:"gender" example:"Laki-Laki"`
+	BirthDate string `form:"birth_date" json:"birth_date" example:"2002-09-09"`
 }
 
 type UserUpdatePhotoProfileInput struct {
