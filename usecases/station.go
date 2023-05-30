@@ -196,7 +196,7 @@ func (u *stationUsecase) DeleteStation(id uint) error {
 	station, err := u.stationRepo.GetStationByID(id)
 
 	if err != nil {
-		return nil
+		return err
 	}
 	err = u.stationRepo.DeleteStation(station)
 	return err

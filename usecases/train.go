@@ -355,7 +355,7 @@ func (u *trainUsecase) DeleteTrain(id uint) error {
 	train, err := u.trainRepo.GetTrainByID(id)
 
 	if err != nil {
-		return nil
+		return err
 	}
 	err = u.trainRepo.DeleteTrain(train)
 	return err

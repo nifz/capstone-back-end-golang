@@ -67,6 +67,12 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	userByAdminUsecase := usecases.NewUserByAdminUsecase(userByAdminRepository)
 	userByAdminController := controllers.NewUserByAdminController(userByAdminUsecase)
 
+	// Middleware CORS
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"}, // Izinkan semua domain
+		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
+	}))
+
 	api := e.Group("/api/v1")
 
 	// USER

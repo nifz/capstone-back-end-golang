@@ -214,7 +214,7 @@ func (u *articleUsecase) DeleteArticle(id uint) error {
 	article, err := u.articleRepo.GetArticleByID(id)
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	err = u.articleRepo.DeleteArticle(article)

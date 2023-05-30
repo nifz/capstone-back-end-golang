@@ -184,7 +184,7 @@ func (u *recommendationUsecase) DeleteRecommendation(id uint) error {
 	recommendation, err := u.recommendationRepo.GetRecommendationByID(id)
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	err = u.recommendationRepo.DeleteRecommendation(recommendation)

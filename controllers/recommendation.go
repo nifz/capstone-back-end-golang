@@ -186,7 +186,7 @@ func (c *recommendationController) DeleteRecommendation(ctx echo.Context) error 
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed deleting recommendation",
+				"Failed to delete recommendation",
 				helpers.GetErrorData(err),
 			),
 		)

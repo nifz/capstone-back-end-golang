@@ -10,25 +10,25 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type ArticleController interface {
-	GetAllArticles(c echo.Context) error
-	GetArticleByID(c echo.Context) error
-	CreateArticle(c echo.Context) error
-	UpdateArticle(c echo.Context) error
-	DeleteArticle(c echo.Context) error
+type UserByAdminController interface {
+	GetAllUserByAdmin(c echo.Context) error
+	GetUserByAdminByID(c echo.Context) error
+	CreateUserByAdmin(c echo.Context) error
+	UpdateUserByAdmin(c echo.Context) error
+	DeleteUserByAdmin(c echo.Context) error
 }
 
-type articleController struct {
-	articleUsecase usecases.ArticleUsecase
+type userByAdminController struct {
+	userByadminUsecase usecases.UserByAdminUsecase
 }
 
-func NewArticleController(articleUsecase usecases.ArticleUsecase) ArticleController {
-	return &articleController{articleUsecase}
+func NewUserByAdminController(userByAdminUsecase usecases.UserByAdminUsecase) UserByAdminController {
+	return &userByAdminController{userByAdminUsecase}
 }
 
 // Implementasi fungsi-fungsi dari interface ItemController
 
-func (c *articleController) GetAllArticles(ctx echo.Context) error {
+func (c *userByAdminController) GetAllUserByAdmin(ctx echo.Context) error {
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -41,14 +41,14 @@ func (c *articleController) GetAllArticles(ctx echo.Context) error {
 		limit = 10
 	}
 
-	articles, count, err := c.articleUsecase.GetAllArticles(page, limit)
+	users, count, err := c.userByadminUsecase.GetAllUserByAdmin(page, limit)
 	if err != nil {
 
 		return ctx.JSON(
 			http.StatusInternalServerError,
 			helpers.NewErrorResponse(
 				http.StatusInternalServerError,
-				"Failed fetching articles",
+				"Failed fetching users",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -58,8 +58,8 @@ func (c *articleController) GetAllArticles(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewPaginationResponse(
 			http.StatusOK,
-			"Successfully get all article",
-			articles,
+			"Successfully get all user",
+			users,
 			page,
 			limit,
 			count,
@@ -67,16 +67,16 @@ func (c *articleController) GetAllArticles(ctx echo.Context) error {
 	)
 }
 
-func (c *articleController) GetArticleByID(ctx echo.Context) error {
+func (c *userByAdminController) GetUserByAdminByID(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	article, err := c.articleUsecase.GetArticleByID(uint(id))
+	user, err := c.userByadminUsecase.GetUserByAdminByID(uint(id))
 
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get article by id",
+				"Failed to get user by id",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -86,33 +86,33 @@ func (c *articleController) GetArticleByID(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully to get article by id",
-			article,
+			"Successfully to get user by id",
+			user,
 		),
 	)
 
 }
 
-func (c *articleController) CreateArticle(ctx echo.Context) error {
-	var articleDTO dtos.ArticleInput
-	if err := ctx.Bind(&articleDTO); err != nil {
+func (c *userByAdminController) CreateUserByAdmin(ctx echo.Context) error {
+	var userDTO dtos.UserRegisterInputByAdmin
+	if err := ctx.Bind(&userDTO); err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding article",
+				"Failed binding user",
 				helpers.GetErrorData(err),
 			),
 		)
 	}
 
-	article, err := c.articleUsecase.CreateArticle(&articleDTO)
+	user, err := c.userByadminUsecase.CreateUserByAdmin(userDTO)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to created a article",
+				"Failed to created a user",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -122,21 +122,21 @@ func (c *articleController) CreateArticle(ctx echo.Context) error {
 		http.StatusCreated,
 		helpers.NewResponse(
 			http.StatusCreated,
-			"Successfully to created a article",
-			article,
+			"Successfully to created a user",
+			user,
 		),
 	)
 }
 
-func (c *articleController) UpdateArticle(ctx echo.Context) error {
+func (c *userByAdminController) UpdateUserByAdmin(ctx echo.Context) error {
 
-	var articleInput dtos.ArticleInput
-	if err := ctx.Bind(&articleInput); err != nil {
+	var userInput dtos.UserRegisterInputByAdmin
+	if err := ctx.Bind(&userInput); err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding article",
+				"Failed binding user",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -144,25 +144,25 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	article, err := c.articleUsecase.GetArticleByID(uint(id))
-	if article.ArticleID == 0 {
+	user, err := c.userByadminUsecase.GetUserByAdminByID(uint(id))
+	if user.ID == 0 {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get article by id",
+				"Failed to get user by id",
 				helpers.GetErrorData(err),
 			),
 		)
 	}
 
-	articleResp, err := c.articleUsecase.UpdateArticle(uint(id), articleInput)
+	userResp, err := c.userByadminUsecase.UpdateUserByAdmin(uint(id), userInput)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding article",
+				"Failed binding user",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -172,31 +172,32 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully updated article",
-			articleResp,
+			"Successfully updated user",
+			userResp,
 		),
 	)
 }
 
-func (c *articleController) DeleteArticle(ctx echo.Context) error {
+func (c *userByAdminController) DeleteUserByAdmin(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	err := c.articleUsecase.DeleteArticle(uint(id))
+	err := c.userByadminUsecase.DeleteUserByAdmin(uint(id))
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to delete article",
+				"Failed to delete user",
 				helpers.GetErrorData(err),
 			),
 		)
 	}
+
 	return ctx.JSON(
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully deleted article",
+			"Successfully deleted user",
 			nil,
 		),
 	)

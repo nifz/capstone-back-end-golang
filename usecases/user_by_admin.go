@@ -263,7 +263,7 @@ func (u *userByAdminUsecase) DeleteUserByAdmin(id uint) error {
 	user, err := u.userByAdminRepo.UserGetById(id)
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	err = u.userByAdminRepo.UserDelete(user)

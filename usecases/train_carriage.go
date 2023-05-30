@@ -412,7 +412,7 @@ func (u *trainCarriageUsecase) DeleteTrainCarriage(id uint) error {
 	trainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID(id)
 
 	if err != nil {
-		return nil
+		return err
 	}
 	err = u.trainCarriageRepo.DeleteTrainCarriage(trainCarriage)
 	return err
