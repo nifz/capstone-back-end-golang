@@ -18,6 +18,4 @@ jobs:
           script: |
             cd back-end-golang
             git pull origin production
-            sudo /usr/local/go/bin/go build -o binary
-            sudo ./binary
-            # docker-compose down && docker-compose up --build --force-recreate --no-deps -d
+            docker-compose down && docker-compose up --build --force-recreate --no-deps -d
