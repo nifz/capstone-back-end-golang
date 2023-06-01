@@ -192,7 +192,7 @@ func (c *trainController) DeleteTrain(ctx echo.Context) error {
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding train carriage",
+				"Failed to delete train",
 				helpers.GetErrorData(err),
 			),
 		)

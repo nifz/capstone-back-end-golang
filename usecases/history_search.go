@@ -7,7 +7,7 @@ import (
 )
 
 type HistorySearchUseCase interface {
-	HistorySearchGetAll(userId uint) ([]dtos.HistorySearchResponse, error)
+	HistorySearchGetAll(userId uint, page, limit int) ([]dtos.HistorySearchResponse, int, error)
 	HistorySearchCreate(userId uint, input dtos.HistorySearchInput) (dtos.HistorySearchResponse, error)
 	HistorySearchDelete(userId, id uint) (models.HistorySearch, error)
 }
@@ -27,6 +27,8 @@ func NewHistorySearchUsecase(historySearchRepository repositories.HistorySearchR
 // @Tags         User - History Search
 // @Accept       json
 // @Produce      json
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
 // @Success      200 {object} dtos.HistorySearchStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -35,12 +37,12 @@ func NewHistorySearchUsecase(historySearchRepository repositories.HistorySearchR
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/history-search [get]
 // @Security BearerAuth
-func (u *historySearchUsecase) HistorySearchGetAll(userId uint) ([]dtos.HistorySearchResponse, error) {
+func (u *historySearchUsecase) HistorySearchGetAll(userId uint, page, limit int) ([]dtos.HistorySearchResponse, int, error) {
 	var historySearchResponses []dtos.HistorySearchResponse
 
-	histories, err := u.historySearchRepository.HistorySearchGetByUserId(userId)
+	histories, count, err := u.historySearchRepository.HistorySearchGetByUserId(userId, page, limit)
 	if err != nil {
-		return historySearchResponses, err
+		return historySearchResponses, count, err
 	}
 
 	for _, history := range histories {
@@ -52,7 +54,7 @@ func (u *historySearchUsecase) HistorySearchGetAll(userId uint) ([]dtos.HistoryS
 		historySearchResponses = append(historySearchResponses, historySearchResponse)
 	}
 
-	return historySearchResponses, nil
+	return historySearchResponses, count, nil
 }
 
 // HistorySearchCreate godoc
