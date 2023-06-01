@@ -9,6 +9,7 @@ import (
 type TrainCarriageRepository interface {
 	GetAllTrainCarriages(page, limit int) ([]models.TrainCarriage, int, error)
 	GetTrainCarriageByID(id uint) (models.TrainCarriage, error)
+	GetTrainCarriageByID2(id uint) (models.TrainCarriage, error)
 	GetTrainByID2(id uint) (models.Train, error)
 	GetStationByID2(id uint) (models.Station, error)
 	GetTrainSeatsByClass(class string) ([]models.TrainSeat, error)
@@ -30,7 +31,7 @@ func NewTrainCarriageRepository(db *gorm.DB) TrainCarriageRepository {
 func (r *trainCarriageRepository) GetAllTrainCarriages(page, limit int) ([]models.TrainCarriage, int, error) {
 	var (
 		trainCarriages []models.TrainCarriage
-		count       int64
+		count          int64
 	)
 	err := r.db.Find(&trainCarriages).Count(&count).Error
 	if err != nil {
@@ -45,6 +46,12 @@ func (r *trainCarriageRepository) GetAllTrainCarriages(page, limit int) ([]model
 }
 
 func (r *trainCarriageRepository) GetTrainCarriageByID(id uint) (models.TrainCarriage, error) {
+	var trainCarriage models.TrainCarriage
+	err := r.db.Unscoped().Where("id = ?", id).First(&trainCarriage).Error
+	return trainCarriage, err
+}
+
+func (r *trainCarriageRepository) GetTrainCarriageByID2(id uint) (models.TrainCarriage, error) {
 	var trainCarriage models.TrainCarriage
 	err := r.db.Where("id = ?", id).First(&trainCarriage).Error
 	return trainCarriage, err
