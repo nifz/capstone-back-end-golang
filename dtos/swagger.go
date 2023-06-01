@@ -90,6 +90,25 @@ type TrainCarriageCreeatedResponse struct {
 	Data       TrainCarriageResponse `json:"data"`
 }
 
+type GetAllTicketOrderStatusOKResponse struct {
+	StatusCode int                 `json:"status_code" example:"200"`
+	Message    string              `json:"message" example:"Successfully get train carriage"`
+	Data       TicketOrderResponse `json:"data"`
+	Meta       helpers.Meta        `json:"meta"`
+}
+
+type TicketOrderStatusOKResponse struct {
+	StatusCode int                 `json:"status_code" example:"200"`
+	Message    string              `json:"message" example:"Successfully get train carriage"`
+	Data       TicketOrderResponse `json:"data"`
+}
+
+type TicketOrderCreeatedResponse struct {
+	StatusCode int                 `json:"status_code" example:"201"`
+	Message    string              `json:"message" example:"Successfully created train carriage"`
+	Data       TicketOrderResponse `json:"data"`
+}
+
 type GetAllArticleStatusOKResponse struct {
 	StatusCode int             `json:"status_code" example:"200"`
 	Message    string          `json:"message" example:"Successfully get article"`
