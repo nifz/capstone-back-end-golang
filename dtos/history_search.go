@@ -5,7 +5,7 @@ type HistorySearchInput struct {
 }
 
 type HistorySearchResponse struct {
-	ID     uint   `json"id"`
+	ID     uint   `json:"id"`
 	UserID uint   `json:"user_id"`
 	Name   string `json:"name"`
 }

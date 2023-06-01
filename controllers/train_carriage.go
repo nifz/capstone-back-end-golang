@@ -185,7 +185,7 @@ func (c *trainCarriageController) DeleteTrainCarriage(ctx echo.Context) error {
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding train carriage",
+				"Failed to delete train carriage",
 				helpers.GetErrorData(err),
 			),
 		)

@@ -45,8 +45,7 @@ func NewTrainUsecase(TrainRepo repositories.TrainRepository, TrainStationRepo re
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/train [get]
-// @Security BearerAuth
+// @Router       /public/train [get]
 func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int, error) {
 
 	trains, err := u.trainRepo.GetAllTrain()
@@ -61,9 +60,9 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int
 			return trainResponses, 0, err
 		}
 
-		if getTrain.Status != "available" {
-			continue
-		}
+		// if getTrain.Status != "available" {
+		// 	continue
+		// }
 
 		getTrainStation, err := u.trainRepo.GetTrainStationByTrainID(getTrain.ID)
 		if err != nil {
@@ -134,8 +133,7 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/train/{id} [get]
-// @Security BearerAuth
+// @Router       /public/train/{id} [get]
 func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponses, error) {
 	var trainResponses dtos.TrainResponses
 	train, err := u.trainRepo.GetTrainByID(id)
@@ -352,13 +350,13 @@ func (u *trainUsecase) UpdateTrain(id uint, train dtos.TrainInput) (dtos.TrainRe
 // @Router       /admin/train/{id} [delete]
 // @Security BearerAuth
 func (u *trainUsecase) DeleteTrain(id uint) error {
-	train, err := u.trainRepo.GetTrainByID(id)
+	train, err := u.trainRepo.GetTrainByID2(id)
 
 	if err != nil {
-		return nil
+		return err
 	}
-	err = u.trainRepo.DeleteTrain(train)
-	return err
+	train, err = u.trainRepo.DeleteTrain(train)
+	return nil
 }
 
 // =============================== ADMIN END ================================== \\
@@ -385,8 +383,7 @@ func (u *trainUsecase) DeleteTrain(id uint) error {
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /user/train/search [get]
-// @Security BearerAuth
+// @Router       /public/train/search [get]
 func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, stationDestinationId, sortByTrainId int, sortClassName, sortByPrice, sortByArriveTime string) ([]dtos.TrainResponse, int, error) {
 	trains, err := u.trainRepo.GetAllTrains(sortClassName, sortByTrainId)
 	if err != nil {
