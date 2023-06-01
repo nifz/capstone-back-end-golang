@@ -10,10 +10,4 @@ RUN go mod tidy
 
 RUN go build -o binary
 
-USER ec2-user
-
-RUN chmod 644 /etc/letsencrypt/live/capstone.hanifz.com/fullchain.pem
-
-USER nobody
-
-ENTRYPOINT ["./binary"]
+ENTRYPOINT [ "./binary" ]
