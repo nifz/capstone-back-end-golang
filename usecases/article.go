@@ -38,8 +38,7 @@ func NewArticleUsecase(ArticleRepo repositories.ArticleRepository) ArticleUsecas
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/article [get]
-// @Security BearerAuth
+// @Router       /public/article [get]
 func (u *articleUsecase) GetAllArticles(page, limit int) ([]dtos.ArticleResponse, int, error) {
 	articles, count, err := u.articleRepo.GetAllArticles(page, limit)
 	if err != nil {
@@ -77,8 +76,7 @@ func (u *articleUsecase) GetAllArticles(page, limit int) ([]dtos.ArticleResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/article/{id} [get]
-// @Security BearerAuth
+// @Router       /public/article/{id} [get]
 func (u *articleUsecase) GetArticleByID(id uint) (dtos.ArticleResponse, error) {
 	var articleResponses dtos.ArticleResponse
 	article, err := u.articleRepo.GetArticleByID(id)
@@ -214,9 +212,9 @@ func (u *articleUsecase) DeleteArticle(id uint) error {
 	article, err := u.articleRepo.GetArticleByID(id)
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	err = u.articleRepo.DeleteArticle(article)
-	return err
+	return nil
 }

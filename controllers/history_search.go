@@ -20,7 +20,17 @@ func NewHistorySearchController(historyUsecase usecases.HistorySearchUseCase) Hi
 }
 
 func (h *HistorySearchController) HistorySearchGetAll(ctx echo.Context) error {
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
 
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 10
+	}
 	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
 	if tokenString == "" {
 		return ctx.JSON(
@@ -44,7 +54,7 @@ func (h *HistorySearchController) HistorySearchGetAll(ctx echo.Context) error {
 			),
 		)
 	}
-	histories, err := h.historyUsecase.HistorySearchGetAll(userId)
+	histories, count, err := h.historyUsecase.HistorySearchGetAll(userId, page, limit)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusInternalServerError,
@@ -58,10 +68,13 @@ func (h *HistorySearchController) HistorySearchGetAll(ctx echo.Context) error {
 
 	return ctx.JSON(
 		http.StatusOK,
-		helpers.NewResponse(
+		helpers.NewPaginationResponse(
 			http.StatusOK,
 			"Successfully get all history search",
 			histories,
+			page,
+			limit,
+			count,
 		),
 	)
 }

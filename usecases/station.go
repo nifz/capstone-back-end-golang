@@ -11,7 +11,7 @@ type StationUsecase interface {
 	GetStationByID(id uint) (dtos.StationResponse, error)
 	CreateStation(station *dtos.StationInput) (dtos.StationResponse, error)
 	UpdateStation(id uint, station dtos.StationInput) (dtos.StationResponse, error)
-	DeleteStation(id uint) error
+	DeleteStation(id uint) (models.Station, error)
 }
 
 type stationUsecase struct {
@@ -36,8 +36,7 @@ func NewStationUsecase(StationRepo repositories.StationRepository) StationUsecas
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/station [get]
-// @Security BearerAuth
+// @Router       /public/station [get]
 func (u *stationUsecase) GetAllStations(page, limit int) ([]dtos.StationResponse, int, error) {
 	stations, count, err := u.stationRepo.GetAllStations(page, limit)
 	if err != nil {
@@ -73,8 +72,7 @@ func (u *stationUsecase) GetAllStations(page, limit int) ([]dtos.StationResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/station/{id} [get]
-// @Security BearerAuth
+// @Router       /public/station/{id} [get]
 func (u *stationUsecase) GetStationByID(id uint) (dtos.StationResponse, error) {
 	var stationResponses dtos.StationResponse
 	station, err := u.stationRepo.GetStationByID(id)
@@ -192,12 +190,12 @@ func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) 
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/station/{id} [delete]
 // @Security BearerAuth
-func (u *stationUsecase) DeleteStation(id uint) error {
-	station, err := u.stationRepo.GetStationByID(id)
+func (u *stationUsecase) DeleteStation(id uint) (models.Station, error) {
+	station, err := u.stationRepo.GetStationByID2(id)
 
 	if err != nil {
-		return nil
+		return station, err
 	}
-	err = u.stationRepo.DeleteStation(station)
-	return err
+	station, err = u.stationRepo.DeleteStation(station)
+	return station, nil
 }
