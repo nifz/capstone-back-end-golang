@@ -13,7 +13,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8088",
+    "host": "capstone.hanifz.com",
     "basePath": "/api/v1",
     "paths": {
         "/admin/article": {

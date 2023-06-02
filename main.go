@@ -24,7 +24,7 @@ import (
 // capstone.hanifz.com
 // localhost:8088
 
-// @host      localhost:8088
+// @host      capstone.hanifz.com
 // @BasePath  /api/v1
 
 // @securityDefinitions.apikey BearerAuth
