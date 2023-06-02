@@ -2,10 +2,9 @@ package usecases
 
 import (
 	"back-end-golang/dtos"
-	"back-end-golang/helpers"
 	"back-end-golang/models"
 	"back-end-golang/repositories"
-	"errors"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -114,10 +113,10 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 	}
 
 	for _, ticketTravelerDetailDeparture := range ticketOrderInput.TicketTravelerDetailDeparture {
-		dateDepartureParse, err := helpers.FormatStringToDate(ticketTravelerDetailDeparture.Date)
-		if err != nil {
-			return ticketOrderResponse, errors.New("Failed to parsing date")
-		}
+		// dateDepartureParse, err := helpers.FormatStringToDate(ticketTravelerDetailDeparture.Date)
+		// if err != nil {
+		// 	return ticketOrderResponse, errors.New("Failed to parsing date")
+		// }
 
 		travelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID(createTicketOrder.ID)
 		if err != nil {
@@ -164,7 +163,7 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 			DepartureTime:        trainStationOrigin.ArriveTime,
 			StationDestinationID: uint(getStationDestination.ID),
 			ArrivalTime:          trainStationDestination.ArriveTime,
-			DateOfDeparture:      dateDepartureParse,
+			DateOfDeparture:      time.Now(),
 			BoardingTicketCode:   "boarding-ticket-" + uuid.New().String(),
 		}
 		createTicketTravelerDetail, err = u.ticketTravelerDetailRepo.CreateTicketTravelerDetail(createTicketTravelerDetail)
@@ -206,10 +205,10 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 
 	if createTicketOrder.WithReturn {
 		for _, ticketTravelerDetailReturn := range ticketOrderInput.TicketTravelerDetailReturn {
-			dateReturn, err := helpers.FormatStringToDate(ticketTravelerDetailReturn.Date)
-			if err != nil {
-				return ticketOrderResponse, errors.New("Failed to parsing date")
-			}
+			// dateReturn, err := helpers.FormatStringToDate(ticketTravelerDetailReturn.Date)
+			// if err != nil {
+			// 	return ticketOrderResponse, errors.New("Failed to parsing date")
+			// }
 
 			travelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID(createTicketOrder.ID)
 			if err != nil {
@@ -256,7 +255,7 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 				DepartureTime:        trainStationOrigin.ArriveTime,
 				StationDestinationID: uint(getStationDestination.ID),
 				ArrivalTime:          trainStationDestination.ArriveTime,
-				DateOfDeparture:      dateReturn,
+				DateOfDeparture:      time.Now(),
 				BoardingTicketCode:   "boarding-ticket-" + uuid.New().String(),
 			}
 			createTicketTravelerDetail, err = u.ticketTravelerDetailRepo.CreateTicketTravelerDetail(createTicketTravelerDetail)
