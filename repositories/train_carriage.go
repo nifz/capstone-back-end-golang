@@ -47,7 +47,7 @@ func (r *trainCarriageRepository) GetAllTrainCarriages(page, limit int) ([]model
 
 func (r *trainCarriageRepository) GetTrainCarriageByID(id uint) (models.TrainCarriage, error) {
 	var trainCarriage models.TrainCarriage
-	err := r.db.Unscoped().Where("id = ?", id).First(&trainCarriage).Error
+	err := r.db.Where("id = ?", id).First(&trainCarriage).Error
 	return trainCarriage, err
 }
 
