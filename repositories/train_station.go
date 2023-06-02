@@ -51,7 +51,7 @@ func (r *trainStationRepository) GetTrainStationByID(id uint) (models.TrainStati
 
 func (r *trainStationRepository) GetTrainStationByTrainIDStationID(trainID, stationID uint) (models.TrainStation, error) {
 	var trainStation models.TrainStation
-	err := r.db.Unscoped().Where("train_id = ? AND station_id = ?", trainID, stationID).First(&trainStation).Error
+	err := r.db.Where("train_id = ? AND station_id = ?", trainID, stationID).First(&trainStation).Error
 	return trainStation, err
 }
 
