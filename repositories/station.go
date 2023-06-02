@@ -44,7 +44,7 @@ func (r *stationRepository) GetAllStations(page, limit int) ([]models.Station, i
 
 func (r *stationRepository) GetStationByID(id uint) (models.Station, error) {
 	var station models.Station
-	err := r.db.Where("id = ?", id).First(&station).Error
+	err := r.db.Unscoped().Where("id = ?", id).First(&station).Error
 	return station, err
 }
 
