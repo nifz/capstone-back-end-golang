@@ -37,8 +37,7 @@ func NewTrainCarriageUsecase(TrainCarriageRepo repositories.TrainCarriageReposit
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/train-carriage [get]
-// @Security BearerAuth
+// @Router       /public/train-carriage [get]
 func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.TrainCarriageResponse, int, error) {
 
 	trainCarriages, count, err := u.trainCarriageRepo.GetAllTrainCarriages(page, limit)
@@ -63,6 +62,7 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.Tra
 		var trainSeatResponses []dtos.TrainSeatResponse
 		for _, trainSeat := range trainSeat {
 			trainSeatRespon := dtos.TrainSeatResponse{
+				ID:   int(trainSeat.ID),
 				Name: trainSeat.Name,
 			}
 			trainSeatResponses = append(trainSeatResponses, trainSeatRespon)
@@ -126,8 +126,7 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.Tra
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/train-carriage/{id} [get]
-// @Security BearerAuth
+// @Router       /public/train-carriage/{id} [get]
 func (u *trainCarriageUsecase) GetTrainCarriageByID(id uint) (dtos.TrainCarriageResponse, error) {
 	var trainCarriageResponses dtos.TrainCarriageResponse
 	trainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID(id)
@@ -149,6 +148,7 @@ func (u *trainCarriageUsecase) GetTrainCarriageByID(id uint) (dtos.TrainCarriage
 	var trainStationResponses []dtos.TrainStationResponse
 	for _, trainSeat := range trainSeat {
 		trainSeatRespon := dtos.TrainSeatResponse{
+			ID:   int(trainSeat.ID),
 			Name: trainSeat.Name,
 		}
 		trainSeatResponses = append(trainSeatResponses, trainSeatRespon)
@@ -241,6 +241,7 @@ func (u *trainCarriageUsecase) CreateTrainCarriage(trainCarriages []dtos.TrainCa
 		var trainStationResponses []dtos.TrainStationResponse
 		for _, trainSeat := range trainSeats {
 			trainSeatResponse := dtos.TrainSeatResponse{
+				ID:   int(trainSeat.ID),
 				Name: trainSeat.Name,
 			}
 			trainSeatResponses = append(trainSeatResponses, trainSeatResponse)
@@ -344,6 +345,7 @@ func (u *trainCarriageUsecase) UpdateTrainCarriage(id uint, trainCarriageInput d
 	var trainSeatResponses []dtos.TrainSeatResponse
 	for _, trainSeat := range trainSeat {
 		trainSeatRespon := dtos.TrainSeatResponse{
+			ID:   int(trainSeat.ID),
 			Name: trainSeat.Name,
 		}
 		trainSeatResponses = append(trainSeatResponses, trainSeatRespon)
@@ -409,11 +411,11 @@ func (u *trainCarriageUsecase) UpdateTrainCarriage(id uint, trainCarriageInput d
 // @Router       /admin/train-carriage/{id} [delete]
 // @Security BearerAuth
 func (u *trainCarriageUsecase) DeleteTrainCarriage(id uint) error {
-	trainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID(id)
+	trainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(id)
 
 	if err != nil {
-		return nil
+		return err
 	}
 	err = u.trainCarriageRepo.DeleteTrainCarriage(trainCarriage)
-	return err
+	return nil
 }

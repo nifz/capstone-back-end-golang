@@ -30,3 +30,14 @@ type TrainResponses struct {
 	CreatedAt time.Time              `json:"created_at" example:"2023-05-17T15:07:16.504+07:00"`
 	UpdatedAt time.Time              `json:"updated_at" example:"2023-05-17T15:07:16.504+07:00"`
 }
+
+type TrainResponsesSimply struct {
+	TrainID         uint   `json:"train_id" example:"1"`
+	CodeTrain       string `json:"code_train" example:"TRAIN001"`
+	Name            string `json:"name" example:"Bengawan"`
+	Class           string `json:"class" example:"Ekonomi"`
+	TrainCarriageID uint   `json:"train_carriage_id" example:"1"`
+	TrainCarriage   string `json:"train_carriage" example:"Gerbong 1"`
+	TrainSeatID     uint   `json:"train_seat_id" example:"1"`
+	TrainSeat       string `json:"train_seat" example:"A1"`
+}

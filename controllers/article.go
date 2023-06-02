@@ -187,7 +187,7 @@ func (c *articleController) DeleteArticle(ctx echo.Context) error {
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding article",
+				"Failed to delete article",
 				helpers.GetErrorData(err),
 			),
 		)
