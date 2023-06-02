@@ -4,4 +4,7 @@ services:
     build: .
     restart: on-failure
     ports:
-      - 433:433
+      - "443:433" # Menjalankan port 443 pada host ke port 433 pada container
+    volumes:
+      - /etc/letsencrypt/live/capstone.hanifz.com/fullchain.pem:/etc/nginx/ssl/fullchain.pem
+      - /etc/letsencrypt/live/capstone.hanifz.com/privkey.pem:/etc/nginx/ssl/privkey.pem
