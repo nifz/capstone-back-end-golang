@@ -13,7 +13,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8088",
+    "host": "capstone.hanifz.com",
     "basePath": "/api/v1",
     "paths": {
         "/admin/article": {
@@ -1742,6 +1742,20 @@
                     "User - History Search"
                 ],
                 "summary": "Get all history search",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
