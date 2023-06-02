@@ -10,4 +10,6 @@ RUN go mod tidy
 
 RUN go build -o binary
 
+EXPOSE 443
+
 ENTRYPOINT [ "./binary" ]
