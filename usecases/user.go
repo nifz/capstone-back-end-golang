@@ -14,7 +14,6 @@ import (
 type UserUsecase interface {
 	UserLogin(input dtos.UserLoginInput) (dtos.UserInformationResponse, error)
 	UserRegister(input dtos.UserRegisterInput) (dtos.UserInformationResponse, error)
-	UserUpdateInformation(userId uint, input dtos.UserUpdateInformationInput) (dtos.UserInformationResponse, error)
 	UserUpdatePassword(userId uint, input dtos.UserUpdatePasswordInput) (dtos.UserInformationResponse, error)
 	UserUpdateProfile(userId uint, input dtos.UserUpdateProfileInput) (dtos.UserInformationResponse, error)
 	UserCredential(userId uint) (dtos.UserInformationResponse, error)
@@ -71,7 +70,6 @@ func (u *userUsecase) UserLogin(input dtos.UserLoginInput) (dtos.UserInformation
 	userResponse.FullName = user.FullName
 	userResponse.Email = user.Email
 	userResponse.PhoneNumber = user.PhoneNumber
-	userResponse.Gender = user.Gender
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
@@ -140,58 +138,6 @@ func (u *userUsecase) UserRegister(input dtos.UserRegisterInput) (dtos.UserInfor
 	userResponse.FullName = user.FullName
 	userResponse.Email = user.Email
 	userResponse.PhoneNumber = user.PhoneNumber
-	userResponse.Gender = user.Gender
-	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
-	userResponse.ProfilePicture = user.ProfilePicture
-	userResponse.Citizen = user.Citizen
-	userResponse.Role = user.Role
-	userResponse.CreatedAt = user.CreatedAt
-	userResponse.UpdatedAt = user.UpdatedAt
-
-	return userResponse, err
-}
-
-// UserUpdateInformation godoc
-// @Summary      Update Information
-// @Description  User update an information
-// @Tags         User - Account
-// @Accept       json
-// @Produce      json
-// @Param        request body dtos.UserUpdateInformationInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.UserStatusOKResponse
-// @Failure      400 {object} dtos.BadRequestResponse
-// @Failure      401 {object} dtos.UnauthorizedResponse
-// @Failure      403 {object} dtos.ForbiddenResponse
-// @Failure      404 {object} dtos.NotFoundResponse
-// @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /user/update-information [patch]
-// @Security BearerAuth
-func (u *userUsecase) UserUpdateInformation(userId uint, input dtos.UserUpdateInformationInput) (dtos.UserInformationResponse, error) {
-	var (
-		user         models.User
-		userResponse dtos.UserInformationResponse
-	)
-
-	user, err := u.userRepo.UserGetById(userId)
-	if err != nil {
-		return userResponse, errors.New("User not found")
-	}
-
-	birthDateParse := helpers.FormatStringToDate(input.BirthDate)
-
-	user.Gender = &input.Gender
-	user.BirthDate = &birthDateParse
-
-	user, err = u.userRepo.UserUpdate(user)
-	if err != nil {
-		return userResponse, err
-	}
-
-	userResponse.ID = user.ID
-	userResponse.FullName = user.FullName
-	userResponse.Email = user.Email
-	userResponse.PhoneNumber = user.PhoneNumber
-	userResponse.Gender = user.Gender
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
@@ -261,7 +207,6 @@ func (u *userUsecase) UserUpdatePassword(userId uint, input dtos.UserUpdatePassw
 	userResponse.FullName = user.FullName
 	userResponse.Email = user.Email
 	userResponse.PhoneNumber = user.PhoneNumber
-	userResponse.Gender = user.Gender
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
@@ -318,7 +263,6 @@ func (u *userUsecase) UserUpdateProfile(userId uint, input dtos.UserUpdateProfil
 	userResponse.FullName = user.FullName
 	userResponse.Email = user.Email
 	userResponse.PhoneNumber = user.PhoneNumber
-	userResponse.Gender = user.Gender
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
@@ -358,7 +302,6 @@ func (u *userUsecase) UserCredential(userId uint) (dtos.UserInformationResponse,
 	userResponse.FullName = user.FullName
 	userResponse.Email = user.Email
 	userResponse.PhoneNumber = user.PhoneNumber
-	userResponse.Gender = user.Gender
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
@@ -406,7 +349,6 @@ func (u *userUsecase) UserUpdatePhotoProfile(userId uint, input dtos.UserUpdateP
 	userResponse.FullName = user.FullName
 	userResponse.Email = user.Email
 	userResponse.PhoneNumber = user.PhoneNumber
-	userResponse.Gender = user.Gender
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
@@ -453,7 +395,6 @@ func (u *userUsecase) UserDeletePhotoProfile(userId uint) (dtos.UserInformationR
 	userResponse.FullName = user.FullName
 	userResponse.Email = user.Email
 	userResponse.PhoneNumber = user.PhoneNumber
-	userResponse.Gender = user.Gender
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen

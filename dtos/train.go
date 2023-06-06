@@ -36,6 +36,7 @@ type TrainResponsesSimply struct {
 	CodeTrain       string `json:"code_train" example:"TRAIN001"`
 	Name            string `json:"name" example:"Bengawan"`
 	Class           string `json:"class" example:"Ekonomi"`
+	TrainPrice      int    `json:"train_price" example:"50000"`
 	TrainCarriageID uint   `json:"train_carriage_id" example:"1"`
 	TrainCarriage   string `json:"train_carriage" example:"Gerbong 1"`
 	TrainSeatID     uint   `json:"train_seat_id" example:"1"`

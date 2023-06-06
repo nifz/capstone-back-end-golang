@@ -51,8 +51,12 @@ func Init(e *echo.Echo, db *gorm.DB) {
 
 	trainSeatRepository := repositories.NewTrainSeatRepository(db)
 
+	paymentRepository := repositories.NewPaymentRepository(db)
+	paymentUsecase := usecases.NewPaymentUsecase(paymentRepository)
+	paymentController := controllers.NewPaymentController(paymentUsecase)
+
 	ticketOrderRepository := repositories.NewTicketOrderRepository(db)
-	ticketOrderUsecase := usecases.NewTicketOrderUsecase(ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository)
+	ticketOrderUsecase := usecases.NewTicketOrderUsecase(ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository)
 	ticketOrderController := controllers.NewTicketOrderController(ticketOrderUsecase)
 
 	articleRepository := repositories.NewArticleRepository(db)
@@ -81,7 +85,6 @@ func Init(e *echo.Echo, db *gorm.DB) {
 
 	// user account
 	user.Any("", userController.UserCredential)
-	user.PATCH("/update-information", userController.UserUpdateInformation)
 	user.PUT("/update-password", userController.UserUpdatePassword)
 	user.PUT("/update-profile", userController.UserUpdateProfile)
 	user.PUT("/update-photo-profile", userController.UserUpdatePhotoProfile)
@@ -91,6 +94,9 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	public.GET("/train/search", trainController.SearchTrainAvailable)
 	user.POST("/train/order", ticketOrderController.CreateTicketOrder)
 	user.PATCH("/train/order", ticketOrderController.UpdateTicketOrder)
+
+	user.GET("/order/ticket", ticketOrderController.GetTicketOrders)
+	user.GET("/order/ticket/detail", ticketOrderController.GetTicketOrderByID)
 
 	user.GET("/history-search", historySearchController.HistorySearchGetAll)
 	user.POST("/history-search", historySearchController.HistorySearchCreate)
@@ -126,4 +132,10 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.PUT("/article/:id", articleController.UpdateArticle)
 	admin.POST("/article", articleController.CreateArticle)
 	admin.DELETE("/article/:id", articleController.DeleteArticle)
+
+	public.GET("/payment", paymentController.GetAllPayments)
+	public.GET("/payment/:id", paymentController.GetPaymentByID)
+	admin.PUT("/payment/:id", paymentController.UpdatePayment)
+	admin.POST("/payment", paymentController.CreatePayment)
+	admin.DELETE("/payment/:id", paymentController.DeletePayment)
 }

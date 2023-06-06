@@ -7,9 +7,10 @@ import (
 )
 
 type TicketTravelerDetailRepository interface {
-	GetAllTicketTravelerDetails(page, limit int) ([]models.TicketTravelerDetail, int, error)
+	GetAllTicketTravelerDetails() ([]models.TicketTravelerDetail, int, error)
 	GetTicketTravelerDetailByID(id uint) (models.TicketTravelerDetail, error)
-	GetTicketTravelerDetailByTrainID(id uint) ([]models.TicketTravelerDetail, error)
+	GetTicketTravelerDetailByTicketOrderID(id uint) ([]models.TicketTravelerDetail, error)
+	GetTicketTravelerDetailByTicketOrderIDAndTrainID(ticketOrderId, trainId uint) (models.TicketTravelerDetail, error)
 	CreateTicketTravelerDetail(ticketTravelerDetail models.TicketTravelerDetail) (models.TicketTravelerDetail, error)
 	UpdateTicketTravelerDetail(ticketTravelerDetail models.TicketTravelerDetail) (models.TicketTravelerDetail, error)
 }
@@ -22,19 +23,16 @@ func NewTicketTravelerDetailRepository(db *gorm.DB) TicketTravelerDetailReposito
 	return &ticketTravelerDetailRepository{db}
 }
 
-func (r *ticketTravelerDetailRepository) GetAllTicketTravelerDetails(page, limit int) ([]models.TicketTravelerDetail, int, error) {
+func (r *ticketTravelerDetailRepository) GetAllTicketTravelerDetails() ([]models.TicketTravelerDetail, int, error) {
 	var (
 		ticketTravelerDetails []models.TicketTravelerDetail
 		count                 int64
 	)
+
 	err := r.db.Find(&ticketTravelerDetails).Count(&count).Error
 	if err != nil {
 		return ticketTravelerDetails, int(count), err
 	}
-
-	offset := (page - 1) * limit
-
-	err = r.db.Limit(limit).Offset(offset).Find(&ticketTravelerDetails).Error
 
 	return ticketTravelerDetails, int(count), err
 }
@@ -45,9 +43,15 @@ func (r *ticketTravelerDetailRepository) GetTicketTravelerDetailByID(id uint) (m
 	return ticketTravelerDetail, err
 }
 
-func (r *ticketTravelerDetailRepository) GetTicketTravelerDetailByTrainID(id uint) ([]models.TicketTravelerDetail, error) {
+func (r *ticketTravelerDetailRepository) GetTicketTravelerDetailByTicketOrderID(id uint) ([]models.TicketTravelerDetail, error) {
 	var ticketTravelerDetail []models.TicketTravelerDetail
-	err := r.db.Where("id = ?", id).Find(&ticketTravelerDetail).Error
+	err := r.db.Where("ticket_order_id = ?", id).Find(&ticketTravelerDetail).Error
+	return ticketTravelerDetail, err
+}
+
+func (r *ticketTravelerDetailRepository) GetTicketTravelerDetailByTicketOrderIDAndTrainID(ticketOrderId, trainId uint) (models.TicketTravelerDetail, error) {
+	var ticketTravelerDetail models.TicketTravelerDetail
+	err := r.db.Where("ticket_order_id = ? AND train_id = ?", ticketOrderId, trainId).First(&ticketTravelerDetail).Error
 	return ticketTravelerDetail, err
 }
 

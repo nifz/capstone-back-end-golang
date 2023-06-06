@@ -16,11 +16,6 @@ type UserLoginInput struct {
 	Password string `form:"password" json:"password" example:"qweqwe123"`
 }
 
-type UserUpdateInformationInput struct {
-	Gender    string `form:"gender" json:"gender" example:"Laki-Laki"`
-	BirthDate string `form:"birth_date" json:"birth_date" example:"2002-09-09"`
-}
-
 type UserUpdatePhotoProfileInput struct {
 	ProfilePicture string `form:"file" json:"file" example:"https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"`
 }
@@ -61,7 +56,6 @@ type UserInformationResponse struct {
 	FullName       string    `json:"full_name" example:"Mochammad Hanif"`
 	Email          string    `json:"email" example:"me@hanifz.com"`
 	PhoneNumber    string    `json:"phone_number" example:"0851555555151"`
-	Gender         *string   `json:"gender" example:"Laki-Laki"`
 	BirthDate      string    `json:"birth_date" example:"2002-09-12"`
 	ProfilePicture string    `json:"profile_picture_url" example:"https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"`
 	Citizen        string    `json:"citizen" example:"Indonesia"`
