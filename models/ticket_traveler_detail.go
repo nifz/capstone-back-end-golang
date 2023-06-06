@@ -14,6 +14,7 @@ type TicketTravelerDetail struct {
 	TravelerDetail       TravelerDetail `gorm:"foreignKey:TravelerDetailID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	TrainID              uint
 	Train                Train `gorm:"foreignKey:TrainID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	TrainPrice           int
 	TrainCarriageID      uint
 	TrainCarriage        TrainCarriage `gorm:"foreignKey:TrainCarriageID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	TrainSeatID          uint

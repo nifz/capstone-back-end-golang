@@ -131,7 +131,7 @@ func (r *trainRepository) SearchTrainAvailable(trainId, originId, destinationId 
 		train []models.TrainStation
 		count int64
 	)
-	err := r.db.Unscoped().Where("train_id = ? AND station_id = ? OR station_id = ?", trainId, originId, destinationId).Find(&train).Count(&count).Error
+	err := r.db.Where("train_id = ? AND station_id = ? OR station_id = ?", trainId, originId, destinationId).Find(&train).Count(&count).Error
 	// Cek apakah ada data dengan 'arrive time' yang descending
 	for i := 0; i < len(train)-1; i++ {
 		if train[i].ArriveTime > train[i+1].ArriveTime {

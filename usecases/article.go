@@ -2,9 +2,9 @@ package usecases
 
 import (
 	"back-end-golang/dtos"
-	"back-end-golang/helpers"
 	"back-end-golang/models"
 	"back-end-golang/repositories"
+	"errors"
 	"fmt"
 )
 
@@ -53,7 +53,6 @@ func (u *articleUsecase) GetAllArticles(page, limit int) ([]dtos.ArticleResponse
 			Image:       article.Image,
 			Description: article.Description,
 			Label:       article.Label,
-			Slug:        article.Slug,
 			CreatedAt:   article.CreatedAt,
 			UpdatedAt:   article.UpdatedAt,
 		}
@@ -89,7 +88,6 @@ func (u *articleUsecase) GetArticleByID(id uint) (dtos.ArticleResponse, error) {
 		Image:       article.Image,
 		Description: article.Description,
 		Label:       article.Label,
-		Slug:        article.Slug,
 		CreatedAt:   article.CreatedAt,
 		UpdatedAt:   article.UpdatedAt,
 	}
@@ -102,7 +100,10 @@ func (u *articleUsecase) GetArticleByID(id uint) (dtos.ArticleResponse, error) {
 // @Tags         Admin - Article
 // @Accept       json
 // @Produce      json
-// @Param        request body dtos.ArticleInput true "Payload Body [RAW]"
+// @Param        file formData file true "Image file"
+// @Param		 title formData string true "Title article"
+// @Param		 description formData string true "Description article"
+// @Param		 label formData string true "Label article"
 // @Success      201 {object} dtos.ArticleCreeatedResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -113,13 +114,16 @@ func (u *articleUsecase) GetArticleByID(id uint) (dtos.ArticleResponse, error) {
 // @Security BearerAuth
 func (u *articleUsecase) CreateArticle(articleInput *dtos.ArticleInput) (dtos.ArticleResponse, error) {
 	var articleResponses dtos.ArticleResponse
-	slug := helpers.CreateSlug(articleInput.Title)
+
+	if articleInput.Title == "" || articleInput.Image == "" || articleInput.Description == "" || articleInput.Label == "" {
+		return articleResponses, errors.New("Failed to create article")
+	}
+
 	CreateArticle := models.Article{
 		Title:       articleInput.Title,
 		Image:       articleInput.Image,
 		Description: articleInput.Description,
 		Label:       articleInput.Label,
-		Slug:        slug,
 	}
 
 	createdArticle, err := u.articleRepo.CreateArticle(CreateArticle)
@@ -134,7 +138,6 @@ func (u *articleUsecase) CreateArticle(articleInput *dtos.ArticleInput) (dtos.Ar
 		Image:       createdArticle.Image,
 		Description: createdArticle.Description,
 		Label:       createdArticle.Label,
-		Slug:        createdArticle.Slug,
 		CreatedAt:   createdArticle.CreatedAt,
 		UpdatedAt:   createdArticle.UpdatedAt,
 	}
@@ -147,32 +150,36 @@ func (u *articleUsecase) CreateArticle(articleInput *dtos.ArticleInput) (dtos.Ar
 // @Tags         Admin - Article
 // @Accept       json
 // @Produce      json
-// @Param id path integer true "ID article"
-// @Param        request body dtos.ArticleInput true "Payload Body [RAW]"
+// @Param		 id path integer true "ID article"
+// @Param        file formData file true "Image file"
+// @Param		 title formData string true "Title article"
+// @Param		 description formData string true "Description article"
+// @Param		 label formData string true "Label article"
 // @Success      200 {object} dtos.ArticleStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/article [put]
+// @Router       /admin/article/{id} [put]
 // @Security BearerAuth
 func (u *articleUsecase) UpdateArticle(id uint, articleInput dtos.ArticleInput) (dtos.ArticleResponse, error) {
 	var article models.Article
 	var articleResponse dtos.ArticleResponse
+
+	if articleInput.Title == "" || articleInput.Image == "" || articleInput.Description == "" || articleInput.Label == "" {
+		return articleResponse, errors.New("Failed to create article")
+	}
 
 	article, err := u.articleRepo.GetArticleByID(id)
 	if err != nil {
 		return articleResponse, err
 	}
 
-	slug := helpers.CreateSlug(articleInput.Title)
-
 	article.Title = articleInput.Title
 	article.Image = articleInput.Image
 	article.Description = articleInput.Description
 	article.Label = articleInput.Label
-	article.Slug = slug
 
 	article, err = u.articleRepo.UpdateArticle(article)
 
@@ -185,7 +192,6 @@ func (u *articleUsecase) UpdateArticle(id uint, articleInput dtos.ArticleInput) 
 	articleResponse.Image = article.Image
 	articleResponse.Description = article.Description
 	articleResponse.Label = article.Label
-	articleResponse.Slug = article.Slug
 	articleResponse.CreatedAt = article.CreatedAt
 	articleResponse.UpdatedAt = article.UpdatedAt
 

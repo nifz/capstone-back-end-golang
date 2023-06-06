@@ -93,66 +93,6 @@ func (c *UserController) UserRegister(ctx echo.Context) error {
 	)
 }
 
-func (c *UserController) UserUpdateInformation(ctx echo.Context) error {
-	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
-	if tokenString == "" {
-		return ctx.JSON(
-			http.StatusUnauthorized,
-			helpers.NewErrorResponse(
-				http.StatusUnauthorized,
-				"No token provided",
-				helpers.GetErrorData(nil),
-			),
-		)
-	}
-
-	userId, err := middlewares.GetUserIdFromToken(tokenString)
-	if err != nil {
-		return ctx.JSON(
-			http.StatusUnauthorized,
-			helpers.NewErrorResponse(
-				http.StatusUnauthorized,
-				"No token provided",
-				helpers.GetErrorData(err),
-			),
-		)
-	}
-
-	var userInput dtos.UserUpdateInformationInput
-	err = ctx.Bind(&userInput)
-	if err != nil {
-		return ctx.JSON(
-			http.StatusBadRequest,
-			helpers.NewErrorResponse(
-				http.StatusBadRequest,
-				"Failed to update information",
-				helpers.GetErrorData(err),
-			),
-		)
-	}
-
-	user, err := c.userUsecase.UserUpdateInformation(userId, userInput)
-	if err != nil {
-		return ctx.JSON(
-			http.StatusBadRequest,
-			helpers.NewErrorResponse(
-				http.StatusBadRequest,
-				"Failed to update information",
-				helpers.GetErrorData(err),
-			),
-		)
-	}
-
-	return ctx.JSON(
-		http.StatusOK,
-		helpers.NewResponse(
-			http.StatusOK,
-			"Successfully updated information",
-			user,
-		),
-	)
-}
-
 func (c *UserController) UserUpdatePassword(ctx echo.Context) error {
 	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
 	if tokenString == "" {
