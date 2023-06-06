@@ -76,7 +76,7 @@ func (u *stationUsecase) GetAllStations(page, limit int) ([]dtos.StationResponse
 // @Router       /public/station/{id} [get]
 func (u *stationUsecase) GetStationByID(id uint) (dtos.StationResponse, error) {
 	var stationResponses dtos.StationResponse
-	station, err := u.stationRepo.GetStationByID(id)
+	station, err := u.stationRepo.GetStationByID2(id)
 	if err != nil {
 		return stationResponses, err
 	}

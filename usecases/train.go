@@ -137,7 +137,7 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int
 // @Router       /public/train/{id} [get]
 func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponses, error) {
 	var trainResponses dtos.TrainResponses
-	train, err := u.trainRepo.GetTrainByID(id)
+	train, err := u.trainRepo.GetTrainByID2(id)
 	if err != nil {
 		return trainResponses, err
 	}
