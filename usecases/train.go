@@ -4,6 +4,7 @@ import (
 	"back-end-golang/dtos"
 	"back-end-golang/models"
 	"back-end-golang/repositories"
+	"errors"
 	"sort"
 	"strings"
 )
@@ -169,6 +170,9 @@ func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponses, error) {
 // @Security BearerAuth
 func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses, error) {
 	var trainResponse dtos.TrainResponses
+	if train.CodeTrain == "" || train.Name == "" || train.Route == nil || train.Status == "" {
+		return trainResponse, errors.New("Failed to create train")
+	}
 
 	createTrain := models.Train{
 		CodeTrain: train.CodeTrain,
@@ -182,6 +186,9 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses,
 	}
 
 	for _, train := range train.Route {
+		if train.ArriveTime == "" || train.StationID < 1 {
+			return trainResponse, errors.New("Failed to create train")
+		}
 		station, err := u.trainRepo.GetStationByID2(train.StationID)
 		if err != nil {
 			return trainResponse, err
@@ -256,6 +263,9 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses,
 func (u *trainUsecase) UpdateTrain(id uint, train dtos.TrainInput) (dtos.TrainResponses, error) {
 	var trains models.Train
 	var trainResponse dtos.TrainResponses
+	if train.CodeTrain == "" || train.Name == "" || train.Route == nil || train.Status == "" {
+		return trainResponse, errors.New("Failed to update train")
+	}
 
 	trains, err := u.trainRepo.GetTrainByID(id)
 	if err != nil {

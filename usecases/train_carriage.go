@@ -4,6 +4,7 @@ import (
 	"back-end-golang/dtos"
 	"back-end-golang/models"
 	"back-end-golang/repositories"
+	"errors"
 )
 
 type TrainCarriageUsecase interface {
@@ -215,6 +216,9 @@ func (u *trainCarriageUsecase) CreateTrainCarriage(trainCarriages []dtos.TrainCa
 	var trainCarriageResponses []dtos.TrainCarriageResponse
 
 	for _, trainCarriageInput := range trainCarriages {
+		if trainCarriageInput.TrainID < 1 || trainCarriageInput.Name == "" || trainCarriageInput.Class == "" || trainCarriageInput.Price < 1 {
+			return trainCarriageResponses, errors.New("Failed to create train carriage")
+		}
 		createTrainCarriage := models.TrainCarriage{
 			TrainID: trainCarriageInput.TrainID,
 			Class:   trainCarriageInput.Class,
@@ -313,6 +317,10 @@ func (u *trainCarriageUsecase) UpdateTrainCarriage(id uint, trainCarriageInput d
 	var trainCarriage models.TrainCarriage
 	var trainCarriageResponse dtos.TrainCarriageResponse
 	var trainCarriageResponsee dtos.TrainCarriageResponse
+
+	if trainCarriageInput.TrainID < 1 || trainCarriageInput.Name == "" || trainCarriageInput.Class == "" || trainCarriageInput.Price < 1 {
+		return trainCarriageResponse, errors.New("Failed to create train carriage")
+	}
 
 	trainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID(id)
 
