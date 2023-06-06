@@ -15,7 +15,7 @@ type TrainCarriageRepository interface {
 	GetTrainSeatsByClass(class string) ([]models.TrainSeat, error)
 	CreateTrainCarriage(trainCarriage models.TrainCarriage) (models.TrainCarriage, error)
 	UpdateTrainCarriage(trainCarriage models.TrainCarriage) (models.TrainCarriage, error)
-	DeleteTrainCarriage(trainCarriage models.TrainCarriage) error
+	DeleteTrainCarriage(id uint) error
 }
 
 type trainCarriageRepository struct {
@@ -59,7 +59,7 @@ func (r *trainCarriageRepository) GetTrainCarriageByID2(id uint) (models.TrainCa
 
 func (r *trainCarriageRepository) GetTrainByID2(id uint) (models.Train, error) {
 	var train models.Train
-	err := r.db.Where("id = ?", id).First(&train).Error
+	err := r.db.Unscoped().Where("id = ?", id).First(&train).Error
 	return train, err
 }
 
@@ -85,7 +85,8 @@ func (r *trainCarriageRepository) UpdateTrainCarriage(trainCarriage models.Train
 	return trainCarriage, err
 }
 
-func (r *trainCarriageRepository) DeleteTrainCarriage(trainCarriage models.TrainCarriage) error {
-	err := r.db.Delete(&trainCarriage).Error
+func (r *trainCarriageRepository) DeleteTrainCarriage(id uint) error {
+	var trainCarriage models.TrainCarriage
+	err := r.db.Where("id = ?", id).Delete(&trainCarriage).Error
 	return err
 }

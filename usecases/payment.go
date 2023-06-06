@@ -12,7 +12,7 @@ type PaymentUsecase interface {
 	GetPaymentByID(id uint) (dtos.PaymentResponse, error)
 	CreatePayment(payment *dtos.PaymentInput) (dtos.PaymentResponse, error)
 	UpdatePayment(id uint, payment dtos.PaymentInput) (dtos.PaymentResponse, error)
-	DeletePayment(id uint) (models.Payment, error)
+	DeletePayment(id uint) error
 }
 
 type paymentUsecase struct {
@@ -215,7 +215,6 @@ func (u *paymentUsecase) UpdatePayment(id uint, paymentInput dtos.PaymentInput) 
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/payment/{id} [delete]
 // @Security BearerAuth
-func (u *paymentUsecase) DeletePayment(id uint) (models.Payment, error) {
-	err := u.paymentRepo.DeletePayment(id)
-	return models.Payment{}, err
+func (u *paymentUsecase) DeletePayment(id uint) error {
+	return u.paymentRepo.DeletePayment(id)
 }

@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"back-end-golang/dtos"
 	"back-end-golang/models"
 	"errors"
 
@@ -16,10 +15,11 @@ type TrainRepository interface {
 	TrainStationByTrainID(id uint) (models.TrainStation, error)
 	GetTrainStationByTrainID(id uint) ([]models.TrainStation, error)
 	SearchTrainAvailable(trainId, originId, destinationId uint) ([]models.TrainStation, error)
+	GetStationByID(id uint) (models.Station, error)
 	GetStationByID2(id uint) (models.Station, error)
 	CreateTrain(train models.Train) (models.Train, error)
 	UpdateTrain(train models.Train) (models.Train, error)
-	DeleteTrain(train models.Train) (models.Train, error)
+	DeleteTrain(id uint) error
 }
 
 type trainRepository struct {
@@ -148,8 +148,8 @@ func (r *trainRepository) SearchTrainAvailable(trainId, originId, destinationId 
 	return train, err
 }
 
-func (r *trainRepository) GetStationByID(id uint) (dtos.StationInput, error) {
-	var station dtos.StationInput
+func (r *trainRepository) GetStationByID(id uint) (models.Station, error) {
+	var station models.Station
 	err := r.db.Where("id = ?", id).Find(&station).Error
 	return station, err
 }
@@ -170,10 +170,11 @@ func (r *trainRepository) UpdateTrain(train models.Train) (models.Train, error) 
 	return train, err
 }
 
-func (r *trainRepository) DeleteTrain(train models.Train) (models.Train, error) {
-	err := r.db.Delete(&train).Error
+func (r *trainRepository) DeleteTrain(id uint) error {
+	var train models.Train
+	err := r.db.Where("id = ?", id).Delete(&train).Error
 	if err != nil {
-		return train, err
+		return err
 	}
 
 	trainStation := models.TrainStation{
@@ -181,7 +182,7 @@ func (r *trainRepository) DeleteTrain(train models.Train) (models.Train, error) 
 	}
 	err = r.db.Where("train_id = ?", trainStation.TrainID).Delete(&trainStation).Error
 	if err != nil {
-		return train, err
+		return err
 	}
 
 	trainCarriage := models.TrainCarriage{
@@ -189,8 +190,8 @@ func (r *trainRepository) DeleteTrain(train models.Train) (models.Train, error) 
 	}
 	err = r.db.Where("train_id = ?", trainCarriage.TrainID).Delete(&trainCarriage).Error
 	if err != nil {
-		return train, err
+		return err
 	}
 
-	return train, nil
+	return nil
 }

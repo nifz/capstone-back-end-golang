@@ -12,7 +12,7 @@ type StationUsecase interface {
 	GetStationByID(id uint) (dtos.StationResponse, error)
 	CreateStation(station *dtos.StationInput) (dtos.StationResponse, error)
 	UpdateStation(id uint, station dtos.StationInput) (dtos.StationResponse, error)
-	DeleteStation(id uint) (models.Station, error)
+	DeleteStation(id uint) error
 }
 
 type stationUsecase struct {
@@ -197,12 +197,6 @@ func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) 
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/station/{id} [delete]
 // @Security BearerAuth
-func (u *stationUsecase) DeleteStation(id uint) (models.Station, error) {
-	station, err := u.stationRepo.GetStationByID2(id)
-
-	if err != nil {
-		return station, err
-	}
-	station, err = u.stationRepo.DeleteStation(station)
-	return station, nil
+func (u *stationUsecase) DeleteStation(id uint) error {
+	return u.stationRepo.DeleteStation(id)
 }
