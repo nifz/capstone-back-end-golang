@@ -3,8 +3,10 @@ package controllers
 import (
 	"back-end-golang/dtos"
 	"back-end-golang/helpers"
+	"back-end-golang/models"
 	"back-end-golang/usecases"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -94,8 +96,8 @@ func (c *articleController) GetArticleByID(ctx echo.Context) error {
 }
 
 func (c *articleController) CreateArticle(ctx echo.Context) error {
-	var articleDTO dtos.ArticleInput
-	if err := ctx.Bind(&articleDTO); err != nil {
+	var articleInput dtos.ArticleInput
+	if err := ctx.Bind(&articleInput); err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
@@ -106,7 +108,92 @@ func (c *articleController) CreateArticle(ctx echo.Context) error {
 		)
 	}
 
-	article, err := c.articleUsecase.CreateArticle(&articleDTO)
+	if articleInput.Image == "" {
+		formHeader, err := ctx.FormFile("file")
+		if err != nil {
+			if err != nil {
+				return ctx.JSON(
+					http.StatusInternalServerError,
+					helpers.NewErrorResponse(
+						http.StatusInternalServerError,
+						"Error uploading photo",
+						helpers.GetErrorData(err),
+					),
+				)
+			}
+		}
+
+		//get file from header
+		formFile, err := formHeader.Open()
+		if err != nil {
+			return ctx.JSON(
+				http.StatusInternalServerError,
+				helpers.NewErrorResponse(
+					http.StatusInternalServerError,
+					"Error uploading photo",
+					helpers.GetErrorData(err),
+				),
+			)
+		}
+
+		var re = regexp.MustCompile(`.png|.jpeg|.jpg`)
+
+		if !re.MatchString(formHeader.Filename) {
+			return ctx.JSON(
+				http.StatusBadRequest,
+				helpers.NewErrorResponse(
+					http.StatusBadRequest,
+					"The provided file format is not allowed. Please upload a JPEG or PNG image",
+					helpers.GetErrorData(err),
+				),
+			)
+		}
+
+		uploadUrl, err := usecases.NewMediaUpload().FileUpload(models.File{File: formFile})
+
+		if err != nil {
+			return ctx.JSON(
+				http.StatusInternalServerError,
+				helpers.NewErrorResponse(
+					http.StatusInternalServerError,
+					"Error uploading photo",
+					helpers.GetErrorData(err),
+				),
+			)
+		}
+		articleInput.Image = uploadUrl
+	} else {
+		var url models.Url
+		url.Url = articleInput.Image
+
+		var re = regexp.MustCompile(`.png|.jpeg|.jpg`)
+		if !re.MatchString(articleInput.Image) {
+			return ctx.JSON(
+				http.StatusBadRequest,
+				helpers.NewErrorResponse(
+					http.StatusBadRequest,
+					"The provided file format is not allowed. Please upload a JPEG or PNG image",
+					helpers.GetErrorData(nil),
+				),
+			)
+		}
+
+		uploadUrl, err := usecases.NewMediaUpload().RemoteUpload(url)
+		if uploadUrl == "" || err != nil {
+			return ctx.JSON(
+				http.StatusInternalServerError,
+				helpers.NewErrorResponse(
+					http.StatusInternalServerError,
+					"Error uploading photo",
+					helpers.GetErrorData(err),
+				),
+			)
+		}
+
+		articleInput.Image = uploadUrl
+	}
+
+	article, err := c.articleUsecase.CreateArticle(&articleInput)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
@@ -154,6 +241,91 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 				helpers.GetErrorData(err),
 			),
 		)
+	}
+
+	if articleInput.Image == "" {
+		formHeader, err := ctx.FormFile("file")
+		if err != nil {
+			if err != nil {
+				return ctx.JSON(
+					http.StatusInternalServerError,
+					helpers.NewErrorResponse(
+						http.StatusInternalServerError,
+						"Error uploading photo",
+						helpers.GetErrorData(err),
+					),
+				)
+			}
+		}
+
+		//get file from header
+		formFile, err := formHeader.Open()
+		if err != nil {
+			return ctx.JSON(
+				http.StatusInternalServerError,
+				helpers.NewErrorResponse(
+					http.StatusInternalServerError,
+					"Error uploading photo",
+					helpers.GetErrorData(err),
+				),
+			)
+		}
+
+		var re = regexp.MustCompile(`.png|.jpeg|.jpg`)
+
+		if !re.MatchString(formHeader.Filename) {
+			return ctx.JSON(
+				http.StatusBadRequest,
+				helpers.NewErrorResponse(
+					http.StatusBadRequest,
+					"The provided file format is not allowed. Please upload a JPEG or PNG image",
+					helpers.GetErrorData(err),
+				),
+			)
+		}
+
+		uploadUrl, err := usecases.NewMediaUpload().FileUpload(models.File{File: formFile})
+
+		if err != nil {
+			return ctx.JSON(
+				http.StatusInternalServerError,
+				helpers.NewErrorResponse(
+					http.StatusInternalServerError,
+					"Error uploading photo",
+					helpers.GetErrorData(err),
+				),
+			)
+		}
+		articleInput.Image = uploadUrl
+	} else {
+		var url models.Url
+		url.Url = articleInput.Image
+
+		var re = regexp.MustCompile(`.png|.jpeg|.jpg`)
+		if !re.MatchString(articleInput.Image) {
+			return ctx.JSON(
+				http.StatusBadRequest,
+				helpers.NewErrorResponse(
+					http.StatusBadRequest,
+					"The provided file format is not allowed. Please upload a JPEG or PNG image",
+					helpers.GetErrorData(nil),
+				),
+			)
+		}
+
+		uploadUrl, err := usecases.NewMediaUpload().RemoteUpload(url)
+		if uploadUrl == "" || err != nil {
+			return ctx.JSON(
+				http.StatusInternalServerError,
+				helpers.NewErrorResponse(
+					http.StatusInternalServerError,
+					"Error uploading photo",
+					helpers.GetErrorData(err),
+				),
+			)
+		}
+
+		articleInput.Image = uploadUrl
 	}
 
 	articleResp, err := c.articleUsecase.UpdateArticle(uint(id), articleInput)
