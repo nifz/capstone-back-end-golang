@@ -7,7 +7,8 @@ import (
 )
 
 type TicketOrderRepository interface {
-	GetAllTicketOrders(page, limit int) ([]models.TicketOrder, int, error)
+	GetTicketOrders(page, limit int, status string) ([]models.TicketOrder, int, error)
+	GetTicketOrderByStatusAndID(id, userID uint, status string) (models.TicketOrder, error)
 	GetTicketOrderByID(id, userID uint) (models.TicketOrder, error)
 	CreateTicketOrder(ticketOrder models.TicketOrder) (models.TicketOrder, error)
 	UpdateTicketOrder(ticketOrder models.TicketOrder) (models.TicketOrder, error)
@@ -21,12 +22,12 @@ func NewTicketOrderRepository(db *gorm.DB) TicketOrderRepository {
 	return &ticketOrderRepository{db}
 }
 
-func (r *ticketOrderRepository) GetAllTicketOrders(page, limit int) ([]models.TicketOrder, int, error) {
+func (r *ticketOrderRepository) GetTicketOrders(page, limit int, status string) ([]models.TicketOrder, int, error) {
 	var (
 		ticketOrders []models.TicketOrder
 		count        int64
 	)
-	err := r.db.Find(&ticketOrders).Count(&count).Error
+	err := r.db.Where("status = ?", status).Find(&ticketOrders).Count(&count).Error
 	if err != nil {
 		return ticketOrders, int(count), err
 	}
@@ -38,8 +39,22 @@ func (r *ticketOrderRepository) GetAllTicketOrders(page, limit int) ([]models.Ti
 	return ticketOrders, int(count), err
 }
 
+func (r *ticketOrderRepository) GetTicketOrderByStatusAndID(id, userID uint, status string) (models.TicketOrder, error) {
+	var ticketOrder models.TicketOrder
+	if userID == 1 {
+		err := r.db.Where("id = ? AND status = ?", id, status).First(&ticketOrder).Error
+		return ticketOrder, err
+	}
+	err := r.db.Where("id = ? AND user_id = ? AND status = ?", id, userID, status).First(&ticketOrder).Error
+	return ticketOrder, err
+}
+
 func (r *ticketOrderRepository) GetTicketOrderByID(id, userID uint) (models.TicketOrder, error) {
 	var ticketOrder models.TicketOrder
+	if userID == 1 {
+		err := r.db.Where("id = ?", id).First(&ticketOrder).Error
+		return ticketOrder, err
+	}
 	err := r.db.Where("id = ? AND user_id = ?", id, userID).First(&ticketOrder).Error
 	return ticketOrder, err
 }

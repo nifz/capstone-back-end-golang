@@ -12,25 +12,25 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type ArticleController interface {
-	GetAllArticles(c echo.Context) error
-	GetArticleByID(c echo.Context) error
-	CreateArticle(c echo.Context) error
-	UpdateArticle(c echo.Context) error
-	DeleteArticle(c echo.Context) error
+type PaymentController interface {
+	GetAllPayments(c echo.Context) error
+	GetPaymentByID(c echo.Context) error
+	CreatePayment(c echo.Context) error
+	UpdatePayment(c echo.Context) error
+	DeletePayment(c echo.Context) error
 }
 
-type articleController struct {
-	articleUsecase usecases.ArticleUsecase
+type paymentController struct {
+	paymentUsecase usecases.PaymentUsecase
 }
 
-func NewArticleController(articleUsecase usecases.ArticleUsecase) ArticleController {
-	return &articleController{articleUsecase}
+func NewPaymentController(paymentUsecase usecases.PaymentUsecase) PaymentController {
+	return &paymentController{paymentUsecase}
 }
 
 // Implementasi fungsi-fungsi dari interface ItemController
 
-func (c *articleController) GetAllArticles(ctx echo.Context) error {
+func (c *paymentController) GetAllPayments(ctx echo.Context) error {
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -43,14 +43,13 @@ func (c *articleController) GetAllArticles(ctx echo.Context) error {
 		limit = 10
 	}
 
-	articles, count, err := c.articleUsecase.GetAllArticles(page, limit)
+	payments, count, err := c.paymentUsecase.GetAllPayments(page, limit)
 	if err != nil {
-
 		return ctx.JSON(
 			http.StatusInternalServerError,
 			helpers.NewErrorResponse(
 				http.StatusInternalServerError,
-				"Failed fetching articles",
+				"Failed fetching payment",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -60,8 +59,8 @@ func (c *articleController) GetAllArticles(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewPaginationResponse(
 			http.StatusOK,
-			"Successfully get all article",
-			articles,
+			"Successfully get all payments",
+			payments,
 			page,
 			limit,
 			count,
@@ -69,16 +68,16 @@ func (c *articleController) GetAllArticles(ctx echo.Context) error {
 	)
 }
 
-func (c *articleController) GetArticleByID(ctx echo.Context) error {
+func (c *paymentController) GetPaymentByID(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	article, err := c.articleUsecase.GetArticleByID(uint(id))
+	payment, err := c.paymentUsecase.GetPaymentByID(uint(id))
 
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get article by id",
+				"Failed to get payment by id",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -88,27 +87,27 @@ func (c *articleController) GetArticleByID(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully to get article by id",
-			article,
+			"Successfully to get payment by id",
+			payment,
 		),
 	)
 
 }
 
-func (c *articleController) CreateArticle(ctx echo.Context) error {
-	var articleInput dtos.ArticleInput
-	if err := ctx.Bind(&articleInput); err != nil {
+func (c *paymentController) CreatePayment(ctx echo.Context) error {
+	var paymentInput dtos.PaymentInput
+	if err := ctx.Bind(&paymentInput); err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding article",
+				"Failed binding payment",
 				helpers.GetErrorData(err),
 			),
 		)
 	}
 
-	if articleInput.Image == "" {
+	if paymentInput.ImageUrl == "" {
 		formHeader, err := ctx.FormFile("file")
 		if err != nil {
 			if err != nil {
@@ -161,13 +160,13 @@ func (c *articleController) CreateArticle(ctx echo.Context) error {
 				),
 			)
 		}
-		articleInput.Image = uploadUrl
+		paymentInput.ImageUrl = uploadUrl
 	} else {
 		var url models.Url
-		url.Url = articleInput.Image
+		url.Url = paymentInput.ImageUrl
 
 		var re = regexp.MustCompile(`.png|.jpeg|.jpg`)
-		if !re.MatchString(articleInput.Image) {
+		if !re.MatchString(paymentInput.ImageUrl) {
 			return ctx.JSON(
 				http.StatusBadRequest,
 				helpers.NewErrorResponse(
@@ -190,16 +189,16 @@ func (c *articleController) CreateArticle(ctx echo.Context) error {
 			)
 		}
 
-		articleInput.Image = uploadUrl
+		paymentInput.ImageUrl = uploadUrl
 	}
 
-	article, err := c.articleUsecase.CreateArticle(&articleInput)
+	payment, err := c.paymentUsecase.CreatePayment(&paymentInput)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to created a article",
+				"Failed to created a payment",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -209,21 +208,20 @@ func (c *articleController) CreateArticle(ctx echo.Context) error {
 		http.StatusCreated,
 		helpers.NewResponse(
 			http.StatusCreated,
-			"Successfully to created a article",
-			article,
+			"Successfully to created a payment",
+			payment,
 		),
 	)
 }
 
-func (c *articleController) UpdateArticle(ctx echo.Context) error {
-
-	var articleInput dtos.ArticleInput
-	if err := ctx.Bind(&articleInput); err != nil {
+func (c *paymentController) UpdatePayment(ctx echo.Context) error {
+	var paymentInput dtos.PaymentInput
+	if err := ctx.Bind(&paymentInput); err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding article",
+				"Failed fetching payment",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -231,19 +229,19 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	article, err := c.articleUsecase.GetArticleByID(uint(id))
-	if article.ArticleID == 0 {
+	payment, err := c.paymentUsecase.GetPaymentByID(uint(id))
+	if payment.ID == 0 {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get article by id",
+				"Failed to get payment by id",
 				helpers.GetErrorData(err),
 			),
 		)
 	}
 
-	if articleInput.Image == "" {
+	if paymentInput.ImageUrl == "" {
 		formHeader, err := ctx.FormFile("file")
 		if err != nil {
 			if err != nil {
@@ -296,13 +294,13 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 				),
 			)
 		}
-		articleInput.Image = uploadUrl
+		paymentInput.ImageUrl = uploadUrl
 	} else {
 		var url models.Url
-		url.Url = articleInput.Image
+		url.Url = paymentInput.ImageUrl
 
 		var re = regexp.MustCompile(`.png|.jpeg|.jpg`)
-		if !re.MatchString(articleInput.Image) {
+		if !re.MatchString(paymentInput.ImageUrl) {
 			return ctx.JSON(
 				http.StatusBadRequest,
 				helpers.NewErrorResponse(
@@ -325,16 +323,16 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 			)
 		}
 
-		articleInput.Image = uploadUrl
+		paymentInput.ImageUrl = uploadUrl
 	}
 
-	articleResp, err := c.articleUsecase.UpdateArticle(uint(id), articleInput)
+	paymentResp, err := c.paymentUsecase.UpdatePayment(uint(id), paymentInput)
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusInternalServerError,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
-				"Failed binding article",
+				http.StatusInternalServerError,
+				"Failed update payment",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -344,22 +342,22 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully updated article",
-			articleResp,
+			"Successfully updated payment",
+			paymentResp,
 		),
 	)
 }
 
-func (c *articleController) DeleteArticle(ctx echo.Context) error {
+func (c *paymentController) DeletePayment(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	err := c.articleUsecase.DeleteArticle(uint(id))
+	_, err := c.paymentUsecase.DeletePayment(uint(id))
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to delete article",
+				"Failed to delete payment",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -368,7 +366,7 @@ func (c *articleController) DeleteArticle(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully deleted article",
+			"Successfully deleted payment",
 			nil,
 		),
 	)

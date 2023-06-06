@@ -92,23 +92,41 @@ type TrainCarriageCreeatedResponse struct {
 
 type GetAllTicketOrderStatusOKResponse struct {
 	StatusCode int                 `json:"status_code" example:"200"`
-	Message    string              `json:"message" example:"Successfully get train carriage"`
+	Message    string              `json:"message" example:"Successfully get ticket order"`
 	Data       TicketOrderResponse `json:"data"`
 	Meta       helpers.Meta        `json:"meta"`
 }
 
 type TicketOrderStatusOKResponse struct {
 	StatusCode int                 `json:"status_code" example:"200"`
-	Message    string              `json:"message" example:"Successfully get train carriage"`
+	Message    string              `json:"message" example:"Successfully get ticket order"`
 	Data       TicketOrderResponse `json:"data"`
 }
 
 type TicketOrderCreeatedResponse struct {
 	StatusCode int                 `json:"status_code" example:"201"`
-	Message    string              `json:"message" example:"Successfully created train carriage"`
+	Message    string              `json:"message" example:"Successfully created ticket order"`
 	Data       TicketOrderResponse `json:"data"`
 }
 
+type GetAllTicketTravelerDetailOrderStatusOKResponse struct {
+	StatusCode int                               `json:"status_code" example:"200"`
+	Message    string                            `json:"message" example:"Successfully get ticket order"`
+	Data       TicketTravelerDetailOrderResponse `json:"data"`
+	Meta       helpers.Meta                      `json:"meta"`
+}
+
+type TicketTravelerDetailOrderStatusOKResponse struct {
+	StatusCode int                               `json:"status_code" example:"200"`
+	Message    string                            `json:"message" example:"Successfully get ticket order"`
+	Data       TicketTravelerDetailOrderResponse `json:"data"`
+}
+
+type TicketTravelerDetailOrderCreeatedResponse struct {
+	StatusCode int                               `json:"status_code" example:"201"`
+	Message    string                            `json:"message" example:"Successfully created ticket order"`
+	Data       TicketTravelerDetailOrderResponse `json:"data"`
+}
 type GetAllArticleStatusOKResponse struct {
 	StatusCode int             `json:"status_code" example:"200"`
 	Message    string          `json:"message" example:"Successfully get article"`
@@ -193,4 +211,23 @@ type InternalServerErrorResponse struct {
 	StatusCode int         `json:"status_code" example:"500"`
 	Message    string      `json:"message" example:"Internal Server Error"`
 	Errors     interface{} `json:"errors"`
+}
+
+type GetAllPaymentStatusOKResponse struct {
+	StatusCode int             `json:"status_code" example:"200"`
+	Message    string          `json:"message" example:"Successfully get station"`
+	Data       PaymentResponse `json:"data"`
+	Meta       helpers.Meta    `json:"meta"`
+}
+
+type PaymentStatusOKResponse struct {
+	StatusCode int             `json:"status_code" example:"200"`
+	Message    string          `json:"message" example:"Successfully get station"`
+	Data       PaymentResponse `json:"data"`
+}
+
+type PaymentCreeatedResponse struct {
+	StatusCode int             `json:"status_code" example:"201"`
+	Message    string          `json:"message" example:"Successfully created station"`
+	Data       PaymentResponse `json:"data"`
 }
