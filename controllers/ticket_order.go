@@ -12,6 +12,8 @@ import (
 )
 
 type TicketOrderController interface {
+	GetTicketOrders(c echo.Context) error
+	GetTicketOrderByID(c echo.Context) error
 	CreateTicketOrder(c echo.Context) error
 	UpdateTicketOrder(c echo.Context) error
 }
@@ -22,6 +24,122 @@ type ticketOrderController struct {
 
 func NewTicketOrderController(ticketOrderUsecase usecases.TicketOrderUsecase) TicketOrderController {
 	return &ticketOrderController{ticketOrderUsecase}
+}
+
+func (c *ticketOrderController) GetTicketOrders(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
+
+	userId, err := middlewares.GetUserIdFromToken(tokenString)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
+
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 1000
+	}
+
+	statusParam := ctx.QueryParam("status")
+
+	ticketOrder, count, err := c.ticketOrderUsecase.GetTicketOrders(page, limit, userId, statusParam)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to created a ticket order",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewPaginationResponse(
+			http.StatusOK,
+			"Successfully to get order tickets",
+			ticketOrder,
+			page,
+			limit,
+			count,
+		),
+	)
+}
+
+func (c *ticketOrderController) GetTicketOrderByID(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
+
+	userId, err := middlewares.GetUserIdFromToken(tokenString)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	trainIdParam := ctx.QueryParam("train_id")
+	trainId, _ := strconv.Atoi(trainIdParam)
+	ticketOrderIdParam := ctx.QueryParam("ticket_order_id")
+	ticketOrderId, _ := strconv.Atoi(ticketOrderIdParam)
+
+	ticketOrder, err := c.ticketOrderUsecase.GetTicketOrderByID(userId, uint(ticketOrderId), uint(trainId))
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to created a ticket order",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewResponse(
+			http.StatusOK,
+			"Successfully to get order tickets",
+			ticketOrder,
+		),
+	)
 }
 
 func (c *ticketOrderController) CreateTicketOrder(ctx echo.Context) error {
