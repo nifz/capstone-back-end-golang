@@ -130,7 +130,7 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.Tra
 // @Router       /public/train-carriage/{id} [get]
 func (u *trainCarriageUsecase) GetTrainCarriageByID(id uint) (dtos.TrainCarriageResponse, error) {
 	var trainCarriageResponses dtos.TrainCarriageResponse
-	trainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID(id)
+	trainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(id)
 	if err != nil {
 		return trainCarriageResponses, err
 	}
