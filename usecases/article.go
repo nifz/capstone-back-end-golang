@@ -215,12 +215,5 @@ func (u *articleUsecase) UpdateArticle(id uint, articleInput dtos.ArticleInput) 
 // @Router       /admin/article/{id} [delete]
 // @Security BearerAuth
 func (u *articleUsecase) DeleteArticle(id uint) error {
-	article, err := u.articleRepo.GetArticleByID(id)
-
-	if err != nil {
-		return err
-	}
-
-	err = u.articleRepo.DeleteArticle(article)
-	return nil
+	return u.articleRepo.DeleteArticle(id)
 }

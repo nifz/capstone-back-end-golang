@@ -360,13 +360,7 @@ func (u *trainUsecase) UpdateTrain(id uint, train dtos.TrainInput) (dtos.TrainRe
 // @Router       /admin/train/{id} [delete]
 // @Security BearerAuth
 func (u *trainUsecase) DeleteTrain(id uint) error {
-	train, err := u.trainRepo.GetTrainByID2(id)
-
-	if err != nil {
-		return err
-	}
-	train, err = u.trainRepo.DeleteTrain(train)
-	return nil
+	return u.trainRepo.DeleteTrain(id)
 }
 
 // =============================== ADMIN END ================================== \\

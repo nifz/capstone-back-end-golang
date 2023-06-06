@@ -166,7 +166,7 @@ func (h *HistorySearchController) HistorySearchDelete(ctx echo.Context) error {
 		)
 	}
 
-	_, err = h.historyUsecase.HistorySearchDelete(userId, uint(id))
+	err = h.historyUsecase.HistorySearchDelete(userId, uint(id))
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,

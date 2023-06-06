@@ -40,15 +40,15 @@ func NewTrainCarriageUsecase(TrainCarriageRepo repositories.TrainCarriageReposit
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /public/train-carriage [get]
 func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.TrainCarriageResponse, int, error) {
-
 	trainCarriages, count, err := u.trainCarriageRepo.GetAllTrainCarriages(page, limit)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	var trainCarriageResponses []dtos.TrainCarriageResponse
-	var trainStationResponses []dtos.TrainStationResponse
+	visitedIDs := make(map[uint]map[uint]bool)
 	for _, trainCarriage := range trainCarriages {
+		trainStationResponses := make([]dtos.TrainStationResponse, 0) // Reset trainStationResponses for each trainCarriage
 
 		train, err := u.trainCarriageRepo.GetTrainByID2(trainCarriage.TrainID)
 		if err != nil {
@@ -75,10 +75,18 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.Tra
 		}
 
 		for _, train := range getTrainStation {
-			getStation, err := u.trainRepo.GetStationByID2(train.StationID)
+			getStation, err := u.trainRepo.GetStationByID(train.StationID)
 			if err != nil {
 				return trainCarriageResponses, count, err
 			}
+
+			if visitedIDs[trainCarriage.ID] == nil {
+				visitedIDs[trainCarriage.ID] = make(map[uint]bool)
+			}
+			if visitedIDs[trainCarriage.ID][getStation.ID] {
+				continue
+			}
+			visitedIDs[trainCarriage.ID][getStation.ID] = true
 
 			trainStationResponse := dtos.TrainStationResponse{
 				StationID: train.StationID,
@@ -145,6 +153,8 @@ func (u *trainCarriageUsecase) GetTrainCarriageByID(id uint) (dtos.TrainCarriage
 		return trainCarriageResponses, err
 	}
 
+	visitedIDs := make(map[uint]map[uint]bool)
+
 	var trainSeatResponses []dtos.TrainSeatResponse
 	var trainStationResponses []dtos.TrainStationResponse
 	for _, trainSeat := range trainSeat {
@@ -165,6 +175,14 @@ func (u *trainCarriageUsecase) GetTrainCarriageByID(id uint) (dtos.TrainCarriage
 		if err != nil {
 			return trainCarriageResponses, err
 		}
+
+		if visitedIDs[trainCarriage.ID] == nil {
+			visitedIDs[trainCarriage.ID] = make(map[uint]bool)
+		}
+		if visitedIDs[trainCarriage.ID][getStation.ID] {
+			continue
+		}
+		visitedIDs[trainCarriage.ID][getStation.ID] = true
 
 		trainStationResponse := dtos.TrainStationResponse{
 			StationID: train.StationID,
@@ -419,11 +437,5 @@ func (u *trainCarriageUsecase) UpdateTrainCarriage(id uint, trainCarriageInput d
 // @Router       /admin/train-carriage/{id} [delete]
 // @Security BearerAuth
 func (u *trainCarriageUsecase) DeleteTrainCarriage(id uint) error {
-	trainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(id)
-
-	if err != nil {
-		return err
-	}
-	err = u.trainCarriageRepo.DeleteTrainCarriage(trainCarriage)
-	return nil
+	return u.trainCarriageRepo.DeleteTrainCarriage(id)
 }

@@ -9,7 +9,7 @@ import (
 type HistorySearchUseCase interface {
 	HistorySearchGetAll(userId uint, page, limit int) ([]dtos.HistorySearchResponse, int, error)
 	HistorySearchCreate(userId uint, input dtos.HistorySearchInput) (dtos.HistorySearchResponse, error)
-	HistorySearchDelete(userId, id uint) (models.HistorySearch, error)
+	HistorySearchDelete(userId, id uint) error
 }
 
 type historySearchUsecase struct {
@@ -108,18 +108,11 @@ func (u *historySearchUsecase) HistorySearchCreate(userId uint, input dtos.Histo
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/history-search/{id} [delete]
 // @Security BearerAuth
-func (u *historySearchUsecase) HistorySearchDelete(userId, id uint) (models.HistorySearch, error) {
-	var history models.HistorySearch
-
-	history, err := u.historySearchRepository.HistorySearchGetById(userId, id)
+func (u *historySearchUsecase) HistorySearchDelete(userId, id uint) error {
+	err := u.historySearchRepository.HistorySearchDelete(userId, id)
 	if err != nil {
-		return history, err
+		return err
 	}
 
-	history, err = u.historySearchRepository.HistorySearchDelete(history)
-	if err != nil {
-		return history, err
-	}
-
-	return history, nil
+	return nil
 }

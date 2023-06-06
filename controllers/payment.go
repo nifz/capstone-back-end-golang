@@ -351,7 +351,7 @@ func (c *paymentController) UpdatePayment(ctx echo.Context) error {
 func (c *paymentController) DeletePayment(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	_, err := c.paymentUsecase.DeletePayment(uint(id))
+	err := c.paymentUsecase.DeletePayment(uint(id))
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,

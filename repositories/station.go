@@ -12,7 +12,7 @@ type StationRepository interface {
 	GetStationByID2(id uint) (models.Station, error)
 	CreateStation(station models.Station) (models.Station, error)
 	UpdateStation(station models.Station) (models.Station, error)
-	DeleteStation(station models.Station) (models.Station, error)
+	DeleteStation(id uint) error
 }
 
 type stationRepository struct {
@@ -64,7 +64,10 @@ func (r *stationRepository) UpdateStation(station models.Station) (models.Statio
 	return station, err
 }
 
-func (r *stationRepository) DeleteStation(station models.Station) (models.Station, error) {
-	err := r.db.Delete(&station).Error
-	return station, err
+func (r *stationRepository) DeleteStation(id uint) error {
+	var station models.Station
+	var trainStation models.TrainStation
+	err := r.db.Where("id = ?", id).Delete(&station).Error
+	err = r.db.Where("station_id = ?", id).Delete(&trainStation).Error
+	return err
 }

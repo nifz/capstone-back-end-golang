@@ -180,7 +180,7 @@ func (c *stationController) UpdateStation(ctx echo.Context) error {
 func (c *stationController) DeleteStation(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	_, err := c.stationUsecase.DeleteStation(uint(id))
+	err := c.stationUsecase.DeleteStation(uint(id))
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
