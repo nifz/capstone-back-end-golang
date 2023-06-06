@@ -4,6 +4,7 @@ import (
 	"back-end-golang/dtos"
 	"back-end-golang/models"
 	"back-end-golang/repositories"
+	"errors"
 )
 
 type StationUsecase interface {
@@ -107,6 +108,9 @@ func (u *stationUsecase) GetStationByID(id uint) (dtos.StationResponse, error) {
 // @Security BearerAuth
 func (u *stationUsecase) CreateStation(station *dtos.StationInput) (dtos.StationResponse, error) {
 	var stationResponses dtos.StationResponse
+	if station.Initial == "" || station.Name == "" || station.Origin == "" {
+		return stationResponses, errors.New("Failed to create station")
+	}
 	createStation := models.Station{
 		Origin:  station.Origin,
 		Name:    station.Name,
@@ -148,6 +152,9 @@ func (u *stationUsecase) CreateStation(station *dtos.StationInput) (dtos.Station
 func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) (dtos.StationResponse, error) {
 	var station models.Station
 	var stationResponse dtos.StationResponse
+	if stationInput.Initial == "" || stationInput.Name == "" || stationInput.Origin == "" {
+		return stationResponse, errors.New("Failed to update station")
+	}
 
 	station, err := u.stationRepo.GetStationByID(id)
 	if err != nil {
