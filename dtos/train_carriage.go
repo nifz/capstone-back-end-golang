@@ -11,9 +11,15 @@ type TrainCarriageInput struct {
 
 type TrainCarriageResponse struct {
 	TrainCarriageID uint                `json:"train_carriage_id" example:"1"`
-	Train        TrainResponse       `json:"train"`
-	Name         string              `json:"name" example:"Gerbong 1"`
-	Seat         []TrainSeatResponse `json:"seat"`
-	CreatedAt    time.Time           `json:"created_at" example:"2023-05-17T15:07:16.504+07:00"`
-	UpdatedAt    time.Time           `json:"updated_at" example:"2023-05-17T15:07:16.504+07:00"`
+	Train           TrainResponse       `json:"train"`
+	Name            string              `json:"name" example:"Gerbong 1"`
+	Seat            []TrainSeatResponse `json:"seat"`
+	CreatedAt       time.Time           `json:"created_at" example:"2023-05-17T15:07:16.504+07:00"`
+	UpdatedAt       time.Time           `json:"updated_at" example:"2023-05-17T15:07:16.504+07:00"`
+}
+
+type TrainCarriageResponseSimply struct {
+	TrainCarriageID uint          `json:"train_carriage_id" example:"1"`
+	Train           TrainResponse `json:"train"`
+	Name            string        `json:"name" example:"Gerbong 1"`
 }

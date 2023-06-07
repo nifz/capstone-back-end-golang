@@ -177,12 +177,11 @@ func MigrateDB(db *gorm.DB) error {
 		&models.TrainStation{},
 		&models.TrainCarriage{},
 		&models.TrainSeat{},
-		models.ReservationCheckouts{},
-		models.ReservationImages{},
-		models.Reservations{},
-		models.ReservationImages{},
+		&models.TravelerDetail{},
+		&models.TicketOrder{},
+		&models.TicketTravelerDetail{},
 		&models.Article{},
-		&models.Recommendation{},
 		&models.HistorySearch{},
+		&models.Payment{},
 	)
 }

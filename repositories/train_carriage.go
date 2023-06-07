@@ -9,12 +9,13 @@ import (
 type TrainCarriageRepository interface {
 	GetAllTrainCarriages(page, limit int) ([]models.TrainCarriage, int, error)
 	GetTrainCarriageByID(id uint) (models.TrainCarriage, error)
+	GetTrainCarriageByID2(id uint) (models.TrainCarriage, error)
 	GetTrainByID2(id uint) (models.Train, error)
 	GetStationByID2(id uint) (models.Station, error)
 	GetTrainSeatsByClass(class string) ([]models.TrainSeat, error)
 	CreateTrainCarriage(trainCarriage models.TrainCarriage) (models.TrainCarriage, error)
 	UpdateTrainCarriage(trainCarriage models.TrainCarriage) (models.TrainCarriage, error)
-	DeleteTrainCarriage(trainCarriage models.TrainCarriage) error
+	DeleteTrainCarriage(id uint) error
 }
 
 type trainCarriageRepository struct {
@@ -30,7 +31,7 @@ func NewTrainCarriageRepository(db *gorm.DB) TrainCarriageRepository {
 func (r *trainCarriageRepository) GetAllTrainCarriages(page, limit int) ([]models.TrainCarriage, int, error) {
 	var (
 		trainCarriages []models.TrainCarriage
-		count       int64
+		count          int64
 	)
 	err := r.db.Find(&trainCarriages).Count(&count).Error
 	if err != nil {
@@ -46,13 +47,19 @@ func (r *trainCarriageRepository) GetAllTrainCarriages(page, limit int) ([]model
 
 func (r *trainCarriageRepository) GetTrainCarriageByID(id uint) (models.TrainCarriage, error) {
 	var trainCarriage models.TrainCarriage
+	err := r.db.Unscoped().Where("id = ?", id).First(&trainCarriage).Error
+	return trainCarriage, err
+}
+
+func (r *trainCarriageRepository) GetTrainCarriageByID2(id uint) (models.TrainCarriage, error) {
+	var trainCarriage models.TrainCarriage
 	err := r.db.Where("id = ?", id).First(&trainCarriage).Error
 	return trainCarriage, err
 }
 
 func (r *trainCarriageRepository) GetTrainByID2(id uint) (models.Train, error) {
 	var train models.Train
-	err := r.db.Where("id = ?", id).First(&train).Error
+	err := r.db.Unscoped().Where("id = ?", id).First(&train).Error
 	return train, err
 }
 
@@ -78,7 +85,8 @@ func (r *trainCarriageRepository) UpdateTrainCarriage(trainCarriage models.Train
 	return trainCarriage, err
 }
 
-func (r *trainCarriageRepository) DeleteTrainCarriage(trainCarriage models.TrainCarriage) error {
-	err := r.db.Delete(&trainCarriage).Error
+func (r *trainCarriageRepository) DeleteTrainCarriage(id uint) error {
+	var trainCarriage models.TrainCarriage
+	err := r.db.Where("id = ?", id).Delete(&trainCarriage).Error
 	return err
 }

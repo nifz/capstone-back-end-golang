@@ -25,150 +25,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/admin/article": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all articles",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin - Article"
-                ],
-                "summary": "Get all articles",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.GetAllArticleStatusOKResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Update article",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin - Article"
-                ],
-                "summary": "Update article",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID article",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Payload Body [RAW]",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ArticleInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ArticleStatusOKResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -188,13 +44,32 @@ const docTemplate = `{
                 "summary": "Create a new article",
                 "parameters": [
                     {
-                        "description": "Payload Body [RAW]",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ArticleInput"
-                        }
+                        "type": "file",
+                        "description": "Image file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title article",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Description article",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Label article",
+                        "name": "label",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -238,13 +113,13 @@ const docTemplate = `{
             }
         },
         "/admin/article/{id}": {
-            "get": {
+            "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get article by ID",
+                "description": "Update article",
                 "consumes": [
                     "application/json"
                 ],
@@ -254,13 +129,41 @@ const docTemplate = `{
                 "tags": [
                     "Admin - Article"
                 ],
-                "summary": "Get article by ID",
+                "summary": "Update article",
                 "parameters": [
                     {
                         "type": "integer",
                         "description": "ID article",
                         "name": "id",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Image file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title article",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Description article",
+                        "name": "description",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Label article",
+                        "name": "label",
+                        "in": "formData",
                         "required": true
                     }
                 ],
@@ -369,84 +272,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/recommendation": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all recommendation",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin - Recommendation"
-                ],
-                "summary": "Get all recommendation",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.GetAllRecommendationStatusOKResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            },
+        "/admin/payment": {
             "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new recommendation",
+                "description": "Create a new payment",
                 "consumes": [
                     "application/json"
                 ],
@@ -454,25 +287,51 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin - Recommendation"
+                    "Admin - Payment"
                 ],
-                "summary": "Create a new recommendation",
+                "summary": "Create a new payment",
                 "parameters": [
                     {
-                        "description": "Payload Body [RAW]",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dtos.RecommendationInput"
-                        }
+                        "type": "file",
+                        "description": "Image file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Type payment",
+                        "name": "type",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name payment",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Account name payment",
+                        "name": "account_name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Account number payment",
+                        "name": "account_number",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.RecommendationCreeatedResponse"
+                            "$ref": "#/definitions/dtos.PaymentStatusOKResponse"
                         }
                     },
                     "400": {
@@ -508,79 +367,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/recommendation/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get recommendation by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin - Recommendation"
-                ],
-                "summary": "Get recommendation by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID recommendation",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.RecommendationStatusOKResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            },
+        "/admin/payment/{id}": {
             "put": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update recommendation",
+                "description": "Update payment",
                 "consumes": [
                     "application/json"
                 ],
@@ -588,32 +382,58 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin - Recommendation"
+                    "Admin - Payment"
                 ],
-                "summary": "Update recommendation",
+                "summary": "Update payment",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID recommendation",
+                        "description": "ID payment",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Payload Body [RAW]",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dtos.RecommendationInput"
-                        }
+                        "type": "file",
+                        "description": "Image file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Type payment",
+                        "name": "type",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name payment",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Account name payment",
+                        "name": "account_name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Account number payment",
+                        "name": "account_number",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.RecommendationStatusOKResponse"
+                            "$ref": "#/definitions/dtos.PaymentStatusOKResponse"
                         }
                     },
                     "400": {
@@ -654,7 +474,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete a recommendation",
+                "description": "Delete a payment",
                 "consumes": [
                     "application/json"
                 ],
@@ -662,13 +482,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin - Recommendation"
+                    "Admin - Payment"
                 ],
-                "summary": "Delete a recommendation",
+                "summary": "Delete a payment",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID recommendation",
+                        "description": "ID payment",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -715,76 +535,6 @@ const docTemplate = `{
             }
         },
         "/admin/station": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all stations",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin - Station"
-                ],
-                "summary": "Get all stations",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.GetAllStationStatusOKResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -854,71 +604,6 @@ const docTemplate = `{
             }
         },
         "/admin/station/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get station by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin - Station"
-                ],
-                "summary": "Get station by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID station",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.StationStatusOKResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            },
             "put": {
                 "security": [
                     {
@@ -1060,76 +745,6 @@ const docTemplate = `{
             }
         },
         "/admin/train": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all train",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin - Train"
-                ],
-                "summary": "Get all train",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.GetAllTrainStatusOKResponses"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -1199,76 +814,6 @@ const docTemplate = `{
             }
         },
         "/admin/train-carriage": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get all train carriage",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin - Train Carriage"
-                ],
-                "summary": "Get all train carriage",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of items per page",
-                        "name": "limit",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.GetAllTrainCarriageStatusOKResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -1341,71 +886,6 @@ const docTemplate = `{
             }
         },
         "/admin/train-carriage/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get train carriage by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin - Train Carriage"
-                ],
-                "summary": "Get train carriage by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID train carriage",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.TrainCarriageStatusOKResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            },
             "put": {
                 "security": [
                     {
@@ -1547,71 +1027,6 @@ const docTemplate = `{
             }
         },
         "/admin/train/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get train by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin - Train"
-                ],
-                "summary": "Get train by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID train",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.TrainStatusOKResponses"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            },
             "put": {
                 "security": [
                     {
@@ -1781,6 +1196,756 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.UserStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/article": {
+            "get": {
+                "description": "Get all articles",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Article"
+                ],
+                "summary": "Get all articles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllArticleStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/article/{id}": {
+            "get": {
+                "description": "Get article by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Article"
+                ],
+                "summary": "Get article by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID article",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ArticleStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/payment": {
+            "get": {
+                "description": "Get all payments",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Payment"
+                ],
+                "summary": "Get all payments",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllPaymentStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/payment/{id}": {
+            "get": {
+                "description": "Get payment by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Payment"
+                ],
+                "summary": "Get payment by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID payment",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.PaymentStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/station": {
+            "get": {
+                "description": "Get all stations",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Station"
+                ],
+                "summary": "Get all stations",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllStationStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/station/{id}": {
+            "get": {
+                "description": "Get station by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Station"
+                ],
+                "summary": "Get station by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID station",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StationStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/train": {
+            "get": {
+                "description": "Get all train",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Train"
+                ],
+                "summary": "Get all train",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllTrainStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/train-carriage": {
+            "get": {
+                "description": "Get all train carriage",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Train Carriage"
+                ],
+                "summary": "Get all train carriage",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllTrainCarriageStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/train-carriage/{id}": {
+            "get": {
+                "description": "Get train carriage by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Train Carriage"
+                ],
+                "summary": "Get train carriage by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID train carriage",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TrainCarriageStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/train/search": {
+            "get": {
+                "description": "Search Train",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Train"
+                ],
+                "summary": "Search Train Available",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Station origin id",
+                        "name": "station_origin_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Station destination id",
+                        "name": "station_destination_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by train id",
+                        "name": "sort_by_train_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by class name",
+                        "name": "sort_by_class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by price",
+                        "name": "sort_by_price",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by arrive time",
+                        "name": "sort_by_arrive_time",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllTrainStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/train/{id}": {
+            "get": {
+                "description": "Get train by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Train"
+                ],
+                "summary": "Get train by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID train",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TrainStatusOKResponses"
                         }
                     },
                     "400": {
@@ -2014,6 +2179,20 @@ const docTemplate = `{
                     "User - History Search"
                 ],
                 "summary": "Get all history search",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -2188,14 +2367,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/train/search": {
+        "/user/order/ticket": {
             "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Search Train",
+                "description": "Get Ticket Order User",
                 "consumes": [
                     "application/json"
                 ],
@@ -2203,9 +2382,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User - Train"
+                    "User - Order"
                 ],
-                "summary": "Search Train Available",
+                "summary": "Get Ticket Order User",
                 "parameters": [
                     {
                         "type": "integer",
@@ -2220,41 +2399,9 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "Station origin id",
-                        "name": "station_origin_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Station destination id",
-                        "name": "station_destination_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filter by train id",
-                        "name": "sort_by_train_id",
-                        "in": "query"
-                    },
-                    {
                         "type": "string",
-                        "description": "Filter by class name",
-                        "name": "sort_by_class",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by price",
-                        "name": "sort_by_price",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by arrive time",
-                        "name": "sort_by_arrive_time",
+                        "description": "Filter by status order",
+                        "name": "status",
                         "in": "query"
                     }
                 ],
@@ -2262,7 +2409,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.GetAllTrainStatusOKResponse"
+                            "$ref": "#/definitions/dtos.GetAllTicketTravelerDetailOrderStatusOKResponse"
                         }
                     },
                     "400": {
@@ -2298,14 +2445,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/update-information": {
-            "patch": {
+        "/user/order/ticket/detail": {
+            "get": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "User update an information",
+                "description": "Get Ticket Order User by ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -2313,9 +2460,83 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User - Account"
+                    "User - Order"
                 ],
-                "summary": "Update Information",
+                "summary": "Get Ticket Order User by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ticket Order ID",
+                        "name": "ticket_order_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Train ID",
+                        "name": "train_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TicketTravelerDetailOrderStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/train/order": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Order ticket KA",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Train"
+                ],
+                "summary": "Order ticket KA",
                 "parameters": [
                     {
                         "description": "Payload Body [RAW]",
@@ -2323,15 +2544,87 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.UserUpdateInformationInput"
+                            "$ref": "#/definitions/dtos.TicketOrderInput"
                         }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TicketOrderCreeatedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update Order ticket KA",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Train"
+                ],
+                "summary": "Update Order ticket KA",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ticket Order ID",
+                        "name": "ticket_order_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Update Status Order ID",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.UserStatusOKResponse"
+                            "$ref": "#/definitions/dtos.TicketOrderStatusOKResponse"
                         }
                     },
                     "400": {
@@ -2589,47 +2882,32 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.ArticleInput": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "image": {
-                    "type": "string"
-                },
-                "label": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
         "dtos.ArticleResponse": {
             "type": "object",
             "properties": {
                 "article_id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
                 "created_at": {
                     "type": "string",
                     "example": "2023-05-17T15:07:16.504+07:00"
                 },
                 "description": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Description"
                 },
                 "image": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "image.png"
                 },
                 "label": {
-                    "type": "string"
-                },
-                "slug": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Label"
                 },
                 "title": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Title"
                 },
                 "updated_at": {
                     "type": "string",
@@ -2700,15 +2978,15 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.GetAllRecommendationStatusOKResponse": {
+        "dtos.GetAllPaymentStatusOKResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/dtos.RecommendationResponse"
+                    "$ref": "#/definitions/dtos.PaymentResponse"
                 },
                 "message": {
                     "type": "string",
-                    "example": "Successfully get recommendation"
+                    "example": "Successfully get station"
                 },
                 "meta": {
                     "$ref": "#/definitions/helpers.Meta"
@@ -2728,6 +3006,25 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Successfully get station"
+                },
+                "meta": {
+                    "$ref": "#/definitions/helpers.Meta"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "dtos.GetAllTicketTravelerDetailOrderStatusOKResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.TicketTravelerDetailOrderResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get ticket order"
                 },
                 "meta": {
                     "$ref": "#/definitions/helpers.Meta"
@@ -2880,56 +3177,89 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.RecommendationCreeatedResponse": {
+        "dtos.PaymentResponse": {
             "type": "object",
             "properties": {
-                "data": {
-                    "$ref": "#/definitions/dtos.RecommendationResponse"
-                },
-                "message": {
+                "account_name": {
                     "type": "string",
-                    "example": "Successfully created recommendation"
+                    "example": "PT Tripease"
                 },
-                "status_code": {
-                    "type": "integer",
-                    "example": 201
-                }
-            }
-        },
-        "dtos.RecommendationInput": {
-            "type": "object",
-            "properties": {
-                "tag": {
-                    "type": "string"
-                }
-            }
-        },
-        "dtos.RecommendationResponse": {
-            "type": "object",
-            "properties": {
+                "account_number": {
+                    "type": "string",
+                    "example": "00832982893221132"
+                },
                 "created_at": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
                 },
-                "recommendation_id": {
-                    "type": "integer"
+                "id": {
+                    "type": "integer",
+                    "example": 1
                 },
-                "tag": {
-                    "type": "string"
+                "image_url": {
+                    "type": "string",
+                    "example": "bca.png"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Bank Central Asia"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "Virtual Account"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
                 }
             }
         },
-        "dtos.RecommendationStatusOKResponse": {
+        "dtos.PaymentResponses": {
+            "type": "object",
+            "properties": {
+                "account_name": {
+                    "type": "string",
+                    "example": "PT Tripease"
+                },
+                "account_number": {
+                    "type": "string",
+                    "example": "00832982893221132"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "image_url": {
+                    "type": "string",
+                    "example": "bca.png"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Bank Central Asia"
+                },
+                "payment_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "type": {
+                    "type": "string",
+                    "example": "Virtual Account"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
+        "dtos.PaymentStatusOKResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/dtos.RecommendationResponse"
+                    "$ref": "#/definitions/dtos.PaymentResponse"
                 },
                 "message": {
                     "type": "string",
-                    "example": "Successfully get recommendation"
+                    "example": "Successfully get station"
                 },
                 "status_code": {
                     "type": "integer",
@@ -2983,6 +3313,31 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.StationResponseSimply": {
+            "type": "object",
+            "properties": {
+                "arrive_time": {
+                    "type": "string",
+                    "example": "00:00"
+                },
+                "initial": {
+                    "type": "string",
+                    "example": "PSE"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Pasar Senen"
+                },
+                "origin": {
+                    "type": "string",
+                    "example": "Jakarta"
+                },
+                "station_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "dtos.StationStatusOKResponse": {
             "type": "object",
             "properties": {
@@ -3010,6 +3365,296 @@ const docTemplate = `{
                 "status_code": {
                     "type": "integer",
                     "example": 200
+                }
+            }
+        },
+        "dtos.TicketOrderCreeatedResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.TicketOrderResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully created ticket order"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 201
+                }
+            }
+        },
+        "dtos.TicketOrderInput": {
+            "type": "object",
+            "properties": {
+                "email_order": {
+                    "type": "string",
+                    "example": "me@hanifz.com"
+                },
+                "name_order": {
+                    "type": "string",
+                    "example": "Mochammad Hanif"
+                },
+                "payment_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "phone_number_order": {
+                    "type": "string",
+                    "example": "085115151515"
+                },
+                "quantity_adult": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "quantity_infant": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "ticket_traveler_detail_departure": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.TicketTravelerDetailInput"
+                    }
+                },
+                "ticket_traveler_detail_return": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.TicketTravelerDetailInput"
+                    }
+                },
+                "traveler_detail": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.TravelerDetailInput"
+                    }
+                },
+                "with_return": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "dtos.TicketOrderResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "email_order": {
+                    "type": "string",
+                    "example": "me@hanifz.com"
+                },
+                "name_order": {
+                    "type": "string",
+                    "example": "Mochammad Hanif"
+                },
+                "payment": {
+                    "$ref": "#/definitions/dtos.PaymentResponses"
+                },
+                "phone_number_order": {
+                    "type": "string",
+                    "example": "085115151515"
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 50000
+                },
+                "quantity_adult": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "quantity_infant": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "status": {
+                    "type": "string",
+                    "example": "unpaid"
+                },
+                "ticket_order_code": {
+                    "type": "string",
+                    "example": "RANDOMCODE123"
+                },
+                "ticket_order_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "ticket_traveler_detail": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.TicketTravelerDetailResponse"
+                    }
+                },
+                "total_amount": {
+                    "type": "integer",
+                    "example": 50000
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
+        "dtos.TicketOrderStatusOKResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.TicketOrderResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get ticket order"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "dtos.TicketTravelerDetailInput": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "example": "2023-05-31"
+                },
+                "station_destination_id": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "station_origin_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "train_carriage_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "train_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "train_seat_id": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "dtos.TicketTravelerDetailOrderResponse": {
+            "type": "object",
+            "properties": {
+                "boarding_ticket_code": {
+                    "type": "string",
+                    "example": "RANDOMBOARDINGTICKETCODE123"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "date": {
+                    "type": "string",
+                    "example": "2023-05-31"
+                },
+                "email_order": {
+                    "type": "string",
+                    "example": "me@hanifz.com"
+                },
+                "name_order": {
+                    "type": "string",
+                    "example": "Mochammad Hanif"
+                },
+                "payment": {
+                    "$ref": "#/definitions/dtos.PaymentResponses"
+                },
+                "phone_number_order": {
+                    "type": "string",
+                    "example": "085115151515"
+                },
+                "quantity_adult": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "quantity_infant": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "station_destination": {
+                    "$ref": "#/definitions/dtos.StationResponseSimply"
+                },
+                "station_origin": {
+                    "$ref": "#/definitions/dtos.StationResponseSimply"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "2023-05-31"
+                },
+                "ticket_order_code": {
+                    "type": "string",
+                    "example": "RANDOMCODE123"
+                },
+                "ticket_order_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "train": {
+                    "$ref": "#/definitions/dtos.TrainResponsesSimply"
+                },
+                "traveler_detail": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.TravelerDetailResponse"
+                    }
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
+        "dtos.TicketTravelerDetailOrderStatusOKResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.TicketTravelerDetailOrderResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get ticket order"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "dtos.TicketTravelerDetailResponse": {
+            "type": "object",
+            "properties": {
+                "boarding_ticket_code": {
+                    "type": "string",
+                    "example": "RANDOMBOARDINGTICKETCODE123"
+                },
+                "date": {
+                    "type": "string",
+                    "example": "2023-05-31"
+                },
+                "station_destination": {
+                    "$ref": "#/definitions/dtos.StationResponseSimply"
+                },
+                "station_origin": {
+                    "$ref": "#/definitions/dtos.StationResponseSimply"
+                },
+                "ticket_traveler_detail_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "train": {
+                    "$ref": "#/definitions/dtos.TrainResponsesSimply"
+                },
+                "traveler_detail": {
+                    "$ref": "#/definitions/dtos.TravelerDetailResponse"
                 }
             }
         },
@@ -3181,9 +3826,53 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.TrainResponsesSimply": {
+            "type": "object",
+            "properties": {
+                "class": {
+                    "type": "string",
+                    "example": "Ekonomi"
+                },
+                "code_train": {
+                    "type": "string",
+                    "example": "TRAIN001"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Bengawan"
+                },
+                "train_carriage": {
+                    "type": "string",
+                    "example": "Gerbong 1"
+                },
+                "train_carriage_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "train_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "train_price": {
+                    "type": "integer",
+                    "example": 50000
+                },
+                "train_seat": {
+                    "type": "string",
+                    "example": "A1"
+                },
+                "train_seat_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
         "dtos.TrainSeatResponse": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string",
                     "example": "A1"
@@ -3231,6 +3920,44 @@ const docTemplate = `{
                 "status_code": {
                     "type": "integer",
                     "example": 200
+                }
+            }
+        },
+        "dtos.TravelerDetailInput": {
+            "type": "object",
+            "properties": {
+                "full_name": {
+                    "type": "string",
+                    "example": "Mochammad Hanif"
+                },
+                "id_card_number": {
+                    "type": "string",
+                    "example": "1902389012801211"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Saudara"
+                }
+            }
+        },
+        "dtos.TravelerDetailResponse": {
+            "type": "object",
+            "properties": {
+                "full_name": {
+                    "type": "string",
+                    "example": "Mochammad Hanif"
+                },
+                "id_card_number": {
+                    "type": "string",
+                    "example": "1902389012801211"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Saudara"
+                },
+                "traveler_detail_id": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -3286,10 +4013,6 @@ const docTemplate = `{
                 "full_name": {
                     "type": "string",
                     "example": "Mochammad Hanif"
-                },
-                "gender": {
-                    "type": "string",
-                    "example": "Laki-Laki"
                 },
                 "id": {
                     "type": "integer",
@@ -3375,19 +4098,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dtos.UserUpdateInformationInput": {
-            "type": "object",
-            "properties": {
-                "birth_date": {
-                    "type": "string",
-                    "example": "2002-09-09"
-                },
-                "gender": {
-                    "type": "string",
-                    "example": "Laki-Laki"
-                }
-            }
-        },
         "dtos.UserUpdatePasswordInput": {
             "type": "object",
             "properties": {
@@ -3461,7 +4171,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "ec2-3-26-30-178.ap-southeast-2.compute.amazonaws.com:8088",
+	Host:             "capstone.hanifz.com",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Tripease API Documentation",

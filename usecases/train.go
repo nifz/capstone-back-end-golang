@@ -4,6 +4,7 @@ import (
 	"back-end-golang/dtos"
 	"back-end-golang/models"
 	"back-end-golang/repositories"
+	"errors"
 	"sort"
 	"strings"
 )
@@ -45,8 +46,7 @@ func NewTrainUsecase(TrainRepo repositories.TrainRepository, TrainStationRepo re
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/train [get]
-// @Security BearerAuth
+// @Router       /public/train [get]
 func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int, error) {
 
 	trains, err := u.trainRepo.GetAllTrain()
@@ -61,9 +61,9 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int
 			return trainResponses, 0, err
 		}
 
-		if getTrain.Status != "available" {
-			continue
-		}
+		// if getTrain.Status != "available" {
+		// 	continue
+		// }
 
 		getTrainStation, err := u.trainRepo.GetTrainStationByTrainID(getTrain.ID)
 		if err != nil {
@@ -134,11 +134,10 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/train/{id} [get]
-// @Security BearerAuth
+// @Router       /public/train/{id} [get]
 func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponses, error) {
 	var trainResponses dtos.TrainResponses
-	train, err := u.trainRepo.GetTrainByID(id)
+	train, err := u.trainRepo.GetTrainByID2(id)
 	if err != nil {
 		return trainResponses, err
 	}
@@ -171,6 +170,9 @@ func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponses, error) {
 // @Security BearerAuth
 func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses, error) {
 	var trainResponse dtos.TrainResponses
+	if train.CodeTrain == "" || train.Name == "" || train.Route == nil || train.Status == "" {
+		return trainResponse, errors.New("Failed to create train")
+	}
 
 	createTrain := models.Train{
 		CodeTrain: train.CodeTrain,
@@ -184,6 +186,9 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses,
 	}
 
 	for _, train := range train.Route {
+		if train.ArriveTime == "" || train.StationID < 1 {
+			return trainResponse, errors.New("Failed to create train")
+		}
 		station, err := u.trainRepo.GetStationByID2(train.StationID)
 		if err != nil {
 			return trainResponse, err
@@ -258,6 +263,9 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses,
 func (u *trainUsecase) UpdateTrain(id uint, train dtos.TrainInput) (dtos.TrainResponses, error) {
 	var trains models.Train
 	var trainResponse dtos.TrainResponses
+	if train.CodeTrain == "" || train.Name == "" || train.Route == nil || train.Status == "" {
+		return trainResponse, errors.New("Failed to update train")
+	}
 
 	trains, err := u.trainRepo.GetTrainByID(id)
 	if err != nil {
@@ -352,13 +360,7 @@ func (u *trainUsecase) UpdateTrain(id uint, train dtos.TrainInput) (dtos.TrainRe
 // @Router       /admin/train/{id} [delete]
 // @Security BearerAuth
 func (u *trainUsecase) DeleteTrain(id uint) error {
-	train, err := u.trainRepo.GetTrainByID(id)
-
-	if err != nil {
-		return err
-	}
-	err = u.trainRepo.DeleteTrain(train)
-	return err
+	return u.trainRepo.DeleteTrain(id)
 }
 
 // =============================== ADMIN END ================================== \\
@@ -385,8 +387,7 @@ func (u *trainUsecase) DeleteTrain(id uint) error {
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /user/train/search [get]
-// @Security BearerAuth
+// @Router       /public/train/search [get]
 func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, stationDestinationId, sortByTrainId int, sortClassName, sortByPrice, sortByArriveTime string) ([]dtos.TrainResponse, int, error) {
 	trains, err := u.trainRepo.GetAllTrains(sortClassName, sortByTrainId)
 	if err != nil {

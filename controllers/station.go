@@ -158,9 +158,9 @@ func (c *stationController) UpdateStation(ctx echo.Context) error {
 	stationResp, err := c.stationUsecase.UpdateStation(uint(id), stationInput)
 	if err != nil {
 		return ctx.JSON(
-			http.StatusInternalServerError,
+			http.StatusBadRequest,
 			helpers.NewErrorResponse(
-				http.StatusInternalServerError,
+				http.StatusBadRequest,
 				"Failed update station",
 				helpers.GetErrorData(err),
 			),

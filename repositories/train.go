@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"back-end-golang/dtos"
 	"back-end-golang/models"
 	"errors"
 
@@ -12,13 +11,15 @@ type TrainRepository interface {
 	GetAllTrain() ([]models.Train, error)
 	GetAllTrains(sortClassName string, sortByTrainId int) ([]models.TrainCarriage, error)
 	GetTrainByID(id uint) (models.Train, error)
+	GetTrainByID2(id uint) (models.Train, error)
 	TrainStationByTrainID(id uint) (models.TrainStation, error)
 	GetTrainStationByTrainID(id uint) ([]models.TrainStation, error)
 	SearchTrainAvailable(trainId, originId, destinationId uint) ([]models.TrainStation, error)
+	GetStationByID(id uint) (models.Station, error)
 	GetStationByID2(id uint) (models.Station, error)
 	CreateTrain(train models.Train) (models.Train, error)
 	UpdateTrain(train models.Train) (models.Train, error)
-	DeleteTrain(train models.Train) error
+	DeleteTrain(id uint) error
 }
 
 type trainRepository struct {
@@ -103,6 +104,12 @@ func (r *trainRepository) GetAllTrains(sortClassName string, sortByTrainId int) 
 
 func (r *trainRepository) GetTrainByID(id uint) (models.Train, error) {
 	var train models.Train
+	err := r.db.Unscoped().Where("id = ?", id).First(&train).Error
+	return train, err
+}
+
+func (r *trainRepository) GetTrainByID2(id uint) (models.Train, error) {
+	var train models.Train
 	err := r.db.Where("id = ?", id).First(&train).Error
 	return train, err
 }
@@ -124,7 +131,7 @@ func (r *trainRepository) SearchTrainAvailable(trainId, originId, destinationId 
 		train []models.TrainStation
 		count int64
 	)
-	err := r.db.Where("train_id = ?", trainId).Where("station_id = ? OR station_id = ?", originId, destinationId).Find(&train).Count(&count).Error
+	err := r.db.Where("train_id = ? AND station_id = ? OR station_id = ?", trainId, originId, destinationId).Find(&train).Count(&count).Error
 	// Cek apakah ada data dengan 'arrive time' yang descending
 	for i := 0; i < len(train)-1; i++ {
 		if train[i].ArriveTime > train[i+1].ArriveTime {
@@ -141,15 +148,15 @@ func (r *trainRepository) SearchTrainAvailable(trainId, originId, destinationId 
 	return train, err
 }
 
-func (r *trainRepository) GetStationByID(id uint) (dtos.StationInput, error) {
-	var station dtos.StationInput
+func (r *trainRepository) GetStationByID(id uint) (models.Station, error) {
+	var station models.Station
 	err := r.db.Where("id = ?", id).Find(&station).Error
 	return station, err
 }
 
 func (r *trainRepository) GetStationByID2(id uint) (models.Station, error) {
 	var station models.Station
-	err := r.db.Where("id = ?", id).First(&station).Error
+	err := r.db.Unscoped().Where("id = ?", id).First(&station).Error
 	return station, err
 }
 
@@ -163,8 +170,9 @@ func (r *trainRepository) UpdateTrain(train models.Train) (models.Train, error) 
 	return train, err
 }
 
-func (r *trainRepository) DeleteTrain(train models.Train) error {
-	err := r.db.Delete(&train).Error
+func (r *trainRepository) DeleteTrain(id uint) error {
+	var train models.Train
+	err := r.db.Where("id = ?", id).Delete(&train).Error
 	if err != nil {
 		return err
 	}
