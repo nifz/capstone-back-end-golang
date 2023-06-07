@@ -14,6 +14,13 @@ type UserCreeatedResponse struct {
 	Data       UserInformationResponse `json:"data"`
 }
 
+type GetAllUserStatusOKResponse struct {
+	StatusCode int                     `json:"status_code" example:"200"`
+	Message    string                  `json:"message" example:"Successfully get station"`
+	Data       UserInformationResponse `json:"data"`
+	Meta       helpers.Meta            `json:"meta"`
+}
+
 type GetAllStationStatusOKResponse struct {
 	StatusCode int             `json:"status_code" example:"200"`
 	Message    string          `json:"message" example:"Successfully get station"`
@@ -230,4 +237,10 @@ type PaymentCreeatedResponse struct {
 	StatusCode int             `json:"status_code" example:"201"`
 	Message    string          `json:"message" example:"Successfully created station"`
 	Data       PaymentResponse `json:"data"`
+}
+
+type DashboardStatusOKResponse struct {
+	StatusCode int               `json:"status_code" example:"200"`
+	Message    string            `json:"message" example:"Successfully get dashboard"`
+	Data       DashboardResponse `json:"data"`
 }

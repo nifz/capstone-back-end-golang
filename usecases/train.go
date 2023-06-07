@@ -12,6 +12,7 @@ import (
 type TrainUsecase interface {
 	// admin
 	GetAllTrains(page, limit int) ([]dtos.TrainResponses, int, error)
+	GetAllTrainsByAdmin(page, limit int, search, sortBy, filter string) ([]dtos.TrainResponses, int, error)
 	GetTrainByID(id uint) (dtos.TrainResponses, error)
 	CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses, error)
 	UpdateTrain(id uint, trainInput dtos.TrainInput) (dtos.TrainResponses, error)
@@ -121,6 +122,124 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int
 	return subsetTrainResponses, len(trainResponses), nil
 }
 
+// GetAllTrainsByAdmin godoc
+// @Summary      Get all train
+// @Description  Get all train
+// @Tags         Admin - Train
+// @Accept       json
+// @Produce      json
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Param search query string false "Search data"
+// @Param sort_by query string false "Sort by name"
+// @Param filter query string false "Filter data"
+// @Success      200 {object} dtos.GetAllTrainStatusOKResponses
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/train [get]
+// @Security BearerAuth
+func (u *trainUsecase) GetAllTrainsByAdmin(page, limit int, search, sortBy, filter string) ([]dtos.TrainResponses, int, error) {
+
+	trains, err := u.trainRepo.GetAllTrain2(search)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	filter = strings.ToLower(filter)
+
+	var trainResponses []dtos.TrainResponses
+	for _, train := range trains {
+		getTrain, err := u.trainRepo.GetTrainByID(train.ID)
+		if err != nil {
+			return trainResponses, 0, err
+		}
+
+		deletedTrain := ""
+
+		if filter == "inactive" && getTrain.DeletedAt.Time.IsZero() {
+			continue
+		} else if filter == "active" && !getTrain.DeletedAt.Time.IsZero() {
+			continue
+		}
+
+		if !getTrain.DeletedAt.Time.IsZero() {
+			deletedTrain = getTrain.DeletedAt.Time.Format("2006-01-02T15:04:05.000-07:00")
+		}
+
+		// if getTrain.Status != "available" {
+		// 	continue
+		// }
+
+		getTrainStation, err := u.trainRepo.GetTrainStationByTrainID(getTrain.ID)
+		if err != nil {
+			return trainResponses, 0, err
+		}
+
+		var trainStationResponses []dtos.TrainStationResponse
+
+		for _, train := range getTrainStation {
+			getStation, err := u.trainRepo.GetStationByID2(train.StationID)
+			if err != nil {
+				return trainResponses, 0, err
+			}
+
+			trainStationResponse := dtos.TrainStationResponse{
+				StationID: train.StationID,
+				Station: dtos.StationInput{
+					Origin:  getStation.Origin,
+					Name:    getStation.Name,
+					Initial: getStation.Initial,
+				},
+				ArriveTime: train.ArriveTime,
+			}
+
+			trainStationResponses = append(trainStationResponses, trainStationResponse)
+		}
+
+		trainResponse := dtos.TrainResponses{
+			TrainID:   getTrain.ID,
+			CodeTrain: getTrain.CodeTrain,
+			Name:      getTrain.Name,
+			Route:     trainStationResponses,
+			Status:    getTrain.Status,
+			CreatedAt: getTrain.CreatedAt,
+			UpdatedAt: getTrain.UpdatedAt,
+			DeletedAt: &deletedTrain,
+		}
+		trainResponses = append(trainResponses, trainResponse)
+	}
+	// Apply offset and limit to trainResponses
+	start := (page - 1) * limit
+	end := start + limit
+
+	// Ensure that `start` is within the range of trainResponses
+	if start >= len(trainResponses) {
+		return nil, 0, nil
+	}
+
+	// Ensure that `end` does not exceed the length of trainResponses
+	if end > len(trainResponses) {
+		end = len(trainResponses)
+	}
+
+	subsetTrainResponses := trainResponses[start:end]
+
+	// Sort trainResponses based on price
+	if strings.ToLower(sortBy) == "asc" {
+		sort.SliceStable(subsetTrainResponses, func(i, j int) bool {
+			return subsetTrainResponses[i].Name < subsetTrainResponses[j].Name
+		})
+	} else if strings.ToLower(sortBy) == "desc" {
+		sort.SliceStable(subsetTrainResponses, func(i, j int) bool {
+			return subsetTrainResponses[i].Name > subsetTrainResponses[j].Name
+		})
+	}
+	return subsetTrainResponses, len(trainResponses), nil
+}
+
 // GetTrainByID godoc
 // @Summary      Get train by ID
 // @Description  Get train by ID
@@ -142,10 +261,37 @@ func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponses, error) {
 		return trainResponses, err
 	}
 
+	getTrainStation, err := u.trainRepo.GetTrainStationByTrainID(train.ID)
+	if err != nil {
+		return trainResponses, err
+	}
+
+	var trainStationResponses []dtos.TrainStationResponse
+
+	for _, train := range getTrainStation {
+		getStation, err := u.trainRepo.GetStationByID2(train.StationID)
+		if err != nil {
+			return trainResponses, err
+		}
+
+		trainStationResponse := dtos.TrainStationResponse{
+			StationID: train.StationID,
+			Station: dtos.StationInput{
+				Origin:  getStation.Origin,
+				Name:    getStation.Name,
+				Initial: getStation.Initial,
+			},
+			ArriveTime: train.ArriveTime,
+		}
+
+		trainStationResponses = append(trainStationResponses, trainStationResponse)
+	}
+
 	trainResponse := dtos.TrainResponses{
 		TrainID:   train.ID,
 		CodeTrain: train.CodeTrain,
 		Name:      train.Name,
+		Route:     trainStationResponses,
 		Status:    train.Status,
 		CreatedAt: train.CreatedAt,
 		UpdatedAt: train.UpdatedAt,
@@ -388,6 +534,7 @@ func (u *trainUsecase) DeleteTrain(id uint) error {
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /public/train/search [get]
+
 func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, stationDestinationId, sortByTrainId int, sortClassName, sortByPrice, sortByArriveTime string) ([]dtos.TrainResponse, int, error) {
 	trains, err := u.trainRepo.GetAllTrains(sortClassName, sortByTrainId)
 	if err != nil {
@@ -395,6 +542,8 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 	}
 
 	var trainResponses []dtos.TrainResponse
+
+	visitedIDs := make(map[uint]map[uint]bool)
 
 	for _, train := range trains {
 		getTrain, err := u.trainRepo.GetTrainByID(train.TrainID)
@@ -433,6 +582,14 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 			if err != nil {
 				return trainResponses, 0, err
 			}
+
+			if visitedIDs[train.ID] == nil {
+				visitedIDs[train.ID] = make(map[uint]bool)
+			}
+			if visitedIDs[train.ID][getStation.ID] {
+				continue
+			}
+			visitedIDs[train.ID][getStation.ID] = true
 
 			trainStationResponse := dtos.TrainStationResponse{
 				StationID: trainStation.StationID,

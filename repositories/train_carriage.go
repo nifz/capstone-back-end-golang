@@ -10,6 +10,7 @@ type TrainCarriageRepository interface {
 	GetAllTrainCarriages(page, limit int) ([]models.TrainCarriage, int, error)
 	GetTrainCarriageByID(id uint) (models.TrainCarriage, error)
 	GetTrainCarriageByID2(id uint) (models.TrainCarriage, error)
+	GetTrainCarriageByID3(id uint, class string) ([]models.TrainCarriage, error)
 	GetTrainByID2(id uint) (models.Train, error)
 	GetStationByID2(id uint) (models.Station, error)
 	GetTrainSeatsByClass(class string) ([]models.TrainSeat, error)
@@ -54,6 +55,12 @@ func (r *trainCarriageRepository) GetTrainCarriageByID(id uint) (models.TrainCar
 func (r *trainCarriageRepository) GetTrainCarriageByID2(id uint) (models.TrainCarriage, error) {
 	var trainCarriage models.TrainCarriage
 	err := r.db.Where("id = ?", id).First(&trainCarriage).Error
+	return trainCarriage, err
+}
+
+func (r *trainCarriageRepository) GetTrainCarriageByID3(id uint, class string) ([]models.TrainCarriage, error) {
+	var trainCarriage []models.TrainCarriage
+	err := r.db.Where("train_id = ? AND class = ?", id, class).Find(&trainCarriage).Error
 	return trainCarriage, err
 }
 
