@@ -5,10 +5,13 @@ import (
 	"back-end-golang/models"
 	"back-end-golang/repositories"
 	"errors"
+	"sort"
+	"strings"
 )
 
 type StationUsecase interface {
 	GetAllStations(page, limit int) ([]dtos.StationResponse, int, error)
+	GetAllStationsByAdmin(page, limit int, search, sortBy, filter string) ([]dtos.StationResponse, int, error)
 	GetStationByID(id uint) (dtos.StationResponse, error)
 	CreateStation(station *dtos.StationInput) (dtos.StationResponse, error)
 	UpdateStation(id uint, station dtos.StationInput) (dtos.StationResponse, error)
@@ -57,6 +60,71 @@ func (u *stationUsecase) GetAllStations(page, limit int) ([]dtos.StationResponse
 		stationResponses = append(stationResponses, stationResponse)
 	}
 
+	return stationResponses, count, nil
+}
+
+// GetAllStations godoc
+// @Summary      Get all stations
+// @Description  Get all stations
+// @Tags         Admin - Station
+// @Accept       json
+// @Produce      json
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Param search query string false "Search data"
+// @Param sort_by query string false "Sort by name"
+// @Param filter query string false "Filter data"
+// @Success      200 {object} dtos.GetAllStationStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/station [get]
+// @Security BearerAuth
+func (u *stationUsecase) GetAllStationsByAdmin(page, limit int, search, sortBy, filter string) ([]dtos.StationResponse, int, error) {
+	stations, count, err := u.stationRepo.GetAllStationsByAdmin(page, limit, search)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	filter = strings.ToLower(filter)
+
+	var stationResponses []dtos.StationResponse
+	for _, station := range stations {
+		deletedStation := ""
+
+		if filter == "inactive" && station.DeletedAt.Time.IsZero() {
+			continue
+		} else if filter == "active" && !station.DeletedAt.Time.IsZero() {
+			continue
+		}
+
+		if !station.DeletedAt.Time.IsZero() {
+			deletedStation = station.DeletedAt.Time.Format("2006-01-02T15:04:05.000-07:00")
+		}
+		stationResponse := dtos.StationResponse{
+			StationID: station.ID,
+			Origin:    station.Origin,
+			Name:      station.Name,
+			Initial:   station.Initial,
+			CreatedAt: station.CreatedAt,
+			UpdatedAt: station.UpdatedAt,
+			DeletedAt: &deletedStation,
+		}
+		stationResponses = append(stationResponses, stationResponse)
+	}
+
+	// Sort trainResponses based on price
+	if strings.ToLower(sortBy) == "asc" {
+		sort.SliceStable(stationResponses, func(i, j int) bool {
+			return stationResponses[i].Name < stationResponses[j].Name
+		})
+	} else if strings.ToLower(sortBy) == "desc" {
+		sort.SliceStable(stationResponses, func(i, j int) bool {
+			return stationResponses[i].Name > stationResponses[j].Name
+		})
+	}
 	return stationResponses, count, nil
 }
 

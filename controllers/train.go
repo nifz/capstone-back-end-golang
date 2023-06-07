@@ -13,6 +13,7 @@ import (
 type TrainController interface {
 	//admin
 	GetAllTrains(c echo.Context) error
+	GetAllTrainsByAdmin(c echo.Context) error
 	GetTrainByID(c echo.Context) error
 	CreateTrain(c echo.Context) error
 	UpdateTrain(c echo.Context) error
@@ -48,6 +49,48 @@ func (c *trainController) GetAllTrains(ctx echo.Context) error {
 	}
 
 	trains, count, err := c.trainUsecase.GetAllTrains(page, limit)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to get all train",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewPaginationResponse(
+			http.StatusOK,
+			"Successfully get all trains",
+			trains,
+			page,
+			limit,
+			count,
+		),
+	)
+}
+
+func (c *trainController) GetAllTrainsByAdmin(ctx echo.Context) error {
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
+
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 10
+	}
+
+	searchParam := ctx.QueryParam("search")
+	sortByParam := ctx.QueryParam("sort_by")
+	filterParam := ctx.QueryParam("filter")
+
+	trains, count, err := c.trainUsecase.GetAllTrainsByAdmin(page, limit, searchParam, sortByParam, filterParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
