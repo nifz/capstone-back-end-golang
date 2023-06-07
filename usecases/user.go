@@ -7,6 +7,7 @@ import (
 	"back-end-golang/models"
 	"back-end-golang/repositories"
 	"errors"
+	"sort"
 	"strings"
 	"time"
 )
@@ -19,6 +20,10 @@ type UserUsecase interface {
 	UserCredential(userId uint) (dtos.UserInformationResponse, error)
 	UserUpdatePhotoProfile(userId uint, input dtos.UserUpdatePhotoProfileInput) (dtos.UserInformationResponse, error)
 	UserDeletePhotoProfile(userId uint) (dtos.UserInformationResponse, error)
+	UserGetAll(page, limit int, search, sortBy, filter string) ([]dtos.UserInformationResponse, int, error)
+	UserGetDetail(id int, isDeleted bool) (dtos.UserInformationResponse, error)
+	UserAdminRegister(input dtos.UserRegisterInput) (dtos.UserInformationResponse, error)
+	UserAdminUpdate(id uint, input dtos.UserRegisterInput) (dtos.UserInformationResponse, error)
 }
 
 type userUsecase struct {
@@ -73,7 +78,7 @@ func (u *userUsecase) UserLogin(input dtos.UserLoginInput) (dtos.UserInformation
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
-	userResponse.Role = user.Role
+	userResponse.Role = &user.Role
 	userResponse.Token = &accessToken
 	userResponse.CreatedAt = user.CreatedAt
 	userResponse.UpdatedAt = user.UpdatedAt
@@ -117,7 +122,7 @@ func (u *userUsecase) UserRegister(input dtos.UserRegisterInput) (dtos.UserInfor
 		return userResponse, err
 	}
 
-	if input.Email == "" || input.FullName == "" || input.Password == "" || input.ConfirmPassword == "" || input.Role == "admin" {
+	if input.Email == "" || input.FullName == "" || input.Password == "" || input.ConfirmPassword == "" || input.Role == "admin" || input.PhoneNumber == "" {
 		return userResponse, errors.New("Failed to create user")
 	}
 
@@ -141,7 +146,7 @@ func (u *userUsecase) UserRegister(input dtos.UserRegisterInput) (dtos.UserInfor
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
-	userResponse.Role = user.Role
+	userResponse.Role = &user.Role
 	userResponse.CreatedAt = user.CreatedAt
 	userResponse.UpdatedAt = user.UpdatedAt
 
@@ -210,7 +215,7 @@ func (u *userUsecase) UserUpdatePassword(userId uint, input dtos.UserUpdatePassw
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
-	userResponse.Role = user.Role
+	userResponse.Role = &user.Role
 	userResponse.CreatedAt = user.CreatedAt
 	userResponse.UpdatedAt = user.UpdatedAt
 
@@ -243,6 +248,10 @@ func (u *userUsecase) UserUpdateProfile(userId uint, input dtos.UserUpdateProfil
 		return userResponse, errors.New("User not found")
 	}
 
+	if input.BirthDate > time.Now().Format("2006-01-02") {
+		return userResponse, errors.New("Birth date invalid")
+	}
+
 	dateNow := "2006-01-02"
 	birthDateParse, err := time.Parse(dateNow, input.BirthDate)
 	if err != nil {
@@ -266,7 +275,7 @@ func (u *userUsecase) UserUpdateProfile(userId uint, input dtos.UserUpdateProfil
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
-	userResponse.Role = user.Role
+	userResponse.Role = &user.Role
 	userResponse.CreatedAt = user.CreatedAt
 	userResponse.UpdatedAt = user.UpdatedAt
 
@@ -305,7 +314,7 @@ func (u *userUsecase) UserCredential(userId uint) (dtos.UserInformationResponse,
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
-	userResponse.Role = user.Role
+	userResponse.Role = &user.Role
 	userResponse.CreatedAt = user.CreatedAt
 	userResponse.UpdatedAt = user.UpdatedAt
 
@@ -352,7 +361,7 @@ func (u *userUsecase) UserUpdatePhotoProfile(userId uint, input dtos.UserUpdateP
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
-	userResponse.Role = user.Role
+	userResponse.Role = &user.Role
 	userResponse.CreatedAt = user.CreatedAt
 	userResponse.UpdatedAt = user.UpdatedAt
 
@@ -398,9 +407,312 @@ func (u *userUsecase) UserDeletePhotoProfile(userId uint) (dtos.UserInformationR
 	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
 	userResponse.ProfilePicture = user.ProfilePicture
 	userResponse.Citizen = user.Citizen
-	userResponse.Role = user.Role
+	userResponse.Role = &user.Role
 	userResponse.CreatedAt = user.CreatedAt
 	userResponse.UpdatedAt = user.UpdatedAt
+
+	return userResponse, err
+}
+
+// GetAllUsers godoc
+// @Summary      Get all users
+// @Description  Get all users
+// @Tags         Admin - User
+// @Accept       json
+// @Produce      json
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Param search query string false "Search data"
+// @Param sort_by query string false "Sort by name"
+// @Param filter query string false "Filter data"
+// @Success      200 {object} dtos.GetAllUserStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/user [get]
+// @Security BearerAuth
+func (u *userUsecase) UserGetAll(page, limit int, search, sortBy, filter string) ([]dtos.UserInformationResponse, int, error) {
+	var userResponses []dtos.UserInformationResponse
+	users, count, err := u.userRepo.UserGetAll(page, limit, search)
+	if err != nil {
+		return userResponses, count, err
+	}
+	filter = strings.ToLower(filter)
+
+	for _, user := range users {
+		deletedUser := ""
+
+		if filter == "inactive" && user.DeletedAt.Time.IsZero() {
+			continue
+		} else if filter == "active" && !user.DeletedAt.Time.IsZero() {
+			continue
+		}
+
+		if !user.DeletedAt.Time.IsZero() {
+			deletedUser = user.DeletedAt.Time.Format("2006-01-02T15:04:05.000-07:00")
+		}
+
+		userResponse := dtos.UserInformationResponse{
+			ID:             user.ID,
+			FullName:       user.FullName,
+			Email:          user.Email,
+			PhoneNumber:    user.PhoneNumber,
+			BirthDate:      helpers.FormatDateToYMD(user.BirthDate),
+			ProfilePicture: user.ProfilePicture,
+			Citizen:        user.Citizen,
+			CreatedAt:      user.CreatedAt,
+			UpdatedAt:      user.UpdatedAt,
+			DeletedAt:      &deletedUser,
+		}
+		userResponses = append(userResponses, userResponse)
+	}
+
+	// Sort trainResponses based on price
+	if strings.ToLower(sortBy) == "asc" {
+		sort.SliceStable(userResponses, func(i, j int) bool {
+			return userResponses[i].FullName < userResponses[j].FullName
+		})
+	} else if strings.ToLower(sortBy) == "desc" {
+		sort.SliceStable(userResponses, func(i, j int) bool {
+			return userResponses[i].FullName > userResponses[j].FullName
+		})
+	}
+	return userResponses, count, nil
+}
+
+// UserGetDetail godoc
+// @Summary      Get detail user
+// @Description  Get detail user
+// @Tags         Admin - User
+// @Accept       json
+// @Produce      json
+// @Param id query int false "User ID"
+// @Param isDeleted query bool false "Update deleted user"
+// @Success      200 {object} dtos.GetAllUserStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/user/detail [get]
+// @Security BearerAuth
+func (u *userUsecase) UserGetDetail(id int, isDeleted bool) (dtos.UserInformationResponse, error) {
+	var userResponses dtos.UserInformationResponse
+	user, err := u.userRepo.UserGetById2(uint(id))
+	if err != nil {
+		return userResponses, err
+	}
+	user, err = u.userRepo.UserGetDetail(uint(id), isDeleted)
+	if err != nil {
+		return userResponses, err
+	}
+
+	deletedUser := ""
+	if !user.DeletedAt.Time.IsZero() {
+		deletedUser = user.DeletedAt.Time.Format("2006-01-02T15:04:05.000-07:00")
+	}
+
+	userResponses = dtos.UserInformationResponse{
+		ID:             user.ID,
+		FullName:       user.FullName,
+		Email:          user.Email,
+		PhoneNumber:    user.PhoneNumber,
+		BirthDate:      helpers.FormatDateToYMD(user.BirthDate),
+		ProfilePicture: user.ProfilePicture,
+		Citizen:        user.Citizen,
+		CreatedAt:      user.CreatedAt,
+		UpdatedAt:      user.UpdatedAt,
+		DeletedAt:      &deletedUser,
+	}
+	return userResponses, nil
+}
+
+// UserAdminRegister godoc
+// @Summary      Register user
+// @Description  Register an account
+// @Tags         Admin - User
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.UserRegisterInput true "Payload Body [RAW]"
+// @Success      201 {object} dtos.UserCreeatedResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/user/register [post]
+// @Security BearerAuth
+func (u *userUsecase) UserAdminRegister(input dtos.UserRegisterInput) (dtos.UserInformationResponse, error) {
+	var (
+		user         models.User
+		userResponse dtos.UserInformationResponse
+	)
+
+	input.Email = strings.ToLower(input.Email)
+
+	user, err := u.userRepo.UserGetByEmail(input.Email)
+	if user.ID > 0 {
+		return userResponse, errors.New("Email already used")
+	}
+
+	if input.Password != input.ConfirmPassword {
+		return userResponse, errors.New("Password does not match")
+	}
+
+	password, err := helpers.HashPassword(input.Password)
+	if err != nil {
+		return userResponse, err
+	}
+
+	if input.Email == "" || input.FullName == "" || input.Password == "" || input.ConfirmPassword == "" || input.Role == "admin" || input.PhoneNumber == "" || *input.BirthDate == "" {
+		return userResponse, errors.New("Failed to create user")
+	}
+
+	if *input.BirthDate > time.Now().Format("2006-01-02") {
+		return userResponse, errors.New("Birth date invalid")
+	}
+
+	dateNow := "2006-01-02"
+	birthDateParse, err := time.Parse(dateNow, *input.BirthDate)
+	if err != nil {
+		return userResponse, errors.New("Failed to parse birth date")
+	}
+
+	user.FullName = input.FullName
+	user.Email = input.Email
+	user.Password = password
+	user.PhoneNumber = input.PhoneNumber
+	user.BirthDate = &birthDateParse
+	user.ProfilePicture = "https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"
+	user.Citizen = "Indonesia"
+	user.Role = "user"
+
+	isActive := false // Default value if the pointer is nil
+
+	if input.IsActive != nil {
+		isActive = *input.IsActive
+	}
+
+	user, err = u.userRepo.UserCreate2(user, isActive)
+	if err != nil {
+		return userResponse, err
+	}
+
+	userResponse.ID = user.ID
+	userResponse.FullName = user.FullName
+	userResponse.Email = user.Email
+	userResponse.PhoneNumber = user.PhoneNumber
+	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
+	userResponse.ProfilePicture = user.ProfilePicture
+	userResponse.Citizen = user.Citizen
+	userResponse.Role = &user.Role
+	userResponse.CreatedAt = user.CreatedAt
+	userResponse.UpdatedAt = user.UpdatedAt
+
+	deletedUser := ""
+	if !user.DeletedAt.Time.IsZero() {
+		deletedUser = user.DeletedAt.Time.Format("2006-01-02T15:04:05.000-07:00")
+	}
+
+	userResponse.DeletedAt = &deletedUser
+
+	return userResponse, err
+}
+
+// UserAdminRegister godoc
+// @Summary      Update user
+// @Description  Register an account
+// @Tags         Admin - User
+// @Accept       json
+// @Produce      json
+// @Param id path integer true "ID user"
+// @Param        request body dtos.UserRegisterInput true "Payload Body [RAW]"
+// @Success      201 {object} dtos.UserCreeatedResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/user/update/{id} [put]
+// @Security BearerAuth
+func (u *userUsecase) UserAdminUpdate(id uint, input dtos.UserRegisterInput) (dtos.UserInformationResponse, error) {
+	var (
+		user         models.User
+		userResponse dtos.UserInformationResponse
+	)
+
+	user, err := u.userRepo.UserGetById2(id)
+	if err != nil {
+		return userResponse, errors.New("User not found")
+	}
+
+	userCheck, err := u.userRepo.UserGetByEmail2(id, input.Email)
+	if userCheck.ID != 0 {
+		return userResponse, errors.New("Email already used")
+	}
+
+	if input.Password != input.ConfirmPassword {
+		return userResponse, errors.New("Password does not match")
+	}
+
+	password, err := helpers.HashPassword(input.Password)
+	if err != nil {
+		return userResponse, err
+	}
+
+	if input.Email == "" || input.FullName == "" || input.Password == "" || input.ConfirmPassword == "" || input.Role == "admin" || input.PhoneNumber == "" || *input.BirthDate == "" {
+		return userResponse, errors.New("Failed to create user")
+	}
+
+	if *input.BirthDate > time.Now().Format("2006-01-02") {
+		return userResponse, errors.New("Birth date invalid")
+	}
+
+	dateNow := "2006-01-02"
+	birthDateParse, err := time.Parse(dateNow, *input.BirthDate)
+	if err != nil {
+		return userResponse, errors.New("Failed to parse birth date")
+	}
+
+	user.FullName = input.FullName
+	user.Email = input.Email
+	user.Password = password
+	user.PhoneNumber = input.PhoneNumber
+	user.BirthDate = &birthDateParse
+	user.ProfilePicture = "https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"
+	user.Citizen = "Indonesia"
+	user.Role = "user"
+
+	isActive := false // Default value if the pointer is nil
+
+	if input.IsActive != nil {
+		isActive = *input.IsActive
+	}
+
+	user, err = u.userRepo.UserUpdate2(user, isActive)
+	if err != nil {
+		return userResponse, err
+	}
+
+	userResponse.ID = user.ID
+	userResponse.FullName = user.FullName
+	userResponse.Email = user.Email
+	userResponse.PhoneNumber = user.PhoneNumber
+	userResponse.BirthDate = helpers.FormatDateToYMD(user.BirthDate)
+	userResponse.ProfilePicture = user.ProfilePicture
+	userResponse.Citizen = user.Citizen
+	userResponse.Role = &user.Role
+	userResponse.CreatedAt = user.CreatedAt
+	userResponse.UpdatedAt = user.UpdatedAt
+
+	deletedUser := ""
+	if !user.DeletedAt.Time.IsZero() {
+		deletedUser = user.DeletedAt.Time.Format("2006-01-02T15:04:05.000-07:00")
+	}
+
+	userResponse.DeletedAt = &deletedUser
 
 	return userResponse, err
 }
