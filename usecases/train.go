@@ -542,8 +542,6 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 
 	var trainResponses []dtos.TrainResponse
 
-	visitedIDs := make(map[uint]map[uint]bool)
-
 	for _, train := range trains {
 		getTrain, err := u.trainRepo.GetTrainByID(train.TrainID)
 		if err != nil {
@@ -560,7 +558,7 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 		}
 
 		// Check if route[0] matches stationOriginId and route[1] matches stationDestinationId
-		if getTrainStation[0].StationID != uint(stationOriginId) || getTrainStation[1].StationID != uint(stationDestinationId) {
+		if len(getTrainStation) < 2 || getTrainStation[0].StationID != uint(stationOriginId) || getTrainStation[1].StationID != uint(stationDestinationId) {
 			continue
 		}
 
@@ -581,14 +579,6 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 			if err != nil {
 				return trainResponses, 0, err
 			}
-
-			if visitedIDs[train.ID] == nil {
-				visitedIDs[train.ID] = make(map[uint]bool)
-			}
-			if visitedIDs[train.ID][getStation.ID] {
-				continue
-			}
-			visitedIDs[train.ID][getStation.ID] = true
 
 			trainStationResponse := dtos.TrainStationResponse{
 				StationID: trainStation.StationID,
