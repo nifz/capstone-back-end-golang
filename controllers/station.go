@@ -12,6 +12,7 @@ import (
 
 type StationController interface {
 	GetAllStations(c echo.Context) error
+	GetAllStationsByAdmin(c echo.Context) error
 	GetStationByID(c echo.Context) error
 	CreateStation(c echo.Context) error
 	UpdateStation(c echo.Context) error
@@ -42,6 +43,48 @@ func (c *stationController) GetAllStations(ctx echo.Context) error {
 	}
 
 	stations, count, err := c.stationUsecase.GetAllStations(page, limit)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusInternalServerError,
+			helpers.NewErrorResponse(
+				http.StatusInternalServerError,
+				"Failed fetching station",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewPaginationResponse(
+			http.StatusOK,
+			"Successfully get all stations",
+			stations,
+			page,
+			limit,
+			count,
+		),
+	)
+}
+
+func (c *stationController) GetAllStationsByAdmin(ctx echo.Context) error {
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
+
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 10
+	}
+
+	searchParam := ctx.QueryParam("search")
+	sortByParam := ctx.QueryParam("sort_by")
+	filterParam := ctx.QueryParam("filter")
+
+	stations, count, err := c.stationUsecase.GetAllStationsByAdmin(page, limit, searchParam, sortByParam, filterParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusInternalServerError,

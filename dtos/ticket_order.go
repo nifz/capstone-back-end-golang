@@ -65,21 +65,22 @@ type TicketTravelerDetailResponse struct {
 }
 
 type TicketTravelerDetailOrderResponse struct {
-	TicketOrderID      int                      `json:"ticket_order_id" example:"1"`
-	QuantityAdult      int                      `json:"quantity_adult" example:"1"`
-	QuantityInfant     int                      `json:"quantity_infant" example:"1"`
-	NameOrder          string                   `json:"name_order" example:"Mochammad Hanif"`
-	EmailOrder         string                   `json:"email_order" example:"me@hanifz.com"`
-	PhoneNumberOrder   string                   `json:"phone_number_order" example:"085115151515"`
-	TicketOrderCode    string                   `json:"ticket_order_code" example:"RANDOMCODE123"`
-	Payment            PaymentResponses         `json:"payment"`
-	TravelerDetail     []TravelerDetailResponse `json:"traveler_detail"`
-	Train              TrainResponsesSimply     `json:"train"`
-	StationOrigin      StationResponseSimply    `json:"station_origin"`
-	StationDestination StationResponseSimply    `json:"station_destination"`
-	Date               time.Time                `json:"date" example:"2023-05-31"`
-	BoardingTicketCode string                   `json:"boarding_ticket_code" example:"RANDOMBOARDINGTICKETCODE123"`
-	Status             string                   `json:"status" example:"2023-05-31"`
-	CreatedAt          time.Time                `json:"created_at" example:"2023-05-17T15:07:16.504+07:00"`
-	UpdatedAt          time.Time                `json:"updated_at" example:"2023-05-17T15:07:16.504+07:00"`
+	TicketOrderID      int                       `json:"ticket_order_id" example:"1"`
+	QuantityAdult      int                       `json:"quantity_adult" example:"1"`
+	QuantityInfant     int                       `json:"quantity_infant" example:"1"`
+	NameOrder          string                    `json:"name_order" example:"Mochammad Hanif"`
+	EmailOrder         string                    `json:"email_order" example:"me@hanifz.com"`
+	PhoneNumberOrder   string                    `json:"phone_number_order" example:"085115151515"`
+	TicketOrderCode    string                    `json:"ticket_order_code" example:"RANDOMCODE123"`
+	User               *UserInformationResponses `json:"user,omitempty"`
+	Payment            PaymentResponses          `json:"payment"`
+	TravelerDetail     []TravelerDetailResponse  `json:"traveler_detail"`
+	Train              TrainResponsesSimply      `json:"train"`
+	StationOrigin      StationResponseSimply     `json:"station_origin"`
+	StationDestination StationResponseSimply     `json:"station_destination"`
+	Date               time.Time                 `json:"date" example:"2023-05-31"`
+	BoardingTicketCode string                    `json:"boarding_ticket_code" example:"RANDOMBOARDINGTICKETCODE123"`
+	Status             string                    `json:"status" example:"2023-05-31"`
+	CreatedAt          time.Time                 `json:"created_at" example:"2023-05-17T15:07:16.504+07:00"`
+	UpdatedAt          time.Time                 `json:"updated_at" example:"2023-05-17T15:07:16.504+07:00"`
 }
