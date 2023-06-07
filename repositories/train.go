@@ -2,13 +2,13 @@ package repositories
 
 import (
 	"back-end-golang/models"
-	"errors"
 
 	"gorm.io/gorm"
 )
 
 type TrainRepository interface {
 	GetAllTrain() ([]models.Train, error)
+	GetAllTrain2(search string) ([]models.Train, error)
 	GetAllTrains(sortClassName string, sortByTrainId int) ([]models.TrainCarriage, error)
 	GetTrainByID(id uint) (models.Train, error)
 	GetTrainByID2(id uint) (models.Train, error)
@@ -39,6 +39,15 @@ func (r *trainRepository) GetAllTrain() ([]models.Train, error) {
 	)
 
 	err := r.db.Find(&trains).Count(&count).Error
+
+	return trains, err
+}
+
+func (r *trainRepository) GetAllTrain2(search string) ([]models.Train, error) {
+	var (
+		trains []models.Train
+	)
+	err := r.db.Unscoped().Where("code_train LIKE ? OR name LIKE ?", "%"+search+"%", "%"+search+"%").Find(&trains).Error
 
 	return trains, err
 }
@@ -107,7 +116,6 @@ func (r *trainRepository) GetTrainByID(id uint) (models.Train, error) {
 	err := r.db.Unscoped().Where("id = ?", id).First(&train).Error
 	return train, err
 }
-
 func (r *trainRepository) GetTrainByID2(id uint) (models.Train, error) {
 	var train models.Train
 	err := r.db.Where("id = ?", id).First(&train).Error
@@ -126,26 +134,14 @@ func (r *trainRepository) TrainStationByTrainID(id uint) (models.TrainStation, e
 	return train, err
 }
 
-func (r *trainRepository) SearchTrainAvailable(trainId, originId, destinationId uint) ([]models.TrainStation, error) {
-	var (
-		train []models.TrainStation
-		count int64
-	)
-	err := r.db.Where("train_id = ? AND station_id = ? OR station_id = ?", trainId, originId, destinationId).Find(&train).Count(&count).Error
-	// Cek apakah ada data dengan 'arrive time' yang descending
-	for i := 0; i < len(train)-1; i++ {
-		if train[i].ArriveTime > train[i+1].ArriveTime {
-			err = errors.New("Train not available")
-			train = nil // Reset data jika ada 'arrive time' descending
-			break
-		}
-	}
-
+func (r *trainRepository) SearchTrainAvailable(trainID, originID, destinationID uint) ([]models.TrainStation, error) {
+	var train []models.TrainStation
+	err := r.db.Where("train_id = ? AND station_id IN (?, ?)", trainID, originID, destinationID).Find(&train).Error
 	if err != nil {
-		return train, err
+		return nil, err
 	}
 
-	return train, err
+	return train, nil
 }
 
 func (r *trainRepository) GetStationByID(id uint) (models.Station, error) {

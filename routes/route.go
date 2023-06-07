@@ -56,8 +56,12 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	paymentController := controllers.NewPaymentController(paymentUsecase)
 
 	ticketOrderRepository := repositories.NewTicketOrderRepository(db)
-	ticketOrderUsecase := usecases.NewTicketOrderUsecase(ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository)
+	ticketOrderUsecase := usecases.NewTicketOrderUsecase(ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository, userRepository)
 	ticketOrderController := controllers.NewTicketOrderController(ticketOrderUsecase)
+
+	dashboardRepository := repositories.NewDashboardRepository(db)
+	dashboardUsecase := usecases.NewDashboardUsecase(dashboardRepository, userRepository, ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository)
+	dashboardController := controllers.NewDashboardController(dashboardUsecase)
 
 	articleRepository := repositories.NewArticleRepository(db)
 	articleUsecase := usecases.NewArticleUsecase(articleRepository)
@@ -107,9 +111,21 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin := api.Group("/admin")
 	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("admin"))
 
+	// users @ admin
+	admin.GET("/user", userController.UserGetAll)
+	admin.GET("/user/detail", userController.UserGetDetail)
+	admin.POST("/user/register", userController.UserAdminRegister)
+	admin.PUT("/user/update/:id", userController.UserAdminUpdate)
+
+	admin.GET("/dashboard", dashboardController.DashboardGetAll)
+
+	admin.GET("/order/ticket", ticketOrderController.GetTicketOrdersByAdmin)
+	admin.GET("/order/ticket/detail", ticketOrderController.GetTicketOrderDetailByAdmin)
+
 	// crud station
 	public.GET("/station", stationController.GetAllStations)
 	public.GET("/station/:id", stationController.GetStationByID)
+	admin.GET("/station", stationController.GetAllStationsByAdmin)
 	admin.PUT("/station/:id", stationController.UpdateStation)
 	admin.POST("/station", stationController.CreateStation)
 	admin.DELETE("/station/:id", stationController.DeleteStation)
@@ -117,6 +133,7 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	// crud train
 	public.GET("/train", trainController.GetAllTrains)
 	public.GET("/train/:id", trainController.GetTrainByID)
+	admin.GET("/train", trainController.GetAllTrainsByAdmin)
 	admin.PUT("/train/:id", trainController.UpdateTrain)
 	admin.POST("/train", trainController.CreateTrain)
 	admin.DELETE("/train/:id", trainController.DeleteTrain)

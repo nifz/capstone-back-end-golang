@@ -18,6 +18,13 @@ type TrainCarriageResponse struct {
 	UpdatedAt       time.Time           `json:"updated_at" example:"2023-05-17T15:07:16.504+07:00"`
 }
 
+type TrainCarriageResponses struct {
+	TrainCarriageID uint                `json:"train_carriage_id" example:"1"`
+	Class           string              `json:"class" example:"Ekonomi"`
+	Name            string              `json:"name" example:"Gerbong 1"`
+	Seat            []TrainSeatResponse `json:"seat"`
+}
+
 type TrainCarriageResponseSimply struct {
 	TrainCarriageID uint          `json:"train_carriage_id" example:"1"`
 	Train           TrainResponse `json:"train"`
