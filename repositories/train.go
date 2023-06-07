@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"back-end-golang/models"
-	"errors"
 
 	"gorm.io/gorm"
 )
@@ -135,26 +134,14 @@ func (r *trainRepository) TrainStationByTrainID(id uint) (models.TrainStation, e
 	return train, err
 }
 
-func (r *trainRepository) SearchTrainAvailable(trainId, originId, destinationId uint) ([]models.TrainStation, error) {
-	var (
-		train []models.TrainStation
-		count int64
-	)
-	err := r.db.Where("train_id = ? AND station_id = ? OR station_id = ?", trainId, originId, destinationId).Find(&train).Count(&count).Error
-	// Cek apakah ada data dengan 'arrive time' yang descending
-	for i := 0; i < len(train)-1; i++ {
-		if train[i].ArriveTime > train[i+1].ArriveTime {
-			err = errors.New("Train not available")
-			train = nil // Reset data jika ada 'arrive time' descending
-			break
-		}
-	}
-
+func (r *trainRepository) SearchTrainAvailable(trainID, originID, destinationID uint) ([]models.TrainStation, error) {
+	var train []models.TrainStation
+	err := r.db.Where("train_id = ? AND station_id IN (?, ?)", trainID, originID, destinationID).Find(&train).Error
 	if err != nil {
-		return train, err
+		return nil, err
 	}
 
-	return train, err
+	return train, nil
 }
 
 func (r *trainRepository) GetStationByID(id uint) (models.Station, error) {
