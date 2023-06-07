@@ -13,6 +13,8 @@ import (
 
 type TicketOrderController interface {
 	GetTicketOrders(c echo.Context) error
+	GetTicketOrdersByAdmin(c echo.Context) error
+	GetTicketOrderDetailByAdmin(c echo.Context) error
 	GetTicketOrderByID(c echo.Context) error
 	CreateTicketOrder(c echo.Context) error
 	UpdateTicketOrder(c echo.Context) error
@@ -71,7 +73,7 @@ func (c *ticketOrderController) GetTicketOrders(ctx echo.Context) error {
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to created a ticket order",
+				"Failed to get a ticket order",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -86,6 +88,78 @@ func (c *ticketOrderController) GetTicketOrders(ctx echo.Context) error {
 			page,
 			limit,
 			count,
+		),
+	)
+}
+
+func (c *ticketOrderController) GetTicketOrdersByAdmin(ctx echo.Context) error {
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
+
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 1000
+	}
+
+	searchParam := ctx.QueryParam("search")
+	dateStartParam := ctx.QueryParam("date_start")
+	dateEndParam := ctx.QueryParam("date_end")
+	orderByParam := ctx.QueryParam("order_by")
+	filterParam := ctx.QueryParam("filter")
+
+	ticketOrder, count, err := c.ticketOrderUsecase.GetTicketOrdersByAdmin(page, limit, searchParam, dateStartParam, dateEndParam, orderByParam, filterParam)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to get a ticket order",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewPaginationResponse(
+			http.StatusOK,
+			"Successfully to get order tickets",
+			ticketOrder,
+			page,
+			limit,
+			count,
+		),
+	)
+}
+
+func (c *ticketOrderController) GetTicketOrderDetailByAdmin(ctx echo.Context) error {
+	trainIdParam := ctx.QueryParam("train_id")
+	trainId, _ := strconv.Atoi(trainIdParam)
+	ticketOrderIdParam := ctx.QueryParam("ticket_order_id")
+	ticketOrderId, _ := strconv.Atoi(ticketOrderIdParam)
+
+	ticketOrder, err := c.ticketOrderUsecase.GetTicketOrdersDetailByAdmin(uint(ticketOrderId), uint(trainId))
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to get a ticket order",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewResponse(
+			http.StatusOK,
+			"Successfully to get order tickets",
+			ticketOrder,
 		),
 	)
 }
@@ -126,7 +200,7 @@ func (c *ticketOrderController) GetTicketOrderByID(ctx echo.Context) error {
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to created a ticket order",
+				"Failed to get a ticket order",
 				helpers.GetErrorData(err),
 			),
 		)
