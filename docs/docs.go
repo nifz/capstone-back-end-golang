@@ -2531,6 +2531,111 @@ const docTemplate = `{
                 }
             }
         },
+        "/public/train/search": {
+            "get": {
+                "description": "Search Train",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Train"
+                ],
+                "summary": "Search Train Available",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Station origin id",
+                        "name": "station_origin_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Station destination id",
+                        "name": "station_destination_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by train id",
+                        "name": "sort_by_train_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by class name",
+                        "name": "sort_by_class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by price",
+                        "name": "sort_by_price",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by arrive time",
+                        "name": "sort_by_arrive_time",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllTrainStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/public/train/{id}": {
             "get": {
                 "description": "Get train by ID",
@@ -3694,6 +3799,25 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Successfully get train carriage"
+                },
+                "meta": {
+                    "$ref": "#/definitions/helpers.Meta"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "dtos.GetAllTrainStatusOKResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.TrainResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get train"
                 },
                 "meta": {
                     "$ref": "#/definitions/helpers.Meta"
