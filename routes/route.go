@@ -67,6 +67,19 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	historySearchUsecase := usecases.NewHistorySearchUsecase(historySearchRepository, userRepository)
 	historySearchController := controllers.NewHistorySearchController(historySearchUsecase)
 
+	hotelRepository := repositories.NewHotelRepository(db)
+	hotelImageRepository := repositories.NewHotelImageRepository(db)
+	hotelFacilitiesRepository := repositories.NewHotelFacilitiesRepository(db)
+	hotelPolicyRepository := repositories.NewHotelPoliciesRepository(db)
+	hotelUsecase := usecases.NewHotelUsecase(hotelRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository)
+	hotelController := controllers.NewHotelController(hotelUsecase)
+
+	hotelRoomRepository := repositories.NewHotelRoomRepository(db)
+	hotelRoomImageRepository := repositories.NewHotelRoomImageRepository(db)
+	hotelRoomFacilitiesRepository := repositories.NewHotelRoomFacilitiesRepository(db)
+	hotelRoomUsecase := usecases.NewHotelRoomUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository)
+	hotelRoomController := controllers.NewHotelRoomController(hotelRoomUsecase)
+
 	// Middleware CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"}, // Izinkan semua domain
@@ -138,4 +151,16 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.PUT("/payment/:id", paymentController.UpdatePayment)
 	admin.POST("/payment", paymentController.CreatePayment)
 	admin.DELETE("/payment/:id", paymentController.DeletePayment)
+
+	admin.GET("/hotel", hotelController.GetAllHotels)
+	admin.GET("/hotel/:id", hotelController.GetHotelByID)
+	admin.PUT("/hotel/:id", hotelController.UpdateHotel)
+	admin.POST("/hotel", hotelController.CreateHotel)
+	admin.DELETE("/hotel/:id", hotelController.DeleteHotel)
+
+	admin.GET("/hotel-room", hotelRoomController.GetAllHotelRooms)
+	admin.GET("/hotel-room/:id", hotelRoomController.GetHotelRoomByID)
+	admin.PUT("/hotel-room/:id", hotelRoomController.UpdateHotelRoom)
+	admin.POST("/hotel-room", hotelRoomController.CreateHotelRoom)
+	admin.DELETE("/hotel-room/:id", hotelRoomController.DeleteHotelRoom)
 }
