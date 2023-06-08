@@ -14,6 +14,15 @@ type UserRegisterInput struct {
 	Role            string  `form:"role" json:"role" example:"user"`
 	IsActive        *bool   `form:"is_active" json:"is_active,omitempty" example:"true"`
 }
+type UserRegisterInputByAdmin struct {
+	FullName        string `form:"full_name" json:"full_name" example:"Mochammad Hanif"`
+	Email           string `form:"email" json:"email" example:"me@hanifz.com"`
+	Password        string `form:"password" json:"password" example:"qweqwe123"`
+	ConfirmPassword string `form:"confirm_password" json:"confirm_password" example:"qweqwe123"`
+	PhoneNumber     string `form:"phone_number" json:"phone_number" example:"0851555555151"`
+	BirthDate       string `form:"birth_date" json:"birth_date" example:"2000-01-01"`
+	Role            string `form:"role" json:"role" example:"user"`
+}
 
 type UserLoginInput struct {
 	Email    string `form:"email" json:"email" example:"me@hanifz.com"`

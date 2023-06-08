@@ -9,6 +9,7 @@ import (
 type HotelRoomFacilitiesRepository interface {
 	GetAllHotelRoomFacilities(page, limit int) ([]models.HotelRoomFacilities, int, error)
 	GetAllHotelRoomFacilitiesByID(id uint) ([]models.HotelRoomFacilities, error)
+	GetAllHotelRoomFacilitiesByHotelID(id uint) ([]models.HotelRoomFacilities, error)
 	GetHotelRoomFacilitiesByID(id uint) (models.HotelRoomFacilities, error)
 	CreateHotelRoomFacilities(roomFacilities models.HotelRoomFacilities) (models.HotelRoomFacilities, error)
 	UpdateHotelRoomFacilities(roomFacilities models.HotelRoomFacilities) (models.HotelRoomFacilities, error)
@@ -45,6 +46,12 @@ func (r *hotelRoomFacilitiesRepository) GetAllHotelRoomFacilities(page, limit in
 func (r *hotelRoomFacilitiesRepository) GetAllHotelRoomFacilitiesByID(id uint) ([]models.HotelRoomFacilities, error) {
 	var roomFacilities []models.HotelRoomFacilities
 	err := r.db.Where("hotel_room_id = ?", id).Find(&roomFacilities).Error
+	return roomFacilities, err
+}
+
+func (r *hotelRoomFacilitiesRepository) GetAllHotelRoomFacilitiesByHotelID(id uint) ([]models.HotelRoomFacilities, error) {
+	var roomFacilities []models.HotelRoomFacilities
+	err := r.db.Where("hotel_id = ?", id).Find(&roomFacilities).Error
 	return roomFacilities, err
 }
 
