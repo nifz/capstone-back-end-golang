@@ -43,7 +43,7 @@ func NewHotelRoomUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo r
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/hotel-room [get]
+// @Router       /user/hotel-room [get]
 func (u *hotelRoomUsecase) GetAllHotelRooms(page, limit int) ([]dtos.HotelRoomResponse, int, error) {
 
 	rooms, count, err := u.hotelRoomRepo.GetAllHotelRooms(page, limit)
@@ -135,7 +135,7 @@ func (u *hotelRoomUsecase) GetAllHotelRooms(page, limit int) ([]dtos.HotelRoomRe
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/hotel-room/{id} [get]
+// @Router       /user/hotel-room/{id} [get]
 func (u *hotelRoomUsecase) GetHotelRoomByID(id uint) (dtos.HotelRoomResponse, error) {
 	var hotelRoomResponses dtos.HotelRoomResponse
 	room, err := u.hotelRoomRepo.GetHotelRoomByID(id)
@@ -219,6 +219,7 @@ func (u *hotelRoomUsecase) CreateHotelRoom(roomInput *dtos.HotelRoomInput) (dtos
 		return hotelRoomResponse, errors.New("failed to create hotel room, hotel_id not found")
 	}
 
+	discountPrice := roomInput.NormalPrice - (roomInput.NormalPrice * roomInput.Discount / 100)
 	createHotelRoom := models.HotelRoom{
 		HotelID:          getHotel.ID,
 		Name:             roomInput.Name,
@@ -227,7 +228,7 @@ func (u *hotelRoomUsecase) CreateHotelRoom(roomInput *dtos.HotelRoomInput) (dtos
 		Description:      roomInput.Description,
 		NormalPrice:      roomInput.NormalPrice,
 		Discount:         roomInput.Discount,
-		DiscountPrice:    roomInput.DiscountPrice,
+		DiscountPrice:    discountPrice,
 		NumberOfGuest:    roomInput.NumberOfGuest,
 		MattressSize:     roomInput.MattressSize,
 		NumberOfMattress: roomInput.NumberOfMattress,
@@ -354,6 +355,8 @@ func (u *hotelRoomUsecase) UpdateHotelRoom(id uint, roomInput dtos.HotelRoomInpu
 		return hotelRoomResponse, errors.New("failed to update hotel room, hotel_id not found")
 	}
 
+	discountPrice := roomInput.NormalPrice - (roomInput.NormalPrice * roomInput.Discount / 100)
+
 	hotelRooms.HotelID = getHotel.ID
 	hotelRooms.Name = roomInput.Name
 	hotelRooms.SizeOfRoom = roomInput.SizeOfRoom
@@ -361,7 +364,7 @@ func (u *hotelRoomUsecase) UpdateHotelRoom(id uint, roomInput dtos.HotelRoomInpu
 	hotelRooms.Description = roomInput.Description
 	hotelRooms.NormalPrice = roomInput.NormalPrice
 	hotelRooms.Discount = roomInput.Discount
-	hotelRooms.DiscountPrice = roomInput.DiscountPrice
+	hotelRooms.DiscountPrice = discountPrice
 	hotelRooms.NumberOfGuest = roomInput.NumberOfGuest
 	hotelRooms.MattressSize = roomInput.MattressSize
 	hotelRooms.NumberOfMattress = roomInput.NumberOfMattress

@@ -8,7 +8,9 @@ import (
 
 type HotelRoomRepository interface {
 	GetAllHotelRooms(page, limit int) ([]models.HotelRoom, int, error)
+	GetAllHotelRoomByHotelID(id uint) ([]models.HotelRoom, error)
 	GetHotelRoomByID(id uint) (models.HotelRoom, error)
+	GetMinimumPriceHotelRoomByHotelID(id uint) (models.HotelRoom, error)
 	CreateHotelRoom(hotelRoom models.HotelRoom) (models.HotelRoom, error)
 	UpdateHotelRoom(hotelRoom models.HotelRoom) (models.HotelRoom, error)
 	DeleteHotelRoom(id uint) error
@@ -39,6 +41,18 @@ func (r *hotelRoomRepository) GetAllHotelRooms(page, limit int) ([]models.HotelR
 	err = r.db.Limit(limit).Offset(offset).Find(&hotelrooms).Error
 
 	return hotelrooms, int(count), err
+}
+
+func (r *hotelRoomRepository) GetAllHotelRoomByHotelID(id uint) ([]models.HotelRoom, error) {
+	var hotelRoom []models.HotelRoom
+	err := r.db.Where("hotel_id = ?", id).Find(&hotelRoom).Error
+	return hotelRoom, err
+}
+
+func (r *hotelRoomRepository) GetMinimumPriceHotelRoomByHotelID(id uint) (models.HotelRoom, error) {
+	var hotelRoom models.HotelRoom
+	err := r.db.Where("hotel_id = ?", id).Order("discount_price ASC").First(&hotelRoom).Error
+	return hotelRoom, err
 }
 
 func (r *hotelRoomRepository) GetHotelRoomByID(id uint) (models.HotelRoom, error) {
