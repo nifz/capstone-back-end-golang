@@ -8,6 +8,7 @@ import (
 
 type StationRepository interface {
 	GetAllStations(page, limit int) ([]models.Station, int, error)
+	GetAllStationsByAdmin(page, limit int, search string) ([]models.Station, int, error)
 	GetStationByID(id uint) (models.Station, error)
 	GetStationByID2(id uint) (models.Station, error)
 	CreateStation(station models.Station) (models.Station, error)
@@ -38,6 +39,18 @@ func (r *stationRepository) GetAllStations(page, limit int) ([]models.Station, i
 	offset := (page - 1) * limit
 
 	err = r.db.Limit(limit).Offset(offset).Find(&stations).Error
+
+	return stations, int(count), err
+}
+
+func (r *stationRepository) GetAllStationsByAdmin(page, limit int, search string) ([]models.Station, int, error) {
+	var stations []models.Station
+	var count int64
+	err := r.db.Unscoped().Find(&stations).Count(&count).Error
+
+	offset := (page - 1) * limit
+
+	err = r.db.Unscoped().Where("origin LIKE ? OR name LIKE ? OR initial LIKE ?", "%"+search+"%", "%"+search+"%", "%"+search+"%").Limit(limit).Offset(offset).Find(&stations).Error
 
 	return stations, int(count), err
 }

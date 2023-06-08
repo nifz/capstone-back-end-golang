@@ -8,6 +8,7 @@ import (
 	"back-end-golang/usecases"
 	"net/http"
 	"regexp"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -446,6 +447,151 @@ func (c *UserController) UserDeletePhotoProfile(ctx echo.Context) error {
 		helpers.NewResponse(
 			http.StatusOK,
 			"Successfully updated profile",
+			user,
+		),
+	)
+}
+
+func (c *UserController) UserGetAll(ctx echo.Context) error {
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
+
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 10
+	}
+
+	searchParam := ctx.QueryParam("search")
+	sortByParam := ctx.QueryParam("sort_by")
+	filterParam := ctx.QueryParam("filter")
+
+	users, count, err := c.userUsecase.UserGetAll(page, limit, searchParam, sortByParam, filterParam)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed fetching users",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewPaginationResponse(
+			http.StatusOK,
+			"Successfully get all users",
+			users,
+			page,
+			limit,
+			count,
+		),
+	)
+}
+
+func (c *UserController) UserGetDetail(ctx echo.Context) error {
+	idParam := ctx.QueryParam("id")
+	id, _ := strconv.Atoi(idParam)
+
+	isDeletedParam := ctx.QueryParam("isDeleted")
+	isDeleted, _ := strconv.ParseBool(isDeletedParam)
+
+	users, err := c.userUsecase.UserGetDetail(id, isDeleted)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed fetching user",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewResponse(
+			http.StatusOK,
+			"Successfully get user",
+			users,
+		),
+	)
+}
+
+func (c *UserController) UserAdminRegister(ctx echo.Context) error {
+	var userInput dtos.UserRegisterInput
+	err := ctx.Bind(&userInput)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to register",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	user, err := c.userUsecase.UserAdminRegister(userInput)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to register",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusCreated,
+		helpers.NewResponse(
+			http.StatusCreated,
+			"Successfully registered",
+			user,
+		),
+	)
+}
+
+func (c *UserController) UserAdminUpdate(ctx echo.Context) error {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+
+	var userInput dtos.UserRegisterInput
+	err := ctx.Bind(&userInput)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to update user",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	user, err := c.userUsecase.UserAdminUpdate(uint(id), userInput)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to update user",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusCreated,
+		helpers.NewResponse(
+			http.StatusCreated,
+			"Successfully updated user",
 			user,
 		),
 	)

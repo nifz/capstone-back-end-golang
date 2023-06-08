@@ -56,8 +56,12 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	paymentController := controllers.NewPaymentController(paymentUsecase)
 
 	ticketOrderRepository := repositories.NewTicketOrderRepository(db)
-	ticketOrderUsecase := usecases.NewTicketOrderUsecase(ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository)
+	ticketOrderUsecase := usecases.NewTicketOrderUsecase(ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository, userRepository)
 	ticketOrderController := controllers.NewTicketOrderController(ticketOrderUsecase)
+
+	dashboardRepository := repositories.NewDashboardRepository(db)
+	dashboardUsecase := usecases.NewDashboardUsecase(dashboardRepository, userRepository, ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository)
+	dashboardController := controllers.NewDashboardController(dashboardUsecase)
 
 	articleRepository := repositories.NewArticleRepository(db)
 	articleUsecase := usecases.NewArticleUsecase(articleRepository)
@@ -66,6 +70,19 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	historySearchRepository := repositories.NewHistorySearchRepository(db)
 	historySearchUsecase := usecases.NewHistorySearchUsecase(historySearchRepository, userRepository)
 	historySearchController := controllers.NewHistorySearchController(historySearchUsecase)
+
+	hotelRepository := repositories.NewHotelRepository(db)
+	hotelImageRepository := repositories.NewHotelImageRepository(db)
+	hotelFacilitiesRepository := repositories.NewHotelFacilitiesRepository(db)
+	hotelPolicyRepository := repositories.NewHotelPoliciesRepository(db)
+	hotelUsecase := usecases.NewHotelUsecase(hotelRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository)
+	hotelController := controllers.NewHotelController(hotelUsecase)
+
+	hotelRoomRepository := repositories.NewHotelRoomRepository(db)
+	hotelRoomImageRepository := repositories.NewHotelRoomImageRepository(db)
+	hotelRoomFacilitiesRepository := repositories.NewHotelRoomFacilitiesRepository(db)
+	hotelRoomUsecase := usecases.NewHotelRoomUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository)
+	hotelRoomController := controllers.NewHotelRoomController(hotelRoomUsecase)
 
 	// Middleware CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -107,9 +124,21 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin := api.Group("/admin")
 	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("admin"))
 
+	// users @ admin
+	admin.GET("/user", userController.UserGetAll)
+	admin.GET("/user/detail", userController.UserGetDetail)
+	admin.POST("/user/register", userController.UserAdminRegister)
+	admin.PUT("/user/update/:id", userController.UserAdminUpdate)
+
+	admin.GET("/dashboard", dashboardController.DashboardGetAll)
+
+	admin.GET("/order/ticket", ticketOrderController.GetTicketOrdersByAdmin)
+	admin.GET("/order/ticket/detail", ticketOrderController.GetTicketOrderDetailByAdmin)
+
 	// crud station
 	public.GET("/station", stationController.GetAllStations)
 	public.GET("/station/:id", stationController.GetStationByID)
+	admin.GET("/station", stationController.GetAllStationsByAdmin)
 	admin.PUT("/station/:id", stationController.UpdateStation)
 	admin.POST("/station", stationController.CreateStation)
 	admin.DELETE("/station/:id", stationController.DeleteStation)
@@ -117,6 +146,7 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	// crud train
 	public.GET("/train", trainController.GetAllTrains)
 	public.GET("/train/:id", trainController.GetTrainByID)
+	admin.GET("/train", trainController.GetAllTrainsByAdmin)
 	admin.PUT("/train/:id", trainController.UpdateTrain)
 	admin.POST("/train", trainController.CreateTrain)
 	admin.DELETE("/train/:id", trainController.DeleteTrain)
@@ -138,4 +168,16 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.PUT("/payment/:id", paymentController.UpdatePayment)
 	admin.POST("/payment", paymentController.CreatePayment)
 	admin.DELETE("/payment/:id", paymentController.DeletePayment)
+
+	admin.GET("/hotel", hotelController.GetAllHotels)
+	admin.GET("/hotel/:id", hotelController.GetHotelByID)
+	admin.PUT("/hotel/:id", hotelController.UpdateHotel)
+	admin.POST("/hotel", hotelController.CreateHotel)
+	admin.DELETE("/hotel/:id", hotelController.DeleteHotel)
+
+	admin.GET("/hotel-room", hotelRoomController.GetAllHotelRooms)
+	admin.GET("/hotel-room/:id", hotelRoomController.GetHotelRoomByID)
+	admin.PUT("/hotel-room/:id", hotelRoomController.UpdateHotelRoom)
+	admin.POST("/hotel-room", hotelRoomController.CreateHotelRoom)
+	admin.DELETE("/hotel-room/:id", hotelRoomController.DeleteHotelRoom)
 }
