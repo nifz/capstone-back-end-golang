@@ -222,7 +222,7 @@ func (u *trainCarriageUsecase) GetTrainCarriageByID(id uint) (dtos.TrainCarriage
 // @Accept       json
 // @Produce      json
 // @Param        request body []dtos.TrainCarriageInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.TrainCarriageStatusOKResponse
+// @Success      201 {object} dtos.TrainCarriageCreeatedResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse

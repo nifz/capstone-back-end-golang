@@ -322,6 +322,676 @@
                 }
             }
         },
+        "/admin/hotel": {
+            "get": {
+                "description": "Get all hotel",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel"
+                ],
+                "summary": "Get all hotel",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllHotelStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new hotel",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel"
+                ],
+                "summary": "Create a new hotel",
+                "parameters": [
+                    {
+                        "description": "Payload Body [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelCreeatedResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/hotel-room": {
+            "get": {
+                "description": "Get all hotel room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel Room"
+                ],
+                "summary": "Get all hotel room",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllHotelRoomStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new hotel room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel Room"
+                ],
+                "summary": "Create a new hotel room",
+                "parameters": [
+                    {
+                        "description": "Payload Body [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelRoomInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelRoomCreeatedResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/hotel-room/{id}": {
+            "get": {
+                "description": "Get hotel room by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel Room"
+                ],
+                "summary": "Get hotel room by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Hotel Room",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelRoomStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update hotel room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel Room"
+                ],
+                "summary": "Update hotel room",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Hotel Room",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload Body [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelRoomInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelRoomStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a hotel room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel Room"
+                ],
+                "summary": "Delete a hotel room",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Hotel Room",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StatusOKDeletedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/hotel/{id}": {
+            "get": {
+                "description": "Get hotel by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel"
+                ],
+                "summary": "Get hotel by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Hotel",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update hotel",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel"
+                ],
+                "summary": "Update hotel",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID hotel",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Payload Body [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Delete a hotel",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel"
+                ],
+                "summary": "Delete a hotel",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Hotel",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StatusOKDeletedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/order/ticket": {
             "get": {
                 "security": [
@@ -554,10 +1224,10 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dtos.PaymentStatusOKResponse"
+                            "$ref": "#/definitions/dtos.PaymentCreeatedResponse"
                         }
                     },
                     "400": {
@@ -878,10 +1548,10 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dtos.StationStatusOKResponse"
+                            "$ref": "#/definitions/dtos.StationCreeatedResponse"
                         }
                     },
                     "400": {
@@ -1176,10 +1846,10 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dtos.TrainStatusOKResponses"
+                            "$ref": "#/definitions/dtos.TrainCreeatedResponse"
                         }
                     },
                     "400": {
@@ -1248,10 +1918,10 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dtos.TrainCarriageStatusOKResponse"
+                            "$ref": "#/definitions/dtos.TrainCarriageCreeatedResponse"
                         }
                     },
                     "400": {
@@ -3725,6 +4395,44 @@
                 }
             }
         },
+        "dtos.GetAllHotelRoomStatusOKResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelRoomResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get station"
+                },
+                "meta": {
+                    "$ref": "#/definitions/helpers.Meta"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "dtos.GetAllHotelStatusOKResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get station"
+                },
+                "meta": {
+                    "$ref": "#/definitions/helpers.Meta"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
         "dtos.GetAllPaymentStatusOKResponse": {
             "type": "object",
             "properties": {
@@ -3915,6 +4623,425 @@
                 }
             }
         },
+        "dtos.HotelCreeatedResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully created station"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 201
+                }
+            }
+        },
+        "dtos.HotelFacilitiesInput": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.HotelFacilitiesResponse": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.HotelImageInput": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.HotelImageResponse": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.HotelInput": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "hotel_facilities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelFacilitiesInput"
+                    }
+                },
+                "hotel_image": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelImageInput"
+                    }
+                },
+                "hotel_policy": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelPoliciesInput"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.HotelPoliciesInput": {
+            "type": "object",
+            "properties": {
+                "is_breakfast": {
+                    "type": "boolean"
+                },
+                "is_check_in_check_out": {
+                    "type": "boolean"
+                },
+                "is_check_in_early": {
+                    "type": "boolean"
+                },
+                "is_check_out_overdue": {
+                    "type": "boolean"
+                },
+                "is_pet": {
+                    "type": "boolean"
+                },
+                "is_policy_canceled": {
+                    "type": "boolean"
+                },
+                "is_smoking": {
+                    "type": "boolean"
+                },
+                "policy_minimum_age": {
+                    "type": "integer"
+                },
+                "time_breakfast_end": {
+                    "type": "string"
+                },
+                "time_breakfast_start": {
+                    "type": "string"
+                },
+                "time_check_in": {
+                    "type": "string"
+                },
+                "time_check_out": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.HotelPoliciesResponse": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "is_breakfast": {
+                    "type": "boolean"
+                },
+                "is_check_in_check_out": {
+                    "type": "boolean"
+                },
+                "is_check_in_early": {
+                    "type": "boolean"
+                },
+                "is_check_out_overdue": {
+                    "type": "boolean"
+                },
+                "is_pet": {
+                    "type": "boolean"
+                },
+                "is_policy_canceled": {
+                    "type": "boolean"
+                },
+                "is_smoking": {
+                    "type": "boolean"
+                },
+                "policy_minimum_age": {
+                    "type": "integer"
+                },
+                "time_breakfast_end": {
+                    "type": "string"
+                },
+                "time_breakfast_start": {
+                    "type": "string"
+                },
+                "time_check_in": {
+                    "type": "string"
+                },
+                "time_check_out": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.HotelResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "hotel_facilities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelFacilitiesResponse"
+                    }
+                },
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_image": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelImageResponse"
+                    }
+                },
+                "hotel_policy": {
+                    "$ref": "#/definitions/dtos.HotelPoliciesResponse"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
+        "dtos.HotelRoomCreeatedResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelRoomResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully created station"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 201
+                }
+            }
+        },
+        "dtos.HotelRoomFacilitiesResponse": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_room_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.HotelRoomImageResponse": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_room_id": {
+                    "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.HotelRoomInput": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "discount": {
+                    "type": "integer"
+                },
+                "discount_price": {
+                    "type": "integer"
+                },
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_room_facility": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelRoomFacilitiesResponse"
+                    }
+                },
+                "hotel_room_image": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelRoomImageResponse"
+                    }
+                },
+                "mattress_size": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "normal_price": {
+                    "type": "integer"
+                },
+                "number_of_guest": {
+                    "type": "integer"
+                },
+                "number_of_mattress": {
+                    "type": "integer"
+                },
+                "quantity_of_room": {
+                    "type": "integer"
+                },
+                "size_of_room": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.HotelRoomResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "discount": {
+                    "type": "integer"
+                },
+                "discount_price": {
+                    "type": "integer"
+                },
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_room_facility": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelRoomFacilitiesResponse"
+                    }
+                },
+                "hotel_room_id": {
+                    "type": "integer"
+                },
+                "hotel_room_image": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelRoomImageResponse"
+                    }
+                },
+                "mattress_size": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "normal_price": {
+                    "type": "integer"
+                },
+                "number_of_guest": {
+                    "type": "integer"
+                },
+                "number_of_mattress": {
+                    "type": "integer"
+                },
+                "quantity_of_room": {
+                    "type": "integer"
+                },
+                "size_of_room": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
+        "dtos.HotelRoomStatusOKResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelRoomResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get station"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "dtos.HotelStatusOKResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get station"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
         "dtos.InternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -3940,6 +5067,22 @@
                 "status_code": {
                     "type": "integer",
                     "example": 404
+                }
+            }
+        },
+        "dtos.PaymentCreeatedResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.PaymentResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully created station"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 201
                 }
             }
         },
@@ -4030,6 +5173,22 @@
                 "status_code": {
                     "type": "integer",
                     "example": 200
+                }
+            }
+        },
+        "dtos.StationCreeatedResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.StationResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully created station"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 201
                 }
             }
         },
@@ -4431,6 +5590,22 @@
                 }
             }
         },
+        "dtos.TrainCarriageCreeatedResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.TrainCarriageResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully created train carriage"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 201
+                }
+            }
+        },
         "dtos.TrainCarriageInput": {
             "type": "object",
             "properties": {
@@ -4518,6 +5693,22 @@
                 "status_code": {
                     "type": "integer",
                     "example": 200
+                }
+            }
+        },
+        "dtos.TrainCreeatedResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.TrainResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully created train"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 201
                 }
             }
         },

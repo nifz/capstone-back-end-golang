@@ -166,7 +166,7 @@ func (u *stationUsecase) GetStationByID(id uint) (dtos.StationResponse, error) {
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.StationInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.StationStatusOKResponse
+// @Success      201 {object} dtos.StationCreeatedResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
