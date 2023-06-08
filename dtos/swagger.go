@@ -247,38 +247,44 @@ type DashboardStatusOKResponse struct {
 
 type GetAllHotelStatusOKResponses struct {
 	StatusCode int           `json:"status_code" example:"200"`
-	Message    string        `json:"message" example:"Successfully get station"`
+	Message    string        `json:"message" example:"Successfully get hotel"`
 	Data       HotelResponse `json:"data"`
 	Meta       helpers.Meta  `json:"meta"`
 }
 
 type HotelStatusOKResponses struct {
 	StatusCode int           `json:"status_code" example:"200"`
-	Message    string        `json:"message" example:"Successfully get station"`
+	Message    string        `json:"message" example:"Successfully get hotel"`
 	Data       HotelResponse `json:"data"`
+}
+
+type HotelByIDStatusOKResponses struct {
+	StatusCode int           `json:"status_code" example:"200"`
+	Message    string        `json:"message" example:"Successfully get hotel"`
+	Data       HotelByIDResponse `json:"data"`
 }
 
 type HotelCreeatedResponses struct {
 	StatusCode int           `json:"status_code" example:"201"`
-	Message    string        `json:"message" example:"Successfully created station"`
+	Message    string        `json:"message" example:"Successfully created hotel"`
 	Data       HotelResponse `json:"data"`
 }
 
 type GetAllHotelRoomStatusOKResponses struct {
 	StatusCode int               `json:"status_code" example:"200"`
-	Message    string            `json:"message" example:"Successfully get station"`
+	Message    string            `json:"message" example:"Successfully get hotel room"`
 	Data       HotelRoomResponse `json:"data"`
 	Meta       helpers.Meta      `json:"meta"`
 }
 
 type HotelRoomStatusOKResponses struct {
 	StatusCode int               `json:"status_code" example:"200"`
-	Message    string            `json:"message" example:"Successfully get station"`
+	Message    string            `json:"message" example:"Successfully get hotel room"`
 	Data       HotelRoomResponse `json:"data"`
 }
 
 type HotelRoomCreeatedResponses struct {
 	StatusCode int               `json:"status_code" example:"201"`
-	Message    string            `json:"message" example:"Successfully created station"`
+	Message    string            `json:"message" example:"Successfully created hotel room"`
 	Data       HotelRoomResponse `json:"data"`
 }
