@@ -306,7 +306,7 @@ func (u *trainUsecase) GetTrainByID(id uint) (dtos.TrainResponses, error) {
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.TrainInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.TrainStatusOKResponses
+// @Success      201 {object} dtos.TrainCreeatedResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse

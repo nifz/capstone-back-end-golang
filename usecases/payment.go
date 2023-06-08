@@ -106,7 +106,7 @@ func (u *paymentUsecase) GetPaymentByID(id uint) (dtos.PaymentResponse, error) {
 // @Param		 name formData string true "Name payment"
 // @Param		 account_name formData string true "Account name payment"
 // @Param		 account_number formData string true "Account number payment"
-// @Success      200 {object} dtos.PaymentStatusOKResponse
+// @Success      201 {object} dtos.PaymentCreeatedResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
