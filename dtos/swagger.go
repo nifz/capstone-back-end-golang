@@ -244,3 +244,41 @@ type DashboardStatusOKResponse struct {
 	Message    string            `json:"message" example:"Successfully get dashboard"`
 	Data       DashboardResponse `json:"data"`
 }
+
+type GetAllHotelStatusOKResponses struct {
+	StatusCode int           `json:"status_code" example:"200"`
+	Message    string        `json:"message" example:"Successfully get station"`
+	Data       HotelResponse `json:"data"`
+	Meta       helpers.Meta  `json:"meta"`
+}
+
+type HotelStatusOKResponses struct {
+	StatusCode int           `json:"status_code" example:"200"`
+	Message    string        `json:"message" example:"Successfully get station"`
+	Data       HotelResponse `json:"data"`
+}
+
+type HotelCreeatedResponses struct {
+	StatusCode int           `json:"status_code" example:"201"`
+	Message    string        `json:"message" example:"Successfully created station"`
+	Data       HotelResponse `json:"data"`
+}
+
+type GetAllHotelRoomStatusOKResponses struct {
+	StatusCode int               `json:"status_code" example:"200"`
+	Message    string            `json:"message" example:"Successfully get station"`
+	Data       HotelRoomResponse `json:"data"`
+	Meta       helpers.Meta      `json:"meta"`
+}
+
+type HotelRoomStatusOKResponses struct {
+	StatusCode int               `json:"status_code" example:"200"`
+	Message    string            `json:"message" example:"Successfully get station"`
+	Data       HotelRoomResponse `json:"data"`
+}
+
+type HotelRoomCreeatedResponses struct {
+	StatusCode int               `json:"status_code" example:"201"`
+	Message    string            `json:"message" example:"Successfully created station"`
+	Data       HotelRoomResponse `json:"data"`
+}

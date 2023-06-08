@@ -200,7 +200,7 @@ func (u *hotelRoomUsecase) GetHotelRoomByID(id uint) (dtos.HotelRoomResponse, er
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.HotelRoomInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.HotelStatusOKResponses
+// @Success      201 {object} dtos.HotelRoomCreeatedResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
@@ -328,7 +328,7 @@ func (u *hotelRoomUsecase) CreateHotelRoom(roomInput *dtos.HotelRoomInput) (dtos
 // @Produce      json
 // @Param id path integer true "ID Hotel Room"
 // @Param        request body dtos.HotelRoomInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.StatusOKResponses
+// @Success      200 {object} dtos.HotelRoomStatusOKResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse

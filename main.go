@@ -4,6 +4,7 @@ import (
 	"back-end-golang/configs"
 	_ "back-end-golang/docs"
 	"back-end-golang/routes"
+	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -62,12 +63,12 @@ func main() {
 	routes.Init(e, db)
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
-	e.Logger.Fatal(e.Start(":8088"))
+	// e.Logger.Fatal(e.Start(":8088"))
 
 	// Start server with TLS
-	// err = e.StartTLS(":443", "/etc/nginx/ssl/fullchain.pem", "/etc/nginx/ssl/privkey.pem")
-	// if err != nil {
-	// 	log.Fatal("StartTLS: ", err)
-	// }
+	err = e.StartTLS(":443", "/etc/nginx/ssl/fullchain.pem", "/etc/nginx/ssl/privkey.pem")
+	if err != nil {
+		log.Fatal("StartTLS: ", err)
+	}
 
 }

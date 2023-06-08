@@ -230,7 +230,7 @@ func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelResponse, error) {
 // @Accept       json
 // @Produce      json
 // @Param        request body dtos.HotelInput true "Payload Body [RAW]"
-// @Success      200 {object} dtos.HotelStatusOKResponses
+// @Success      201 {object} dtos.HotelCreeatedResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
