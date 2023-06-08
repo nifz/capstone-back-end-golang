@@ -72,15 +72,16 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	historySearchController := controllers.NewHistorySearchController(historySearchUsecase)
 
 	hotelRepository := repositories.NewHotelRepository(db)
-	hotelImageRepository := repositories.NewHotelImageRepository(db)
-	hotelFacilitiesRepository := repositories.NewHotelFacilitiesRepository(db)
-	hotelPolicyRepository := repositories.NewHotelPoliciesRepository(db)
-	hotelUsecase := usecases.NewHotelUsecase(hotelRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository)
-	hotelController := controllers.NewHotelController(hotelUsecase)
-
 	hotelRoomRepository := repositories.NewHotelRoomRepository(db)
 	hotelRoomImageRepository := repositories.NewHotelRoomImageRepository(db)
 	hotelRoomFacilitiesRepository := repositories.NewHotelRoomFacilitiesRepository(db)
+
+	hotelImageRepository := repositories.NewHotelImageRepository(db)
+	hotelFacilitiesRepository := repositories.NewHotelFacilitiesRepository(db)
+	hotelPolicyRepository := repositories.NewHotelPoliciesRepository(db)
+	hotelUsecase := usecases.NewHotelUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository)
+	hotelController := controllers.NewHotelController(hotelUsecase)
+
 	hotelRoomUsecase := usecases.NewHotelRoomUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository)
 	hotelRoomController := controllers.NewHotelRoomController(hotelRoomUsecase)
 
