@@ -172,35 +172,6 @@ func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelByIDResponse, error) {
 		return hotelResponses, err
 	}
 
-	getImageRoom, err := u.hotelRoomImageRepo.GetAllHotelRoomImageByHotelID(hotel.ID)
-	if err != nil {
-		return hotelResponses, err
-	}
-	getFacilitiesRoom, err := u.hotelRoomFacilitiesRepo.GetAllHotelRoomFacilitiesByHotelID(hotel.ID)
-	if err != nil {
-		return hotelResponses, err
-	}
-
-	var hotelRoomImageResponses []dtos.HotelRoomImageResponse
-	for _, image := range getImageRoom {
-		hotelRoomImageResponse := dtos.HotelRoomImageResponse{
-			HotelID:     image.HotelID,
-			HotelRoomID: image.HotelRoomID,
-			ImageUrl:    image.ImageUrl,
-		}
-		hotelRoomImageResponses = append(hotelRoomImageResponses, hotelRoomImageResponse)
-	}
-
-	var hotelRoomFacilitiesResponses []dtos.HotelRoomFacilitiesResponse
-	for _, facilities := range getFacilitiesRoom {
-		HotelRoomFacilitiesResponse := dtos.HotelRoomFacilitiesResponse{
-			HotelID:     facilities.HotelID,
-			HotelRoomID: facilities.HotelRoomID,
-			Name:        facilities.Name,
-		}
-		hotelRoomFacilitiesResponses = append(hotelRoomFacilitiesResponses, HotelRoomFacilitiesResponse)
-	}
-
 	getImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotel.ID)
 	if err != nil {
 		return hotelResponses, err
@@ -217,6 +188,35 @@ func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelByIDResponse, error) {
 
 	var hotelRoomResponses []dtos.HotelRoomHotelIDResponse
 	for _, room := range getRoom {
+		getImageRoom, err := u.hotelRoomImageRepo.GetAllHotelRoomImageByID(room.ID)
+		if err != nil {
+			return hotelResponses, err
+		}
+		getFacilitiesRoom, err := u.hotelRoomFacilitiesRepo.GetAllHotelRoomFacilitiesByID(room.ID)
+		if err != nil {
+			return hotelResponses, err
+		}
+
+		var hotelRoomImageResponses []dtos.HotelRoomImageResponse
+		for _, image := range getImageRoom {
+			hotelRoomImageResponse := dtos.HotelRoomImageResponse{
+				HotelID:     image.HotelID,
+				HotelRoomID: image.HotelRoomID,
+				ImageUrl:    image.ImageUrl,
+			}
+			hotelRoomImageResponses = append(hotelRoomImageResponses, hotelRoomImageResponse)
+		}
+
+		var hotelRoomFacilitiesResponses []dtos.HotelRoomFacilitiesResponse
+		for _, facilities := range getFacilitiesRoom {
+			HotelRoomFacilitiesResponse := dtos.HotelRoomFacilitiesResponse{
+				HotelID:     facilities.HotelID,
+				HotelRoomID: facilities.HotelRoomID,
+				Name:        facilities.Name,
+			}
+			hotelRoomFacilitiesResponses = append(hotelRoomFacilitiesResponses, HotelRoomFacilitiesResponse)
+		}
+
 		hotelRoomResponse := dtos.HotelRoomHotelIDResponse{
 			HotelRoomID:       room.ID,
 			HotelID:           room.HotelID,
