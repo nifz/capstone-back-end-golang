@@ -43,7 +43,7 @@ func NewHotelRoomUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo r
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/hotel-room [get]
+// @Router       /user/hotel-room [get]
 func (u *hotelRoomUsecase) GetAllHotelRooms(page, limit int) ([]dtos.HotelRoomResponse, int, error) {
 
 	rooms, count, err := u.hotelRoomRepo.GetAllHotelRooms(page, limit)
@@ -135,7 +135,7 @@ func (u *hotelRoomUsecase) GetAllHotelRooms(page, limit int) ([]dtos.HotelRoomRe
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/hotel-room/{id} [get]
+// @Router       /user/hotel-room/{id} [get]
 func (u *hotelRoomUsecase) GetHotelRoomByID(id uint) (dtos.HotelRoomResponse, error) {
 	var hotelRoomResponses dtos.HotelRoomResponse
 	room, err := u.hotelRoomRepo.GetHotelRoomByID(id)

@@ -170,15 +170,15 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.POST("/payment", paymentController.CreatePayment)
 	admin.DELETE("/payment/:id", paymentController.DeletePayment)
 
-	admin.GET("/hotel", hotelController.GetAllHotels)
-	admin.GET("/hotel/:id", hotelController.GetHotelByID)
+	public.GET("/hotel", hotelController.GetAllHotels)
+	public.GET("/hotel/:id", hotelController.GetHotelByID)
 	admin.PUT("/hotel/:id", hotelController.UpdateHotel)
 	admin.POST("/hotel", hotelController.CreateHotel)
 	admin.DELETE("/hotel/:id", hotelController.DeleteHotel)
 
 	admin.GET("/hotel-room", hotelRoomController.GetAllHotelRooms)
-	admin.GET("/hotel-room/:id", hotelRoomController.GetHotelRoomByID)
-	admin.PUT("/hotel-room/:id", hotelRoomController.UpdateHotelRoom)
+	public.GET("/hotel-room/:id", hotelRoomController.GetHotelRoomByID)
+	public.PUT("/hotel-room/:id", hotelRoomController.UpdateHotelRoom)
 	admin.POST("/hotel-room", hotelRoomController.CreateHotelRoom)
 	admin.DELETE("/hotel-room/:id", hotelRoomController.DeleteHotelRoom)
 }
