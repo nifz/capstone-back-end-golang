@@ -5,6 +5,7 @@ type HotelPoliciesInput struct {
 	TimeCheckIn        string `form:"time_check_in" json:"time_check_in"`
 	TimeCheckOut       string `form:"time_check_out" json:"time_check_out"`
 	IsPolicyCanceled   bool   `form:"is_policy_canceled" json:"is_policy_canceled"`
+	IsPolicyMinimumAge bool   `form:"is_policy_minimum_age" json:"is_policy_minimum_age"`
 	PolicyMinimumAge   int    `form:"policy_minimum_age" json:"policy_minimum_age"`
 	IsCheckInEarly     bool   `form:"is_check_in_early" json:"is_check_in_early"`
 	IsCheckOutOverdue  bool   `form:"is_check_out_overdue" json:"is_check_out_overdue"`
@@ -22,6 +23,7 @@ type HotelPoliciesResponse struct {
 	TimeCheckOut       string `form:"time_check_out" json:"time_check_out"`
 	IsPolicyCanceled   bool   `form:"is_policy_canceled" json:"is_policy_canceled"`
 	PolicyMinimumAge   int    `form:"policy_minimum_age" json:"policy_minimum_age"`
+	IsPolicyMinimumAge bool   `form:"is_policy_minimum_age" json:"is_policy_minimum_age"`
 	IsCheckInEarly     bool   `form:"is_check_in_early" json:"is_check_in_early"`
 	IsCheckOutOverdue  bool   `form:"is_check_out_overdue" json:"is_check_out_overdue"`
 	IsBreakfast        bool   `form:"is_breakfast" json:"is_breakfast"`

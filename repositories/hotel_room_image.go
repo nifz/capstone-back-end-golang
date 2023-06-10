@@ -9,6 +9,7 @@ import (
 type HotelRoomImageRepository interface {
 	GetAllHotelRoomImages(page, limit int) ([]models.HotelRoomImage, int, error)
 	GetAllHotelRoomImageByID(id uint) ([]models.HotelRoomImage, error)
+	GetAllHotelRoomImageByHotelID(id uint) ([]models.HotelRoomImage, error)
 	GetHotelRoomImageByID(id uint) (models.HotelRoomImage, error)
 	CreateHotelRoomImage(roomImage models.HotelRoomImage) (models.HotelRoomImage, error)
 	UpdateHotelRoomImage(roomImage models.HotelRoomImage) (models.HotelRoomImage, error)
@@ -45,6 +46,12 @@ func (r *hotelRoomImageRepository) GetAllHotelRoomImages(page, limit int) ([]mod
 func (r *hotelRoomImageRepository) GetAllHotelRoomImageByID(id uint) ([]models.HotelRoomImage, error) {
 	var roomImage []models.HotelRoomImage
 	err := r.db.Where("hotel_room_id = ?", id).Find(&roomImage).Error
+	return roomImage, err
+}
+
+func (r *hotelRoomImageRepository) GetAllHotelRoomImageByHotelID(id uint) ([]models.HotelRoomImage, error) {
+	var roomImage []models.HotelRoomImage
+	err := r.db.Where("hotel_id = ?", id).Find(&roomImage).Error
 	return roomImage, err
 }
 

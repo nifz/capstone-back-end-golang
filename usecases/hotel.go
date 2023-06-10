@@ -10,21 +10,24 @@ import (
 type HotelUsecase interface {
 	// admin
 	GetAllHotels(page, limit int) ([]dtos.HotelResponse, int, error)
-	GetHotelByID(id uint) (dtos.HotelResponse, error)
+	GetHotelByID(id uint) (dtos.HotelByIDResponse, error)
 	CreateHotel(train *dtos.HotelInput) (dtos.HotelResponse, error)
 	UpdateHotel(id uint, hotelInput dtos.HotelInput) (dtos.HotelResponse, error)
 	DeleteHotel(id uint) error
 }
 
 type hotelUsecase struct {
-	hotelRepo           repositories.HotelRepository
-	hotelImageRepo      repositories.HotelImageRepository
-	hotelFacilitiesRepo repositories.HotelFacilitiesRepository
-	hotelPoliciesRepo   repositories.HotelPoliciesRepository
+	hotelRepo               repositories.HotelRepository
+	hotelRoomRepo           repositories.HotelRoomRepository
+	hotelRoomImageRepo      repositories.HotelRoomImageRepository
+	hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository
+	hotelImageRepo          repositories.HotelImageRepository
+	hotelFacilitiesRepo     repositories.HotelFacilitiesRepository
+	hotelPoliciesRepo       repositories.HotelPoliciesRepository
 }
 
-func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository) HotelUsecase {
-	return &hotelUsecase{hotelRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo}
+func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository) HotelUsecase {
+	return &hotelUsecase{hotelRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo}
 }
 
 // =============================== ADMIN ================================== \\
@@ -43,7 +46,7 @@ func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelImageRepo repo
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/hotel [get]
+// @Router       /public/hotel [get]
 func (u *hotelUsecase) GetAllHotels(page, limit int) ([]dtos.HotelResponse, int, error) {
 
 	hotels, count, err := u.hotelRepo.GetAllHotels(page, limit)
@@ -54,6 +57,15 @@ func (u *hotelUsecase) GetAllHotels(page, limit int) ([]dtos.HotelResponse, int,
 	var hotelResponses []dtos.HotelResponse
 
 	for _, hotel := range hotels {
+		getMinimumPriceRoom, err := u.hotelRoomRepo.GetMinimumPriceHotelRoomByHotelID(hotel.ID)
+		if err != nil {
+			if err.Error() == "record not found" {
+				getMinimumPriceRoom.DiscountPrice = 0
+			} else {
+				return hotelResponses, 0, err
+			}
+		}
+
 		getImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotel.ID)
 		if err != nil {
 			return hotelResponses, 0, err
@@ -110,6 +122,7 @@ func (u *hotelUsecase) GetAllHotels(page, limit int) ([]dtos.HotelResponse, int,
 			PhoneNumber:     hotel.PhoneNumber,
 			Email:           hotel.Email,
 			Address:         hotel.Address,
+			HotelRoomStart:  getMinimumPriceRoom.DiscountPrice,
 			HotelImage:      hotelImageResponses,
 			HotelFacilities: hotelFacilitiesResponses,
 			HotelPolicy:     hotelPoliciesResponses,
@@ -144,16 +157,21 @@ func (u *hotelUsecase) GetAllHotels(page, limit int) ([]dtos.HotelResponse, int,
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID Hotel"
-// @Success      200 {object} dtos.HotelStatusOKResponses
+// @Success      200 {object} dtos.HotelByIDStatusOKResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /admin/hotel/{id} [get]
-func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelResponse, error) {
-	var hotelResponses dtos.HotelResponse
+// @Router       /public/hotel/{id} [get]
+func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelByIDResponse, error) {
+	var hotelResponses dtos.HotelByIDResponse
 	hotel, err := u.hotelRepo.GetHotelByID(id)
+	if err != nil {
+		return hotelResponses, err
+	}
+
+	getRoom, err := u.hotelRoomRepo.GetAllHotelRoomByHotelID(hotel.ID)
 	if err != nil {
 		return hotelResponses, err
 	}
@@ -170,6 +188,56 @@ func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelResponse, error) {
 	getPolicy, err := u.hotelPoliciesRepo.GetHotelPoliciesByIDHotel(hotel.ID)
 	if err != nil {
 		return hotelResponses, err
+	}
+
+	var hotelRoomResponses []dtos.HotelRoomHotelIDResponse
+	for _, room := range getRoom {
+		getImageRoom, err := u.hotelRoomImageRepo.GetAllHotelRoomImageByID(room.ID)
+		if err != nil {
+			return hotelResponses, err
+		}
+		getFacilitiesRoom, err := u.hotelRoomFacilitiesRepo.GetAllHotelRoomFacilitiesByID(room.ID)
+		if err != nil {
+			return hotelResponses, err
+		}
+
+		var hotelRoomImageResponses []dtos.HotelRoomImageResponse
+		for _, image := range getImageRoom {
+			hotelRoomImageResponse := dtos.HotelRoomImageResponse{
+				HotelID:     image.HotelID,
+				HotelRoomID: image.HotelRoomID,
+				ImageUrl:    image.ImageUrl,
+			}
+			hotelRoomImageResponses = append(hotelRoomImageResponses, hotelRoomImageResponse)
+		}
+
+		var hotelRoomFacilitiesResponses []dtos.HotelRoomFacilitiesResponse
+		for _, facilities := range getFacilitiesRoom {
+			HotelRoomFacilitiesResponse := dtos.HotelRoomFacilitiesResponse{
+				HotelID:     facilities.HotelID,
+				HotelRoomID: facilities.HotelRoomID,
+				Name:        facilities.Name,
+			}
+			hotelRoomFacilitiesResponses = append(hotelRoomFacilitiesResponses, HotelRoomFacilitiesResponse)
+		}
+
+		hotelRoomResponse := dtos.HotelRoomHotelIDResponse{
+			HotelRoomID:       room.ID,
+			HotelID:           room.HotelID,
+			Name:              room.Name,
+			SizeOfRoom:        room.SizeOfRoom,
+			QuantityOfRoom:    room.QuantityOfRoom,
+			Description:       room.Description,
+			NormalPrice:       room.NormalPrice,
+			Discount:          room.Discount,
+			DiscountPrice:     room.DiscountPrice,
+			NumberOfGuest:     room.NumberOfGuest,
+			MattressSize:      room.MattressSize,
+			NumberOfMattress:  room.NumberOfMattress,
+			HotelRoomImage:    hotelRoomImageResponses,
+			HotelRoomFacility: hotelRoomFacilitiesResponses,
+		}
+		hotelRoomResponses = append(hotelRoomResponses, hotelRoomResponse)
 	}
 
 	var hotelImageResponses []dtos.HotelImageResponse
@@ -206,7 +274,7 @@ func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelResponse, error) {
 		IsPet:              getPolicy.IsPet,
 	}
 
-	hotelResponse := dtos.HotelResponse{
+	hotelResponse := dtos.HotelByIDResponse{
 		HotelID:         hotel.ID,
 		Name:            hotel.Name,
 		Class:           hotel.Class,
@@ -214,6 +282,7 @@ func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelResponse, error) {
 		PhoneNumber:     hotel.PhoneNumber,
 		Email:           hotel.Email,
 		Address:         hotel.Address,
+		HotelRoom:       hotelRoomResponses,
 		HotelImage:      hotelImageResponses,
 		HotelFacilities: hotelFacilitiesResponses,
 		HotelPolicy:     hotelPoliciesResponses,
