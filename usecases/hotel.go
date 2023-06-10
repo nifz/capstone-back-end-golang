@@ -59,7 +59,11 @@ func (u *hotelUsecase) GetAllHotels(page, limit int) ([]dtos.HotelResponse, int,
 	for _, hotel := range hotels {
 		getMinimumPriceRoom, err := u.hotelRoomRepo.GetMinimumPriceHotelRoomByHotelID(hotel.ID)
 		if err != nil {
-			return hotelResponses, 0, err
+			if err.Error() == "record not found" {
+				getMinimumPriceRoom.DiscountPrice = 0
+			} else {
+				return hotelResponses, 0, err
+			}
 		}
 
 		getImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotel.ID)
