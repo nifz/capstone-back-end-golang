@@ -147,8 +147,6 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(trainId, page, limit int, cl
 			},
 			Name:      trainCarriage.Name,
 			Seat:      trainSeatResponses,
-			CreatedAt: trainCarriage.CreatedAt,
-			UpdatedAt: trainCarriage.UpdatedAt,
 		}
 		trainCarriageResponses = append(trainCarriageResponses, trainCarriageResponse)
 	}
