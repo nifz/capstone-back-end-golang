@@ -5,10 +5,11 @@ import (
 	"back-end-golang/models"
 	"back-end-golang/repositories"
 	"errors"
+	"strings"
 )
 
 type TrainCarriageUsecase interface {
-	GetAllTrainCarriages(page, limit int) ([]dtos.TrainCarriageResponse, int, error)
+	GetAllTrainCarriages(trainId, page, limit int, class, status string) ([]dtos.TrainCarriageResponse, int, error)
 	GetTrainCarriageByID(id uint) (dtos.TrainCarriageResponse, error)
 	CreateTrainCarriage(trainCarriage []dtos.TrainCarriageInput) ([]dtos.TrainCarriageResponse, error)
 	UpdateTrainCarriage(id uint, trainCarriageInput dtos.TrainCarriageInput) (dtos.TrainCarriageResponse, error)
@@ -30,6 +31,9 @@ func NewTrainCarriageUsecase(TrainCarriageRepo repositories.TrainCarriageReposit
 // @Tags         Admin - Train Carriage
 // @Accept       json
 // @Produce      json
+// @Param train_id query int false "Train id"
+// @Param class query string false "Class train"
+// @Param status query string false "Status train"
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
 // @Success      200 {object} dtos.GetAllTrainCarriageStatusOKResponse
@@ -39,11 +43,13 @@ func NewTrainCarriageUsecase(TrainCarriageRepo repositories.TrainCarriageReposit
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /public/train-carriage [get]
-func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.TrainCarriageResponse, int, error) {
+func (u *trainCarriageUsecase) GetAllTrainCarriages(trainId, page, limit int, class, status string) ([]dtos.TrainCarriageResponse, int, error) {
 	trainCarriages, count, err := u.trainCarriageRepo.GetAllTrainCarriages(page, limit)
 	if err != nil {
 		return nil, 0, err
 	}
+
+	status = strings.ToLower(status)
 
 	var trainCarriageResponses []dtos.TrainCarriageResponse
 	visitedIDs := make(map[uint]map[uint]bool)
@@ -55,6 +61,18 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.Tra
 			return trainCarriageResponses, 0, err
 		}
 
+		// Filter by trainId
+		if trainId > 0 && int(train.ID) != trainId {
+			continue
+		}
+
+		if class != "" && strings.ToLower(class) != strings.ToLower(trainCarriage.Class) {
+			continue
+		}
+
+		if status != "" && strings.ToLower(status) != strings.ToLower(train.Status) {
+			continue
+		}
 		trainSeat, err := u.trainCarriageRepo.GetTrainSeatsByClass(trainCarriage.Class)
 		if err != nil {
 			return trainCarriageResponses, 0, err

@@ -820,7 +820,12 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 		Status:           "unpaid",
 	}
 
-	createTicketOrder, err := u.ticketOrderRepo.CreateTicketOrder(createTicketOrder)
+	getPayment, err := u.paymentRepo.GetPaymentByID2(uint(createTicketOrder.PaymentID))
+	if err != nil {
+		return ticketOrderResponse, errors.New("failed to get payment id")
+	}
+
+	createTicketOrder, err = u.ticketOrderRepo.CreateTicketOrder(createTicketOrder)
 	if err != nil {
 		return ticketOrderResponse, err
 	}
@@ -852,13 +857,15 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 				return ticketOrderResponse, errors.New("Failed to parsing date")
 			}
 
-			getTrain, err := u.trainRepo.GetTrainByID(uint(ticketTravelerDetailDeparture.TrainID))
+			getTrain, err := u.trainRepo.GetTrainByID2(uint(ticketTravelerDetailDeparture.TrainID))
 			if err != nil {
-				return ticketOrderResponse, err
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train id")
 			}
-			getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID(uint(ticketTravelerDetailDeparture.TrainCarriageID))
+			getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(uint(ticketTravelerDetailDeparture.TrainCarriageID))
 			if err != nil {
-				return ticketOrderResponse, err
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train carriage id")
 			}
 
 			if travelerDetail.IDCardNumber != "" {
@@ -871,23 +878,28 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 
 			getTrainSeat, err := u.trainSeatRepo.GetTrainSeatByID(uint(ticketTravelerDetailDeparture.TrainSeatID))
 			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 				return ticketOrderResponse, err
 			}
-			getStationOrigin, err := u.stationRepo.GetStationByID(uint(ticketTravelerDetailDeparture.StationOriginID))
+			getStationOrigin, err := u.stationRepo.GetStationByID2(uint(ticketTravelerDetailDeparture.StationOriginID))
 			if err != nil {
-				return ticketOrderResponse, err
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get station origin id")
 			}
-			getStationDestination, err := u.stationRepo.GetStationByID(uint(ticketTravelerDetailDeparture.StationDestinationID))
+			getStationDestination, err := u.stationRepo.GetStationByID2(uint(ticketTravelerDetailDeparture.StationDestinationID))
 			if err != nil {
-				return ticketOrderResponse, err
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get station destination id")
 			}
 
 			trainStationOrigin, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationOrigin.ID)
 			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 				return ticketOrderResponse, err
 			}
 			trainStationDestination, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationDestination.ID)
 			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 				return ticketOrderResponse, err
 			}
 
@@ -907,11 +919,15 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 			}
 			createTicketTravelerDetail, err = u.ticketTravelerDetailRepo.CreateTicketTravelerDetail(createTicketTravelerDetail)
 			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
 				return ticketOrderResponse, err
 			}
 
 			getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID(createTicketTravelerDetail.TravelerDetailID)
 			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
 				return ticketOrderResponse, err
 			}
 
@@ -964,13 +980,15 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 					return ticketOrderResponse, errors.New("Failed to parsing date")
 				}
 
-				getTrain, err := u.trainRepo.GetTrainByID(uint(ticketTravelerDetailReturn.TrainID))
+				getTrain, err := u.trainRepo.GetTrainByID2(uint(ticketTravelerDetailReturn.TrainID))
 				if err != nil {
-					return ticketOrderResponse, err
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get train id")
 				}
-				getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID(uint(ticketTravelerDetailReturn.TrainCarriageID))
+				getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(uint(ticketTravelerDetailReturn.TrainCarriageID))
 				if err != nil {
-					return ticketOrderResponse, err
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get train carriage id")
 				}
 
 				if travelerDetail.IDCardNumber != "" {
@@ -983,23 +1001,28 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 
 				getTrainSeat, err := u.trainSeatRepo.GetTrainSeatByID(uint(ticketTravelerDetailReturn.TrainSeatID))
 				if err != nil {
-					return ticketOrderResponse, err
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get train seat id")
 				}
 				getStationOrigin, err := u.stationRepo.GetStationByID(uint(ticketTravelerDetailReturn.StationOriginID))
 				if err != nil {
-					return ticketOrderResponse, err
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get station origin id")
 				}
 				getStationDestination, err := u.stationRepo.GetStationByID(uint(ticketTravelerDetailReturn.StationDestinationID))
 				if err != nil {
-					return ticketOrderResponse, err
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get station destination id")
 				}
 
 				trainStationOrigin, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationOrigin.ID)
 				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 					return ticketOrderResponse, err
 				}
 				trainStationDestination, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationDestination.ID)
 				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 					return ticketOrderResponse, err
 				}
 
@@ -1019,11 +1042,15 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 				}
 				createTicketTravelerDetail, err = u.ticketTravelerDetailRepo.CreateTicketTravelerDetail(createTicketTravelerDetail)
 				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
 					return ticketOrderResponse, err
 				}
 
 				getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID(createTicketTravelerDetail.TravelerDetailID)
 				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
 					return ticketOrderResponse, err
 				}
 
@@ -1078,10 +1105,6 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 	}
 
 	getOrderTicket, err := u.ticketOrderRepo.GetTicketOrderByID(updateTicketOrder.ID, userID)
-	if err != nil {
-		return ticketOrderResponse, err
-	}
-	getPayment, err := u.paymentRepo.GetPaymentByID(uint(getOrderTicket.PaymentID))
 	if err != nil {
 		return ticketOrderResponse, err
 	}

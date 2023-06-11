@@ -10,6 +10,7 @@ type TrainStationRepository interface {
 	GetAllTrainStations(page, limit int) ([]models.TrainStation, int, error)
 	GetTrainStationByID(id uint) (models.TrainStation, error)
 	GetTrainStationByTrainIDStationID(trainID, stationID uint) (models.TrainStation, error)
+	GetTrainStationByTrainIDStationID2(trainID, stationID uint) (models.TrainStation, error)
 	CreateTrainStation(trainStation models.TrainStation) (models.TrainStation, error)
 	UpdateTrainStation(trainStation models.TrainStation) (models.TrainStation, error)
 	DeleteTrainStation(trainStation models.TrainStation) error
@@ -52,6 +53,12 @@ func (r *trainStationRepository) GetTrainStationByID(id uint) (models.TrainStati
 func (r *trainStationRepository) GetTrainStationByTrainIDStationID(trainID, stationID uint) (models.TrainStation, error) {
 	var trainStation models.TrainStation
 	err := r.db.Unscoped().Where("train_id = ? AND station_id = ?", trainID, stationID).First(&trainStation).Error
+	return trainStation, err
+}
+
+func (r *trainStationRepository) GetTrainStationByTrainIDStationID2(trainID, stationID uint) (models.TrainStation, error) {
+	var trainStation models.TrainStation
+	err := r.db.Where("train_id = ? AND station_id = ?", trainID, stationID).First(&trainStation).Error
 	return trainStation, err
 }
 
