@@ -8,6 +8,7 @@ import (
 
 type TrainCarriageRepository interface {
 	GetAllTrainCarriages(page, limit int) ([]models.TrainCarriage, int, error)
+	GetAllTrainCarriages2() ([]models.TrainCarriage, error)
 	GetTrainCarriageByID(id uint) (models.TrainCarriage, error)
 	GetTrainCarriageByID2(id uint) (models.TrainCarriage, error)
 	GetTrainCarriageByID3(id uint, class string) ([]models.TrainCarriage, error)
@@ -44,6 +45,18 @@ func (r *trainCarriageRepository) GetAllTrainCarriages(page, limit int) ([]model
 	err = r.db.Limit(limit).Offset(offset).Find(&trainCarriages).Error
 
 	return trainCarriages, int(count), err
+}
+
+func (r *trainCarriageRepository) GetAllTrainCarriages2() ([]models.TrainCarriage, error) {
+	var (
+		trainCarriages []models.TrainCarriage
+	)
+	err := r.db.Find(&trainCarriages).Error
+	if err != nil {
+		return trainCarriages, err
+	}
+
+	return trainCarriages, err
 }
 
 func (r *trainCarriageRepository) GetTrainCarriageByID(id uint) (models.TrainCarriage, error) {

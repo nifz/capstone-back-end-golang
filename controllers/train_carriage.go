@@ -44,9 +44,10 @@ func (c *trainCarriageController) GetAllTrainCarriages(ctx echo.Context) error {
 		limit = 10
 	}
 	classParam := ctx.QueryParam("class")
+	dateParam := ctx.QueryParam("date")
 	statusParam := ctx.QueryParam("status")
 
-	trainCarriages, count, err := c.trainCarriageUsecase.GetAllTrainCarriages(trainId, page, limit, classParam, statusParam)
+	trainCarriages, count, err := c.trainCarriageUsecase.GetAllTrainCarriages(trainId, page, limit, classParam, dateParam, statusParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
