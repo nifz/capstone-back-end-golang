@@ -29,6 +29,9 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	userUsecase := usecases.NewUserUsecase(userRepository)
 	userController := controllers.NewUserController(userUsecase)
 
+	cloudinaryUsecase := usecases.NewMediaUpload()
+	cloudinaryController := controllers.NewCloudinaryController(cloudinaryUsecase)
+
 	stationRepository := repositories.NewStationRepository(db)
 	stationUsecase := usecases.NewStationUsecase(stationRepository)
 	stationController := controllers.NewStationController(stationUsecase)
@@ -93,6 +96,10 @@ func Init(e *echo.Echo, db *gorm.DB) {
 
 	api := e.Group("/api/v1")
 	public := api.Group("/public")
+
+	// cloudinary
+	public.POST("/cloudinary/file-upload", cloudinaryController.FileUpload)
+	public.POST("/cloudinary/url-upload", cloudinaryController.UrlUpload)
 
 	// USER
 	api.POST("/login", userController.UserLogin)
