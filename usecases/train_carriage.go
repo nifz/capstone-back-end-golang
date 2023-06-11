@@ -136,7 +136,7 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(trainId, page, limit int, cl
 
 		trainCarriageResponse := dtos.TrainCarriageSeatResponses{
 			TrainCarriageID: trainCarriage.ID,
-			Train: dtos.TrainResponse{
+			Train: dtos.TrainResponse2{
 				TrainID:   trainCarriage.TrainID,
 				CodeTrain: train.CodeTrain,
 				Name:      train.Name,
@@ -147,6 +147,8 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(trainId, page, limit int, cl
 			},
 			Name:      trainCarriage.Name,
 			Seat:      trainSeatResponses,
+			CreatedAt: trainCarriage.CreatedAt,
+			UpdatedAt: trainCarriage.UpdatedAt,
 		}
 		trainCarriageResponses = append(trainCarriageResponses, trainCarriageResponse)
 	}
