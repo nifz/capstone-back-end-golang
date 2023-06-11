@@ -22,6 +22,17 @@ type TrainResponse struct {
 	UpdatedAt     time.Time                 `json:"updated_at" example:"2023-05-17T15:07:16.504+07:00"`
 }
 
+type TrainResponse2 struct {
+	TrainID       uint                      `json:"train_id" example:"1"`
+	CodeTrain     string                    `json:"code_train" example:"TRAIN001"`
+	Name          string                    `json:"name" example:"Bengawan"`
+	Class         string                    `json:"class" example:"Ekonomi"`
+	Price         int                       `json:"price" example:"50000"`
+	Route         []TrainStationResponse    `json:"route"`
+	TrainCarriage *[]TrainCarriageResponses `json:"train_carriage,omitempty"`
+	Status        string                    `json:"status" example:"available"`
+}
+
 type TrainResponses struct {
 	TrainID   uint                   `json:"train_id" example:"1"`
 	CodeTrain string                 `json:"code_train" example:"TRAIN001"`
