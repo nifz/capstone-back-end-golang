@@ -159,9 +159,9 @@ func (u *trainUsecase) GetAllTrainsByAdmin(page, limit int, search, sortBy, filt
 
 		deletedTrain := ""
 
-		if filter == "inactive" && getTrain.DeletedAt.Time.IsZero() {
+		if filter == "inactive" && getTrain.Status == "unavailable" && getTrain.DeletedAt.Time.IsZero() {
 			continue
-		} else if filter == "active" && !getTrain.DeletedAt.Time.IsZero() {
+		} else if filter == "active" && getTrain.Status == "available" && !getTrain.DeletedAt.Time.IsZero() {
 			continue
 		}
 
@@ -319,6 +319,8 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses,
 	if train.CodeTrain == "" || train.Name == "" || train.Route == nil || train.Status == "" {
 		return trainResponse, errors.New("Failed to create train")
 	}
+	train.Name = strings.ToUpper(train.Name)
+	train.CodeTrain = strings.ToUpper(train.CodeTrain)
 
 	createTrain := models.Train{
 		CodeTrain: train.CodeTrain,
@@ -417,6 +419,9 @@ func (u *trainUsecase) UpdateTrain(id uint, train dtos.TrainInput) (dtos.TrainRe
 	if err != nil {
 		return trainResponse, err
 	}
+
+	train.Name = strings.ToUpper(train.Name)
+	train.CodeTrain = strings.ToUpper(train.CodeTrain)
 
 	trains.CodeTrain = train.CodeTrain
 	trains.Name = train.Name

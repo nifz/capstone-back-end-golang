@@ -29,6 +29,9 @@ func NewTrainCarriageController(trainCarriageUsecase usecases.TrainCarriageUseca
 // Implementasi fungsi-fungsi dari interface ItemController
 
 func (c *trainCarriageController) GetAllTrainCarriages(ctx echo.Context) error {
+	trainIdParam := ctx.QueryParam("train_id")
+	trainId, _ := strconv.Atoi(trainIdParam)
+
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -40,7 +43,10 @@ func (c *trainCarriageController) GetAllTrainCarriages(ctx echo.Context) error {
 	if err != nil {
 		limit = 10
 	}
-	trainCarriages, count, err := c.trainCarriageUsecase.GetAllTrainCarriages(page, limit)
+	classParam := ctx.QueryParam("class")
+	statusParam := ctx.QueryParam("status")
+
+	trainCarriages, count, err := c.trainCarriageUsecase.GetAllTrainCarriages(trainId, page, limit, classParam, statusParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,

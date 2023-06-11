@@ -808,6 +808,16 @@ definitions:
         example: 200
         type: integer
     type: object
+  dtos.StatusOKResponse:
+    properties:
+      data: {}
+      message:
+        example: Successfully
+        type: string
+      status_code:
+        example: 200
+        type: integer
+    type: object
   dtos.TicketOrderCreeatedResponse:
     properties:
       data:
@@ -958,7 +968,7 @@ definitions:
         example: 1
         type: integer
       quantity_infant:
-        example: 1
+        example: 0
         type: integer
       station_destination:
         $ref: '#/definitions/dtos.StationResponseSimply'
@@ -1445,6 +1455,13 @@ definitions:
       total:
         example: 1
         type: integer
+    type: object
+  models.Url:
+    properties:
+      url:
+        type: string
+    required:
+    - url
     type: object
 externalDocs:
   description: OpenAPI
@@ -3063,6 +3080,88 @@ paths:
       summary: Get article by ID
       tags:
       - Admin - Article
+  /public/cloudinary/file-upload:
+    post:
+      consumes:
+      - application/json
+      description: Upload file to cloudinary
+      parameters:
+      - description: Photo file
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Upload file
+      tags:
+      - Cloudinary
+  /public/cloudinary/url-upload:
+    post:
+      consumes:
+      - application/json
+      description: Upload file to cloudinary
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Url'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Upload file
+      tags:
+      - Cloudinary
   /public/hotel:
     get:
       consumes:
@@ -3368,6 +3467,18 @@ paths:
       - application/json
       description: Get all train carriage
       parameters:
+      - description: Train id
+        in: query
+        name: train_id
+        type: integer
+      - description: Class train
+        in: query
+        name: class
+        type: string
+      - description: Status train
+        in: query
+        name: status
+        type: string
       - description: Page number
         in: query
         name: page

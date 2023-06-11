@@ -179,6 +179,9 @@ func (u *stationUsecase) CreateStation(station *dtos.StationInput) (dtos.Station
 	if station.Initial == "" || station.Name == "" || station.Origin == "" {
 		return stationResponses, errors.New("Failed to create station")
 	}
+	station.Name = strings.ToUpper(station.Name)
+	station.Origin = strings.ToUpper(station.Origin)
+	station.Initial = strings.ToUpper(station.Initial)
 	createStation := models.Station{
 		Origin:  station.Origin,
 		Name:    station.Name,
@@ -232,6 +235,10 @@ func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) 
 	station.Origin = stationInput.Origin
 	station.Name = stationInput.Name
 	station.Initial = stationInput.Initial
+
+	station.Name = strings.ToUpper(station.Name)
+	station.Origin = strings.ToUpper(station.Origin)
+	station.Initial = strings.ToUpper(station.Initial)
 
 	station, err = u.stationRepo.UpdateStation(station)
 

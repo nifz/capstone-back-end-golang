@@ -184,6 +184,12 @@ type HistorySearchCreeatedResponse struct {
 	Data       HistorySearchResponse `json:"data"`
 }
 
+type StatusOKResponse struct {
+	StatusCode int         `json:"status_code" example:"200"`
+	Message    string      `json:"message" example:"Successfully"`
+	Data       interface{} `json:"data"`
+}
+
 type StatusOKDeletedResponse struct {
 	StatusCode int         `json:"status_code" example:"200"`
 	Message    string      `json:"message" example:"Successfully deleted"`
@@ -259,8 +265,8 @@ type HotelStatusOKResponses struct {
 }
 
 type HotelByIDStatusOKResponses struct {
-	StatusCode int           `json:"status_code" example:"200"`
-	Message    string        `json:"message" example:"Successfully get hotel"`
+	StatusCode int               `json:"status_code" example:"200"`
+	Message    string            `json:"message" example:"Successfully get hotel"`
 	Data       HotelByIDResponse `json:"data"`
 }
 

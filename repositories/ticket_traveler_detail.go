@@ -13,6 +13,7 @@ type TicketTravelerDetailRepository interface {
 	GetTicketTravelerDetailByTicketOrderIDAndTrainID(ticketOrderId, trainId uint) (models.TicketTravelerDetail, error)
 	CreateTicketTravelerDetail(ticketTravelerDetail models.TicketTravelerDetail) (models.TicketTravelerDetail, error)
 	UpdateTicketTravelerDetail(ticketTravelerDetail models.TicketTravelerDetail) (models.TicketTravelerDetail, error)
+	DeleteTicketTravelerDetail(ticketTravelerDetail models.TicketTravelerDetail) (models.TicketTravelerDetail, error)
 }
 
 type ticketTravelerDetailRepository struct {
@@ -62,5 +63,10 @@ func (r *ticketTravelerDetailRepository) CreateTicketTravelerDetail(ticketTravel
 
 func (r *ticketTravelerDetailRepository) UpdateTicketTravelerDetail(ticketTravelerDetail models.TicketTravelerDetail) (models.TicketTravelerDetail, error) {
 	err := r.db.Save(ticketTravelerDetail).Error
+	return ticketTravelerDetail, err
+}
+
+func (r *ticketTravelerDetailRepository) DeleteTicketTravelerDetail(ticketTravelerDetail models.TicketTravelerDetail) (models.TicketTravelerDetail, error) {
+	err := r.db.Unscoped().Delete(&ticketTravelerDetail).Error
 	return ticketTravelerDetail, err
 }
