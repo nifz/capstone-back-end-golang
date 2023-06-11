@@ -3104,6 +3104,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "Date order",
+                        "name": "date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Status train",
                         "name": "status",
                         "in": "query"

@@ -3475,6 +3475,10 @@ paths:
         in: query
         name: class
         type: string
+      - description: Date order
+        in: query
+        name: date
+        type: string
       - description: Status train
         in: query
         name: status
