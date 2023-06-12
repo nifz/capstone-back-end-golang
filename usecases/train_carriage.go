@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"back-end-golang/dtos"
+	"back-end-golang/helpers"
 	"back-end-golang/models"
 	"back-end-golang/repositories"
 	"errors"
@@ -83,15 +84,17 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(trainId, page, limit int, cl
 		var trainSeatResponses []dtos.TrainSeatAvailableResponse
 		for _, trainSeat := range trainSeat {
 			isAvailable := true
-			if date != "" {
+			if date != "" && trainId != 0 {
 				trainCarriages, err = u.trainCarriageRepo.GetAllTrainCarriages2()
 				if err != nil {
 					return nil, 0, err
 				}
 				for _, trainC := range trainCarriages {
 					trainOrder, _ := u.ticketTravelerDetailRepo.GetTicketTravelerDetailByTrainSeatID(trainC.ID, trainSeat.ID, date)
-					if trainOrder.ID > 0 {
-						isAvailable = false
+					for _, trainO := range trainOrder {
+						if helpers.FormatDateToYMD(&trainO.DateOfDeparture) == date && trainO.TrainCarriageID == trainC.ID && trainO.TrainSeatID == trainSeat.ID {
+							isAvailable = false
+						}
 					}
 				}
 			}

@@ -9,7 +9,7 @@ import (
 type TicketTravelerDetailRepository interface {
 	GetAllTicketTravelerDetails() ([]models.TicketTravelerDetail, int, error)
 	GetTicketTravelerDetailByID(id uint) (models.TicketTravelerDetail, error)
-	GetTicketTravelerDetailByTrainSeatID(trainCarriageId, trainSeatId uint, date string) (models.TicketTravelerDetail, error)
+	GetTicketTravelerDetailByTrainSeatID(trainCarriageId, trainSeatId uint, date string) ([]models.TicketTravelerDetail, error)
 	GetTicketTravelerDetailByTicketOrderID(id uint) ([]models.TicketTravelerDetail, error)
 	GetTicketTravelerDetailByTicketOrderIDAndTrainID(ticketOrderId, trainId uint) (models.TicketTravelerDetail, error)
 	CreateTicketTravelerDetail(ticketTravelerDetail models.TicketTravelerDetail) (models.TicketTravelerDetail, error)
@@ -45,9 +45,9 @@ func (r *ticketTravelerDetailRepository) GetTicketTravelerDetailByID(id uint) (m
 	return ticketTravelerDetail, err
 }
 
-func (r *ticketTravelerDetailRepository) GetTicketTravelerDetailByTrainSeatID(trainCarriageId, trainSeatId uint, date string) (models.TicketTravelerDetail, error) {
-	var ticketTravelerDetail models.TicketTravelerDetail
-	err := r.db.Where("train_carriage_id = ? AND train_seat_id = ? AND date_of_departure = ?", trainCarriageId, trainSeatId, date).First(&ticketTravelerDetail).Error
+func (r *ticketTravelerDetailRepository) GetTicketTravelerDetailByTrainSeatID(trainCarriageId, trainSeatId uint, date string) ([]models.TicketTravelerDetail, error) {
+	var ticketTravelerDetail []models.TicketTravelerDetail
+	err := r.db.Where("train_carriage_id = ? AND train_seat_id = ? AND date_of_departure = ?", trainCarriageId, trainSeatId, date).Find(&ticketTravelerDetail).Error
 	return ticketTravelerDetail, err
 }
 
