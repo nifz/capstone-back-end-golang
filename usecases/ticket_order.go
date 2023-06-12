@@ -246,7 +246,7 @@ func (u *ticketOrderUsecase) GetTicketOrdersByAdmin(page, limit int, search, dat
 		} else {
 			getTicketOrder, err = u.ticketOrderRepo.GetTicketOrderByStatusAndID(ticketTravelerDetail.TicketOrderID, 1, filter)
 			if err != nil {
-				return ticketTravelerDetailResponses, 0, err
+				continue
 			}
 		}
 
