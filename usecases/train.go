@@ -201,8 +201,8 @@ func (u *trainUsecase) GetAllTrainsByAdmin(page, limit int, search, sortBy, filt
 
 		trainResponse := dtos.TrainResponses{
 			TrainID:   getTrain.ID,
-			CodeTrain: getTrain.CodeTrain,
-			Name:      getTrain.Name,
+			CodeTrain: strings.ToUpper(getTrain.CodeTrain),
+			Name:      strings.ToUpper(getTrain.Name),
 			Route:     trainStationResponses,
 			Status:    getTrain.Status,
 			CreatedAt: getTrain.CreatedAt,
@@ -319,8 +319,6 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses,
 	if train.CodeTrain == "" || train.Name == "" || train.Route == nil || train.Status == "" {
 		return trainResponse, errors.New("Failed to create train")
 	}
-	train.Name = strings.ToUpper(train.Name)
-	train.CodeTrain = strings.ToUpper(train.CodeTrain)
 
 	createTrain := models.Train{
 		CodeTrain: train.CodeTrain,
