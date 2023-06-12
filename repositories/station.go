@@ -50,7 +50,7 @@ func (r *stationRepository) GetAllStationsByAdmin(page, limit int, search string
 
 	offset := (page - 1) * limit
 
-	err = r.db.Where("origin LIKE ? OR name LIKE ? OR initial LIKE ?", "%"+search+"%", "%"+search+"%", "%"+search+"%").Limit(limit).Offset(offset).Find(&stations).Error
+	err = r.db.Where("origin LIKE ? OR name LIKE ? OR initial LIKE ?", "%"+search+"%", "%"+search+"%", "%"+search+"%").Order("id DESC").Limit(limit).Offset(offset).Find(&stations).Error
 
 	return stations, int(count), err
 }
