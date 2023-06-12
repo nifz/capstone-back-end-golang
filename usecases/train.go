@@ -156,14 +156,16 @@ func (u *trainUsecase) GetAllTrainsByAdmin(page, limit int, search, sortBy, filt
 		if err != nil {
 			return trainResponses, 0, err
 		}
-
 		deletedTrain := ""
-		isAvailable := getTrain.Status == "available" && getTrain.DeletedAt.Time.IsZero()
 
-		if filter == "active" && !isAvailable {
-			continue
-		} else if filter != "active" && isAvailable {
-			continue
+		if filter != "" {
+			isAvailable := getTrain.Status == "available" && getTrain.DeletedAt.Time.IsZero()
+
+			if filter == "active" && !isAvailable {
+				continue
+			} else if filter != "active" && isAvailable {
+				continue
+			}
 		}
 
 		if !getTrain.DeletedAt.Time.IsZero() {
