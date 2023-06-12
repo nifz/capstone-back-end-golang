@@ -346,7 +346,7 @@ func (u *ticketOrderUsecase) GetTicketOrdersByAdmin(page, limit int, search, dat
 			Train: dtos.TrainResponsesSimply{
 				TrainID:         getTrain.ID,
 				CodeTrain:       getTrain.CodeTrain,
-				Name:            getTrain.Name,
+				Name:            strings.ToUpper(getTrain.Name),
 				Class:           getTrainCarriage.Class,
 				TrainPrice:      ticketTravelerDetail.TrainPrice,
 				TrainCarriageID: getTrainCarriage.ID,
