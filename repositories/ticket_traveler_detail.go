@@ -47,7 +47,7 @@ func (r *ticketTravelerDetailRepository) GetTicketTravelerDetailByID(id uint) (m
 
 func (r *ticketTravelerDetailRepository) GetTicketTravelerDetailByTrainSeatID(trainCarriageId, trainSeatId uint, date string) (models.TicketTravelerDetail, error) {
 	var ticketTravelerDetail models.TicketTravelerDetail
-	err := r.db.Where("train_carriage_id = ? AND train_seat_id = ? AND date_of_departure LIKE ?", trainCarriageId, trainSeatId, "%"+date+"%").First(&ticketTravelerDetail).Error
+	err := r.db.Where("train_carriage_id = ? AND train_seat_id = ? AND date_of_departure = ?", trainCarriageId, trainSeatId, date).First(&ticketTravelerDetail).Error
 	return ticketTravelerDetail, err
 }
 
