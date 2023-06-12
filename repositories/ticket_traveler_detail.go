@@ -31,7 +31,7 @@ func (r *ticketTravelerDetailRepository) GetAllTicketTravelerDetails() ([]models
 		count                 int64
 	)
 
-	err := r.db.Find(&ticketTravelerDetails).Count(&count).Error
+	err := r.db.Order("id DESC").Find(&ticketTravelerDetails).Count(&count).Error
 	if err != nil {
 		return ticketTravelerDetails, int(count), err
 	}
