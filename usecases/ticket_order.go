@@ -69,12 +69,12 @@ func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, statu
 		if status == "" {
 			getTicketOrder, err = u.ticketOrderRepo.GetTicketOrderByID(ticketTravelerDetail.TicketOrderID, userID)
 			if err != nil {
-				return ticketTravelerDetailResponses, 0, err
+				continue
 			}
 		} else {
 			getTicketOrder, err = u.ticketOrderRepo.GetTicketOrderByStatusAndID(ticketTravelerDetail.TicketOrderID, userID, status)
 			if err != nil {
-				return ticketTravelerDetailResponses, 0, err
+				continue
 			}
 		}
 
