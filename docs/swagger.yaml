@@ -3622,74 +3622,6 @@ paths:
       summary: Get hotel by ID
       tags:
       - Admin - Hotel
-  /public/hotel/search:
-    get:
-      consumes:
-      - application/json
-      description: Search Hotel
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: integer
-      - description: Number of items per page
-        in: query
-        name: limit
-        type: integer
-      - description: Filter minimum price
-        in: query
-        name: minimum_price
-        type: integer
-      - description: Filter maximum price
-        in: query
-        name: maximum_price
-        type: integer
-      - description: Filter rating class
-        in: query
-        name: rating_class
-        type: integer
-      - description: Search address hotel
-        in: query
-        name: address
-        type: string
-      - description: Search name hotel
-        in: query
-        name: name
-        type: string
-      - description: Filter by price
-        in: query
-        name: sort_by_price
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.GetAllHotelStatusOKResponses'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.BadRequestResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dtos.UnauthorizedResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/dtos.ForbiddenResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/dtos.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dtos.InternalServerErrorResponse'
-      summary: Search Hotel Available
-      tags:
-      - User - Hotel
   /public/payment:
     get:
       consumes:
@@ -4046,76 +3978,6 @@ paths:
       summary: Get train by ID
       tags:
       - Admin - Train
-  /public/train/search:
-    get:
-      consumes:
-      - application/json
-      description: Search Train
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: integer
-      - description: Number of items per page
-        in: query
-        name: limit
-        type: integer
-      - description: Station origin id
-        in: query
-        name: station_origin_id
-        required: true
-        type: integer
-      - description: Station destination id
-        in: query
-        name: station_destination_id
-        required: true
-        type: integer
-      - description: Filter by train id
-        in: query
-        name: sort_by_train_id
-        type: integer
-      - description: Filter by class name
-        in: query
-        name: sort_by_class
-        type: string
-      - description: Filter by price
-        in: query
-        name: sort_by_price
-        type: string
-      - description: Filter by arrive time
-        in: query
-        name: sort_by_arrive_time
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.GetAllTrainStatusOKResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.BadRequestResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dtos.UnauthorizedResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/dtos.ForbiddenResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/dtos.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dtos.InternalServerErrorResponse'
-      summary: Search Train Available
-      tags:
-      - User - Train
   /register:
     post:
       consumes:
@@ -4455,6 +4317,76 @@ paths:
       summary: Order Hotel
       tags:
       - User - Hotel
+  /user/hotel/search:
+    get:
+      consumes:
+      - application/json
+      description: Search Hotel
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter minimum price
+        in: query
+        name: minimum_price
+        type: integer
+      - description: Filter maximum price
+        in: query
+        name: maximum_price
+        type: integer
+      - description: Filter rating class
+        in: query
+        name: rating_class
+        type: integer
+      - description: Search address hotel
+        in: query
+        name: address
+        type: string
+      - description: Search name hotel
+        in: query
+        name: name
+        type: string
+      - description: Filter by price
+        in: query
+        name: sort_by_price
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllHotelStatusOKResponses'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Search Hotel Available
+      tags:
+      - User - Hotel
   /user/order/hotel:
     get:
       consumes:
@@ -4735,6 +4667,78 @@ paths:
       security:
       - BearerAuth: []
       summary: Order ticket KA
+      tags:
+      - User - Train
+  /user/train/search:
+    get:
+      consumes:
+      - application/json
+      description: Search Train
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Station origin id
+        in: query
+        name: station_origin_id
+        required: true
+        type: integer
+      - description: Station destination id
+        in: query
+        name: station_destination_id
+        required: true
+        type: integer
+      - description: Filter by train id
+        in: query
+        name: sort_by_train_id
+        type: integer
+      - description: Filter by class name
+        in: query
+        name: sort_by_class
+        type: string
+      - description: Filter by price
+        in: query
+        name: sort_by_price
+        type: string
+      - description: Filter by arrive time
+        in: query
+        name: sort_by_arrive_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllTrainStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Search Train Available
       tags:
       - User - Train
   /user/update-password:

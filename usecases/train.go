@@ -535,7 +535,8 @@ func (u *trainUsecase) DeleteTrain(id uint) error {
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /public/train/search [get]
+// @Router       /user/train/search [get]
+// @Security BearerAuth
 func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, stationDestinationId, sortByTrainId int, sortClassName, sortByPrice, sortByArriveTime string) ([]dtos.TrainResponse, int, error) {
 	trains, err := u.trainRepo.GetAllTrains(sortClassName, sortByTrainId)
 	if err != nil {
