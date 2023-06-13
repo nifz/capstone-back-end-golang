@@ -670,7 +670,8 @@ func (u *hotelUsecase) DeleteHotel(id uint) error {
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /public/hotel/search [get]
+// @Router       /user/hotel/search [get]
+// @Security BearerAuth
 func (u *hotelUsecase) SearchHotelAvailable(userId, page, limit, minimumPrice, maximumPrice, ratingClass int, address, name, sortByPrice string) ([]dtos.HotelResponse, int, error) {
 	hotels, count, err := u.hotelRepo.SearchHotelAvailable(page, limit, address, name)
 	if err != nil {
