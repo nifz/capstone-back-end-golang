@@ -9,8 +9,9 @@ import (
 type TravelerDetailRepository interface {
 	GetAllTravelerDetails(page, limit int) ([]models.TravelerDetail, int, error)
 	GetTravelerDetailByID(id uint) (models.TravelerDetail, error)
-	GetTravelerDetailByID2(ticketOrderID uint) ([]models.TravelerDetail, error)
+	GetTravelerDetailByTicketOrderID2(ticketOrderID uint) ([]models.TravelerDetail, error)
 	GetTravelerDetailByTicketOrderID(id uint) ([]models.TravelerDetail, error)
+	GetTravelerDetailByHotelOrderID(hotelOrderID uint) ([]models.TravelerDetail, error)
 	CreateTravelerDetail(travelerDetail models.TravelerDetail) (models.TravelerDetail, error)
 }
 
@@ -45,7 +46,7 @@ func (r *travelerDetailRepository) GetTravelerDetailByID(id uint) (models.Travel
 	return travelerDetail, err
 }
 
-func (r *travelerDetailRepository) GetTravelerDetailByID2(ticketOrderID uint) ([]models.TravelerDetail, error) {
+func (r *travelerDetailRepository) GetTravelerDetailByTicketOrderID2(ticketOrderID uint) ([]models.TravelerDetail, error) {
 	var travelerDetail []models.TravelerDetail
 	err := r.db.Where("ticket_order_id = ?", ticketOrderID).Find(&travelerDetail).Error
 	return travelerDetail, err
@@ -54,6 +55,12 @@ func (r *travelerDetailRepository) GetTravelerDetailByID2(ticketOrderID uint) ([
 func (r *travelerDetailRepository) GetTravelerDetailByTicketOrderID(id uint) ([]models.TravelerDetail, error) {
 	var travelerDetail []models.TravelerDetail
 	err := r.db.Where("ticket_order_id = ?", id).Find(&travelerDetail).Error
+	return travelerDetail, err
+}
+
+func (r *travelerDetailRepository) GetTravelerDetailByHotelOrderID(hotelOrderID uint) ([]models.TravelerDetail, error) {
+	var travelerDetail []models.TravelerDetail
+	err := r.db.Where("hotel_order_id = ?", hotelOrderID).Find(&travelerDetail).Error
 	return travelerDetail, err
 }
 

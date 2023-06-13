@@ -58,21 +58,14 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	paymentUsecase := usecases.NewPaymentUsecase(paymentRepository)
 	paymentController := controllers.NewPaymentController(paymentUsecase)
 
-	ticketOrderRepository := repositories.NewTicketOrderRepository(db)
-	ticketOrderUsecase := usecases.NewTicketOrderUsecase(ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository, userRepository)
-	ticketOrderController := controllers.NewTicketOrderController(ticketOrderUsecase)
-
-	dashboardRepository := repositories.NewDashboardRepository(db)
-	dashboardUsecase := usecases.NewDashboardUsecase(dashboardRepository, userRepository, ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository)
-	dashboardController := controllers.NewDashboardController(dashboardUsecase)
-
-	articleRepository := repositories.NewArticleRepository(db)
-	articleUsecase := usecases.NewArticleUsecase(articleRepository)
-	articleController := controllers.NewArticleController(articleUsecase)
 
 	historySearchRepository := repositories.NewHistorySearchRepository(db)
 	historySearchUsecase := usecases.NewHistorySearchUsecase(historySearchRepository, userRepository)
 	historySearchController := controllers.NewHistorySearchController(historySearchUsecase)
+
+	ticketOrderRepository := repositories.NewTicketOrderRepository(db)
+	ticketOrderUsecase := usecases.NewTicketOrderUsecase(ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository, userRepository)
+	ticketOrderController := controllers.NewTicketOrderController(ticketOrderUsecase)
 
 	hotelRepository := repositories.NewHotelRepository(db)
 	hotelRoomRepository := repositories.NewHotelRoomRepository(db)
@@ -82,11 +75,23 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	hotelImageRepository := repositories.NewHotelImageRepository(db)
 	hotelFacilitiesRepository := repositories.NewHotelFacilitiesRepository(db)
 	hotelPolicyRepository := repositories.NewHotelPoliciesRepository(db)
-	hotelUsecase := usecases.NewHotelUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository)
+	hotelUsecase := usecases.NewHotelUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository, historySearchRepository)
 	hotelController := controllers.NewHotelController(hotelUsecase)
 
 	hotelRoomUsecase := usecases.NewHotelRoomUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository)
 	hotelRoomController := controllers.NewHotelRoomController(hotelRoomUsecase)
+
+	hotelOrderRepository := repositories.NewHotelOrderRepository(db)
+	hotelOrderUsecase := usecases.NewHotelOrderUsecase(hotelOrderRepository, hotelRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository, travelerDetailRepository, paymentRepository, userRepository)
+	hotelOrderController := controllers.NewHotelOrderController(hotelOrderUsecase)
+
+	dashboardRepository := repositories.NewDashboardRepository(db)
+	dashboardUsecase := usecases.NewDashboardUsecase(dashboardRepository, userRepository, ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository)
+	dashboardController := controllers.NewDashboardController(dashboardUsecase)
+
+	articleRepository := repositories.NewArticleRepository(db)
+	articleUsecase := usecases.NewArticleUsecase(articleRepository)
+	articleController := controllers.NewArticleController(articleUsecase)
 
 	// Middleware CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -120,8 +125,15 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.POST("/train/order", ticketOrderController.CreateTicketOrder)
 	user.PATCH("/train/order", ticketOrderController.UpdateTicketOrder)
 
+	public.GET("/hotel/search", hotelController.SearchHotelAvailable)
 	user.GET("/order/ticket", ticketOrderController.GetTicketOrders)
 	user.GET("/order/ticket/detail", ticketOrderController.GetTicketOrderByID)
+
+	user.POST("/hotel/order", hotelOrderController.CreateHotelOrder)
+	user.PATCH("/hotel/order", hotelOrderController.UpdateHotelOrder)
+
+	user.GET("/order/hotel", hotelOrderController.GetHotelOrders)
+	user.GET("/order/hotel/detail", hotelOrderController.GetHotelOrderByID)
 
 	user.GET("/history-search", historySearchController.HistorySearchGetAll)
 	user.POST("/history-search", historySearchController.HistorySearchCreate)
@@ -142,6 +154,9 @@ func Init(e *echo.Echo, db *gorm.DB) {
 
 	admin.GET("/order/ticket", ticketOrderController.GetTicketOrdersByAdmin)
 	admin.GET("/order/ticket/detail", ticketOrderController.GetTicketOrderDetailByAdmin)
+
+	admin.GET("/order/hotel", hotelOrderController.GetHotelOrdersByAdmin)
+	admin.GET("/order/hotel/detail", hotelOrderController.GetHotelOrderDetailByAdmin)
 
 	// crud station
 	public.GET("/station", stationController.GetAllStations)
@@ -183,9 +198,9 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.POST("/hotel", hotelController.CreateHotel)
 	admin.DELETE("/hotel/:id", hotelController.DeleteHotel)
 
-	admin.GET("/hotel-room", hotelRoomController.GetAllHotelRooms)
+	public.GET("/hotel-room", hotelRoomController.GetAllHotelRooms)
 	public.GET("/hotel-room/:id", hotelRoomController.GetHotelRoomByID)
-	public.PUT("/hotel-room/:id", hotelRoomController.UpdateHotelRoom)
+	admin.PUT("/hotel-room/:id", hotelRoomController.UpdateHotelRoom)
 	admin.POST("/hotel-room", hotelRoomController.CreateHotelRoom)
 	admin.DELETE("/hotel-room/:id", hotelRoomController.DeleteHotelRoom)
 }
