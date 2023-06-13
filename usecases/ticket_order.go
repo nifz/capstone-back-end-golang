@@ -110,7 +110,7 @@ func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, statu
 			return ticketTravelerDetailResponses, 0, err
 		}
 
-		getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID2(ticketTravelerDetail.TicketOrderID)
+		getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByTicketOrderID2(ticketTravelerDetail.TicketOrderID)
 		if err != nil {
 			return ticketTravelerDetailResponses, 0, err
 		}
@@ -282,7 +282,7 @@ func (u *ticketOrderUsecase) GetTicketOrdersByAdmin(page, limit int, search, dat
 			return ticketTravelerDetailResponses, 0, err
 		}
 
-		getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID2(ticketTravelerDetail.TicketOrderID)
+		getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByTicketOrderID2(ticketTravelerDetail.TicketOrderID)
 		if err != nil {
 			return ticketTravelerDetailResponses, 0, err
 		}
@@ -504,7 +504,7 @@ func (u *ticketOrderUsecase) GetTicketOrdersDetailByAdmin(ticketOrderId, trainId
 		return ticketTravelerDetailResponses, err
 	}
 
-	getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID2(ticketTravelerDetail.TicketOrderID)
+	getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByTicketOrderID2(ticketTravelerDetail.TicketOrderID)
 	if err != nil {
 		return ticketTravelerDetailResponses, err
 	}
@@ -705,7 +705,7 @@ func (u *ticketOrderUsecase) GetTicketOrderByID(userID, ticketOrderId, trainId u
 		return ticketTravelerDetailResponses, err
 	}
 
-	getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID2(ticketTravelerDetail.TicketOrderID)
+	getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByTicketOrderID2(ticketTravelerDetail.TicketOrderID)
 	if err != nil {
 		return ticketTravelerDetailResponses, err
 	}
@@ -838,7 +838,7 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 		}
 		createTravelerDetail := models.TravelerDetail{
 			UserID:        userID,
-			TicketOrderID: createTicketOrder.ID,
+			TicketOrderID: &createTicketOrder.ID,
 			Title:         travelerDetail.Title,
 			FullName:      travelerDetail.FullName,
 			IDCardNumber:  &travelerDetail.IDCardNumber,

@@ -12,6 +12,7 @@ type HotelRepository interface {
 	CreateHotel(hotel models.Hotel) (models.Hotel, error)
 	UpdateHotel(hotel models.Hotel) (models.Hotel, error)
 	DeleteHotel(id uint) error
+	SearchHotelAvailable(page, limit int, address, name string) ([]models.Hotel, int, error)
 }
 
 type hotelRepository struct {
@@ -61,4 +62,47 @@ func (r *hotelRepository) DeleteHotel(id uint) error {
 	var hotel models.Hotel
 	err := r.db.Where("id = ?", id).Delete(&hotel).Error
 	return err
+}
+
+func (r *hotelRepository) SearchHotelAvailable(page, limit int, address, name string) ([]models.Hotel, int, error) {
+	var (
+		hotels []models.Hotel
+		count  int64
+		err    error
+	)
+
+	if address == "" && name == "" {
+		err = r.db.Find(&hotels).Count(&count).Error
+	}
+	if address != "" && name == "" {
+		err = r.db.Where("address LIKE ?", "%"+address+"%").Find(&hotels).Count(&count).Error
+	}
+	if address == "" && name != "" {
+		err = r.db.Where("name LIKE ?", "%"+name+"%").Find(&hotels).Count(&count).Error
+	}
+	if address != "" && name != "" {
+		err = r.db.Where("name LIKE ? AND address LIKE ?", "%"+name+"%", "%"+address+"%").Find(&hotels).Count(&count).Error
+	}
+
+	if err != nil {
+		return hotels, int(count), err
+	}
+
+	offset := (page - 1) * limit
+
+	if address == "" && name == "" {
+		err = r.db.Order("id DESC").Limit(limit).Offset(offset).Find(&hotels).Error
+	}
+	if address != "" && name == "" {
+		err = r.db.Where("address LIKE ?", "%"+address+"%").Order("id DESC").Limit(limit).Offset(offset).Find(&hotels).Error
+	}
+	if address == "" && name != "" {
+		err = r.db.Where("name LIKE ?", "%"+name+"%").Order("id DESC").Limit(limit).Offset(offset).Find(&hotels).Error
+	}
+	if address != "" && name != "" {
+		err = r.db.Where("name LIKE ? AND address LIKE ?", "%"+name+"%", "%"+address+"%").Order("id DESC").Limit(limit).Offset(offset).Find(&hotels).Error
+	}
+
+	return hotels, int(count), err
+
 }
