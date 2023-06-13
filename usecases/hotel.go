@@ -5,15 +5,19 @@ import (
 	"back-end-golang/models"
 	"back-end-golang/repositories"
 	"errors"
+	"sort"
+	"strings"
 )
 
 type HotelUsecase interface {
 	// admin
-	GetAllHotels(page, limit int) ([]dtos.HotelResponse, int, error)
+	GetAllHotels(page, limit, minimumPrice, maximumPrice, ratingClass int, address, name, sortByPrice string) ([]dtos.HotelResponse, int, error)
 	GetHotelByID(id uint) (dtos.HotelByIDResponse, error)
-	CreateHotel(train *dtos.HotelInput) (dtos.HotelResponse, error)
+	CreateHotel(hotel *dtos.HotelInput) (dtos.HotelResponse, error)
 	UpdateHotel(id uint, hotelInput dtos.HotelInput) (dtos.HotelResponse, error)
 	DeleteHotel(id uint) error
+
+	SearchHotelAvailable(userId, page, limit, minimumPrice, maximumPrice, ratingClass int, address, name, sortByPrice string) ([]dtos.HotelResponse, int, error)
 }
 
 type hotelUsecase struct {
@@ -24,10 +28,11 @@ type hotelUsecase struct {
 	hotelImageRepo          repositories.HotelImageRepository
 	hotelFacilitiesRepo     repositories.HotelFacilitiesRepository
 	hotelPoliciesRepo       repositories.HotelPoliciesRepository
+	historySearchRepo       repositories.HistorySearchRepository
 }
 
-func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository) HotelUsecase {
-	return &hotelUsecase{hotelRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo}
+func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository, historySearchRepo repositories.HistorySearchRepository) HotelUsecase {
+	return &hotelUsecase{hotelRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo, historySearchRepo}
 }
 
 // =============================== ADMIN ================================== \\
@@ -47,9 +52,8 @@ func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo repos
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /public/hotel [get]
-func (u *hotelUsecase) GetAllHotels(page, limit int) ([]dtos.HotelResponse, int, error) {
-
-	hotels, count, err := u.hotelRepo.GetAllHotels(page, limit)
+func (u *hotelUsecase) GetAllHotels(page, limit, minimumPrice, maximumPrice, ratingClass int, address, name, sortByPrice string) ([]dtos.HotelResponse, int, error) {
+	hotels, count, err := u.hotelRepo.SearchHotelAvailable(page, limit, address, name)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -64,6 +68,14 @@ func (u *hotelUsecase) GetAllHotels(page, limit int) ([]dtos.HotelResponse, int,
 			} else {
 				return hotelResponses, 0, err
 			}
+		}
+
+		if minimumPrice > 0 && getMinimumPriceRoom.DiscountPrice < minimumPrice {
+			continue // Skip the hotel if its minimum price is below the specified minimumPrice
+		}
+
+		if maximumPrice > 0 && getMinimumPriceRoom.DiscountPrice > maximumPrice {
+			continue // Skip the hotel if its minimum price is above the specified maximumPrice
 		}
 
 		getImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotel.ID)
@@ -129,25 +141,27 @@ func (u *hotelUsecase) GetAllHotels(page, limit int) ([]dtos.HotelResponse, int,
 			CreatedAt:       hotel.CreatedAt,
 			UpdatedAt:       hotel.UpdatedAt,
 		}
+
+		if ratingClass > 0 && hotelResponse.Class < ratingClass {
+			continue // Skip the hotel if its rating class is below the specified ratingClass
+		}
+
 		hotelResponses = append(hotelResponses, hotelResponse)
+
+		// Sort hotelResponses based on price
+		if strings.ToLower(sortByPrice) == "asc" {
+			sort.SliceStable(hotelResponses, func(i, j int) bool {
+				return hotelResponses[i].HotelRoomStart < hotelResponses[j].HotelRoomStart
+			})
+		} else if strings.ToLower(sortByPrice) == "desc" {
+			sort.SliceStable(hotelResponses, func(i, j int) bool {
+				return hotelResponses[i].HotelRoomStart > hotelResponses[j].HotelRoomStart
+			})
+		}
+
 	}
-	// Apply offset and limit to hotelResponses
-	start := (page - 1) * limit
-	end := start + limit
 
-	// Ensure that `start` is within the range of hotelResponses
-	if start >= count {
-		return nil, 0, nil
-	}
-
-	// Ensure that `end` does not exceed the length of hotelResponses
-	if end > count {
-		end = count
-	}
-
-	subsetHotelResponses := hotelResponses[start:end]
-
-	return subsetHotelResponses, count, nil
+	return hotelResponses, count, nil
 }
 
 // GetHotelByID godoc
@@ -309,7 +323,7 @@ func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelByIDResponse, error) {
 // @Security BearerAuth
 func (u *hotelUsecase) CreateHotel(hotel *dtos.HotelInput) (dtos.HotelResponse, error) {
 	var hotelResponse dtos.HotelResponse
-	if hotel.Name == "" || hotel.Email == "" || hotel.Address == "" || hotel.PhoneNumber == "" || hotel.Class == "" || hotel.Description == "" || hotel.HotelFacilities == nil || hotel.HotelImage == nil || hotel.HotelPolicy == nil {
+	if hotel.Name == "" || hotel.Email == "" || hotel.Address == "" || hotel.PhoneNumber == "" || hotel.Class == 0 || hotel.Description == "" || hotel.HotelFacilities == nil || hotel.HotelImage == nil || hotel.HotelPolicy == nil {
 		return hotelResponse, errors.New("failed to create hotel")
 	}
 
@@ -467,7 +481,7 @@ func (u *hotelUsecase) UpdateHotel(id uint, hotel dtos.HotelInput) (dtos.HotelRe
 	var hotels models.Hotel
 	var hotelResponse dtos.HotelResponse
 
-	if hotel.Name == "" || hotel.Email == "" || hotel.Address == "" || hotel.PhoneNumber == "" || hotel.Class == "" || hotel.Description == "" || hotel.HotelFacilities == nil || hotel.HotelImage == nil || hotel.HotelPolicy == nil {
+	if hotel.Name == "" || hotel.Email == "" || hotel.Address == "" || hotel.PhoneNumber == "" || hotel.Class == 0 || hotel.Description == "" || hotel.HotelFacilities == nil || hotel.HotelImage == nil || hotel.HotelPolicy == nil {
 		return hotelResponse, errors.New("failed to update hotel")
 	}
 
@@ -632,4 +646,149 @@ func (u *hotelUsecase) DeleteHotel(id uint) error {
 	u.hotelFacilitiesRepo.DeleteHotelFacilities(id)
 	u.hotelPoliciesRepo.DeleteHotelPolicies(id)
 	return u.hotelRepo.DeleteHotel(id)
+}
+
+// =============================== USER ================================== \\
+
+// SearchHotelAvailable godoc
+// @Summary      Search Hotel Available
+// @Description  Search Hotel
+// @Tags         User - Hotel
+// @Accept       json
+// @Produce      json
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Param minimum_price query int false "Filter minimum price"
+// @Param maximum_price query int false "Filter maximum price"
+// @Param rating_class query int false "Filter rating class"
+// @Param address query string false "Search address hotel"
+// @Param name query string false "Search name hotel"
+// @Param sort_by_price query string false "Filter by price"
+// @Success      200 {object} dtos.GetAllHotelStatusOKResponses
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /public/hotel/search [get]
+func (u *hotelUsecase) SearchHotelAvailable(userId, page, limit, minimumPrice, maximumPrice, ratingClass int, address, name, sortByPrice string) ([]dtos.HotelResponse, int, error) {
+	hotels, count, err := u.hotelRepo.SearchHotelAvailable(page, limit, address, name)
+	if err != nil {
+		return nil, 0, err
+	}
+	if len(hotels) > 0 && name != "" && userId > 1 {
+		historySearches := models.HistorySearch{
+			UserID: uint(userId),
+			Name:   name,
+		}
+		_, err := u.historySearchRepo.HistorySearchCreate(historySearches)
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+
+	var hotelResponses []dtos.HotelResponse
+
+	for _, hotel := range hotels {
+		getMinimumPriceRoom, err := u.hotelRoomRepo.GetMinimumPriceHotelRoomByHotelID(hotel.ID)
+		if err != nil {
+			if err.Error() == "record not found" {
+				getMinimumPriceRoom.DiscountPrice = 0
+			} else {
+				return hotelResponses, 0, err
+			}
+		}
+
+		if minimumPrice > 0 && getMinimumPriceRoom.DiscountPrice < minimumPrice {
+			continue // Skip the hotel if its minimum price is below the specified minimumPrice
+		}
+
+		if maximumPrice > 0 && getMinimumPriceRoom.DiscountPrice > maximumPrice {
+			continue // Skip the hotel if its minimum price is above the specified maximumPrice
+		}
+
+		getImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotel.ID)
+		if err != nil {
+			return hotelResponses, 0, err
+		}
+		getFacilities, err := u.hotelFacilitiesRepo.GetAllHotelFacilitiesByID(hotel.ID)
+		if err != nil {
+			return hotelResponses, 0, err
+		}
+
+		getPolicy, err := u.hotelPoliciesRepo.GetHotelPoliciesByIDHotel(hotel.ID)
+		if err != nil {
+			return hotelResponses, 0, err
+		}
+
+		var hotelImageResponses []dtos.HotelImageResponse
+		for _, image := range getImage {
+			hotelImageResponse := dtos.HotelImageResponse{
+				HotelID:  image.HotelID,
+				ImageUrl: image.ImageUrl,
+			}
+			hotelImageResponses = append(hotelImageResponses, hotelImageResponse)
+		}
+
+		var hotelFacilitiesResponses []dtos.HotelFacilitiesResponse
+		for _, facilities := range getFacilities {
+			HotelFacilitiesResponse := dtos.HotelFacilitiesResponse{
+				HotelID: facilities.HotelID,
+				Name:    facilities.Name,
+			}
+			hotelFacilitiesResponses = append(hotelFacilitiesResponses, HotelFacilitiesResponse)
+		}
+
+		hotelPoliciesResponses := dtos.HotelPoliciesResponse{
+			HotelID:            getPolicy.HotelID,
+			IsCheckInCheckOut:  getPolicy.IsCheckInCheckOut,
+			TimeCheckIn:        getPolicy.TimeCheckIn,
+			TimeCheckOut:       getPolicy.TimeCheckOut,
+			IsPolicyCanceled:   getPolicy.IsPolicyCanceled,
+			PolicyMinimumAge:   getPolicy.PolicyMinimumAge,
+			IsCheckInEarly:     getPolicy.IsCheckInEarly,
+			IsCheckOutOverdue:  getPolicy.IsCheckOutOverdue,
+			IsBreakfast:        getPolicy.IsBreakfast,
+			TimeBreakfastStart: getPolicy.TimeBreakfastStart,
+			TimeBreakfastEnd:   getPolicy.TimeBreakfastEnd,
+			IsSmoking:          getPolicy.IsSmoking,
+			IsPet:              getPolicy.IsPet,
+		}
+
+		hotelResponse := dtos.HotelResponse{
+			HotelID:         hotel.ID,
+			Name:            hotel.Name,
+			Class:           hotel.Class,
+			Description:     hotel.Description,
+			PhoneNumber:     hotel.PhoneNumber,
+			Email:           hotel.Email,
+			Address:         hotel.Address,
+			HotelRoomStart:  getMinimumPriceRoom.DiscountPrice,
+			HotelImage:      hotelImageResponses,
+			HotelFacilities: hotelFacilitiesResponses,
+			HotelPolicy:     hotelPoliciesResponses,
+			CreatedAt:       hotel.CreatedAt,
+			UpdatedAt:       hotel.UpdatedAt,
+		}
+
+		if ratingClass > 0 && hotelResponse.Class < ratingClass {
+			continue // Skip the hotel if its rating class is below the specified ratingClass
+		}
+
+		hotelResponses = append(hotelResponses, hotelResponse)
+
+		// Sort hotelResponses based on price
+		if strings.ToLower(sortByPrice) == "asc" {
+			sort.SliceStable(hotelResponses, func(i, j int) bool {
+				return hotelResponses[i].HotelRoomStart < hotelResponses[j].HotelRoomStart
+			})
+		} else if strings.ToLower(sortByPrice) == "desc" {
+			sort.SliceStable(hotelResponses, func(i, j int) bool {
+				return hotelResponses[i].HotelRoomStart > hotelResponses[j].HotelRoomStart
+			})
+		}
+
+	}
+
+	return hotelResponses, count, nil
 }
