@@ -43,7 +43,7 @@ func NewHotelRoomUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo r
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /user/hotel-room [get]
+// @Router       /public/hotel-room [get]
 func (u *hotelRoomUsecase) GetAllHotelRooms(page, limit int) ([]dtos.HotelRoomResponse, int, error) {
 
 	rooms, count, err := u.hotelRoomRepo.GetAllHotelRooms(page, limit)
@@ -135,7 +135,7 @@ func (u *hotelRoomUsecase) GetAllHotelRooms(page, limit int) ([]dtos.HotelRoomRe
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /user/hotel-room/{id} [get]
+// @Router       /public/hotel-room/{id} [get]
 func (u *hotelRoomUsecase) GetHotelRoomByID(id uint) (dtos.HotelRoomResponse, error) {
 	var hotelRoomResponses dtos.HotelRoomResponse
 	room, err := u.hotelRoomRepo.GetHotelRoomByID(id)
@@ -210,7 +210,7 @@ func (u *hotelRoomUsecase) GetHotelRoomByID(id uint) (dtos.HotelRoomResponse, er
 // @Security BearerAuth
 func (u *hotelRoomUsecase) CreateHotelRoom(roomInput *dtos.HotelRoomInput) (dtos.HotelRoomResponse, error) {
 	var hotelRoomResponse dtos.HotelRoomResponse
-	if roomInput.Name == "" || roomInput.Description == "" || roomInput.MattressSize == "" || roomInput.HotelRoomImage == nil || roomInput.HotelRoomFacility == nil || roomInput.HotelID < 1 {
+	if roomInput.HotelID < 1 || roomInput.Name == "" || roomInput.SizeOfRoom < 1 || roomInput.QuantityOfRoom < 1 || roomInput.Description == "" || roomInput.NormalPrice < 1 || roomInput.Discount < 0 || roomInput.NumberOfGuest < 1 || roomInput.MattressSize == "" || roomInput.NumberOfMattress < 1 || roomInput.HotelRoomImage == nil || roomInput.HotelRoomFacility == nil {
 		return hotelRoomResponse, errors.New("failed to create hotel room")
 	}
 
@@ -219,7 +219,11 @@ func (u *hotelRoomUsecase) CreateHotelRoom(roomInput *dtos.HotelRoomInput) (dtos
 		return hotelRoomResponse, errors.New("failed to create hotel room, hotel_id not found")
 	}
 
-	discountPrice := roomInput.NormalPrice - (roomInput.NormalPrice * roomInput.Discount / 100)
+	discountPrice := roomInput.NormalPrice
+	if roomInput.Discount != 0 {
+		discountPrice = roomInput.NormalPrice - (roomInput.NormalPrice * roomInput.Discount / 100)
+	}
+
 	createHotelRoom := models.HotelRoom{
 		HotelID:          getHotel.ID,
 		Name:             roomInput.Name,
@@ -341,7 +345,7 @@ func (u *hotelRoomUsecase) UpdateHotelRoom(id uint, roomInput dtos.HotelRoomInpu
 	var hotelRooms models.HotelRoom
 	var hotelRoomResponse dtos.HotelRoomResponse
 
-	if roomInput.Name == "" || roomInput.Description == "" || roomInput.MattressSize == "" || roomInput.HotelRoomImage == nil || roomInput.HotelRoomFacility == nil || roomInput.HotelID < 1 {
+	if roomInput.HotelID < 1 || roomInput.Name == "" || roomInput.SizeOfRoom < 1 || roomInput.QuantityOfRoom < 1 || roomInput.Description == "" || roomInput.NormalPrice < 1 || roomInput.Discount < 0 || roomInput.NumberOfGuest < 1 || roomInput.MattressSize == "" || roomInput.NumberOfMattress < 1 || roomInput.HotelRoomImage == nil || roomInput.HotelRoomFacility == nil {
 		return hotelRoomResponse, errors.New("failed to update hotel room")
 	}
 
@@ -355,7 +359,10 @@ func (u *hotelRoomUsecase) UpdateHotelRoom(id uint, roomInput dtos.HotelRoomInpu
 		return hotelRoomResponse, errors.New("failed to update hotel room, hotel_id not found")
 	}
 
-	discountPrice := roomInput.NormalPrice - (roomInput.NormalPrice * roomInput.Discount / 100)
+	discountPrice := roomInput.NormalPrice
+	if roomInput.Discount != 0 {
+		discountPrice = roomInput.NormalPrice - (roomInput.NormalPrice * roomInput.Discount / 100)
+	}
 
 	hotelRooms.HotelID = getHotel.ID
 	hotelRooms.Name = roomInput.Name
