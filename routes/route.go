@@ -58,7 +58,6 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	paymentUsecase := usecases.NewPaymentUsecase(paymentRepository)
 	paymentController := controllers.NewPaymentController(paymentUsecase)
 
-
 	historySearchRepository := repositories.NewHistorySearchRepository(db)
 	historySearchUsecase := usecases.NewHistorySearchUsecase(historySearchRepository, userRepository)
 	historySearchController := controllers.NewHistorySearchController(historySearchUsecase)
@@ -121,11 +120,11 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.DELETE("/delete-photo-profile", userController.UserDeletePhotoProfile)
 
 	// train ka
-	public.GET("/train/search", trainController.SearchTrainAvailable)
+	user.GET("/train/search", trainController.SearchTrainAvailable)
 	user.POST("/train/order", ticketOrderController.CreateTicketOrder)
 	user.PATCH("/train/order", ticketOrderController.UpdateTicketOrder)
 
-	public.GET("/hotel/search", hotelController.SearchHotelAvailable)
+	user.GET("/hotel/search", hotelController.SearchHotelAvailable)
 	user.GET("/order/ticket", ticketOrderController.GetTicketOrders)
 	user.GET("/order/ticket/detail", ticketOrderController.GetTicketOrderByID)
 
