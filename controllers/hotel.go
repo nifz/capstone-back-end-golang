@@ -3,6 +3,7 @@ package controllers
 import (
 	"back-end-golang/dtos"
 	"back-end-golang/helpers"
+	"back-end-golang/middlewares"
 	"back-end-golang/usecases"
 	"net/http"
 	"strconv"
@@ -17,6 +18,7 @@ type HotelController interface {
 	CreateHotel(c echo.Context) error
 	UpdateHotel(c echo.Context) error
 	DeleteHotel(c echo.Context) error
+	SearchHotelAvailable(c echo.Context) error
 }
 
 type hotelController struct {
@@ -39,10 +41,18 @@ func (c *hotelController) GetAllHotels(ctx echo.Context) error {
 	limitParam := ctx.QueryParam("limit")
 	limit, err := strconv.Atoi(limitParam)
 	if err != nil {
-		limit = 10
+		limit = 1000
 	}
 
-	hotels, count, err := c.hotelUsecase.GetAllHotels(page, limit)
+	minimumPrice, _ := strconv.Atoi(ctx.QueryParam("minimum_price"))
+	maximumPrice, _ := strconv.Atoi(ctx.QueryParam("maximum_price"))
+	ratingClass, _ := strconv.Atoi(ctx.QueryParam("rating_class"))
+
+	addressParam := ctx.QueryParam("address")
+	nameParam := ctx.QueryParam("name")
+
+	sortByPriceParam := ctx.QueryParam("sort_by_price")
+	hotels, count, err := c.hotelUsecase.GetAllHotels(page, limit, minimumPrice, maximumPrice, ratingClass, addressParam, nameParam, sortByPriceParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
@@ -198,6 +208,72 @@ func (c *hotelController) DeleteHotel(ctx echo.Context) error {
 			http.StatusOK,
 			"Successfully deleted hotel",
 			nil,
+		),
+	)
+}
+
+// =============================== USER ================================== \\
+
+func (c *hotelController) SearchHotelAvailable(ctx echo.Context) error {
+	userId := uint(1)
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		userId = 1
+	}
+
+	userId, err := middlewares.GetUserIdFromToken(tokenString)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	pageParam := ctx.QueryParam("page")
+	page, err := strconv.Atoi(pageParam)
+	if err != nil {
+		page = 1
+	}
+
+	limitParam := ctx.QueryParam("limit")
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		limit = 1000
+	}
+
+	minimumPrice, _ := strconv.Atoi(ctx.QueryParam("minimum_price"))
+	maximumPrice, _ := strconv.Atoi(ctx.QueryParam("maximum_price"))
+	ratingClass, _ := strconv.Atoi(ctx.QueryParam("rating_class"))
+
+	addressParam := ctx.QueryParam("address")
+	nameParam := ctx.QueryParam("name")
+
+	sortByPriceParam := ctx.QueryParam("sort_by_price")
+	hotels, count, err := c.hotelUsecase.SearchHotelAvailable(int(userId), page, limit, minimumPrice, maximumPrice, ratingClass, addressParam, nameParam, sortByPriceParam)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to get all hotel",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewPaginationResponse(
+			http.StatusOK,
+			"Successfully get all hotels",
+			hotels,
+			page,
+			limit,
+			count,
 		),
 	)
 }

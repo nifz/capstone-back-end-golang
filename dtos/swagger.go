@@ -294,3 +294,22 @@ type HotelRoomCreeatedResponses struct {
 	Message    string            `json:"message" example:"Successfully created hotel room"`
 	Data       HotelRoomResponse `json:"data"`
 }
+
+type GetAllHotelOrderStatusOKResponse struct {
+	StatusCode int                `json:"status_code" example:"200"`
+	Message    string             `json:"message" example:"Successfully get ticket order"`
+	Data       HotelOrderResponse `json:"data"`
+	Meta       helpers.Meta       `json:"meta"`
+}
+
+type HotelOrderStatusOKResponse struct {
+	StatusCode int                `json:"status_code" example:"200"`
+	Message    string             `json:"message" example:"Successfully get ticket order"`
+	Data       HotelOrderResponse `json:"data"`
+}
+
+type HotelOrderCreeatedResponse struct {
+	StatusCode int                `json:"status_code" example:"201"`
+	Message    string             `json:"message" example:"Successfully created ticket order"`
+	Data       HotelOrderResponse `json:"data"`
+}
