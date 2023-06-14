@@ -3,7 +3,7 @@ package dtos
 import "time"
 
 type HotelOrderInput struct {
-	HotelID          int                   `form:"hotel_id" json:"hotel_id" example:"1"`
+	// HotelID          int                   `form:"hotel_id" json:"hotel_id" example:"1"`
 	HotelRoomID      int                   `form:"hotel_room_id" json:"hotel_room_id" example:"1"`
 	QuantityAdult    int                   `form:"quantity_adult" json:"quantity_adult" example:"1"`
 	QuantityInfant   int                   `form:"quantity_infant" json:"quantity_infant" example:"1"`

@@ -868,8 +868,16 @@ func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint) (dtos.H
 func (u *hotelOrderUsecase) CreateHotelOrder(userID uint, hotelOrderInput dtos.HotelOrderInput) (dtos.HotelOrderResponse, error) {
 	var hotelOrderResponse dtos.HotelOrderResponse
 	sumHotelPrice := 0
-	if hotelOrderInput.HotelID < 1 || hotelOrderInput.HotelRoomID < 1 || hotelOrderInput.QuantityAdult < 1 || hotelOrderInput.DateStart == "" || hotelOrderInput.DateEnd == "" || hotelOrderInput.PaymentID < 1 || hotelOrderInput.NameOrder == "" || hotelOrderInput.EmailOrder == "" || hotelOrderInput.PhoneNumberOrder == "" || hotelOrderInput.TravelerDetail == nil {
+	if hotelOrderInput.HotelRoomID < 1 || hotelOrderInput.QuantityAdult < 1 || hotelOrderInput.DateStart == "" || hotelOrderInput.DateEnd == "" || hotelOrderInput.PaymentID < 1 || hotelOrderInput.NameOrder == "" || hotelOrderInput.EmailOrder == "" || hotelOrderInput.PhoneNumberOrder == "" || hotelOrderInput.TravelerDetail == nil {
 		return hotelOrderResponse, errors.New("Failed to create hotel order")
+	}
+	getHotelRooms, err := u.hotelRoomRepo.GetHotelRoomByID(uint(hotelOrderInput.HotelRoomID))
+	if err != nil {
+		return hotelOrderResponse, err
+	}
+	getHotels, err := u.hotelRepo.GetHotelByID(getHotelRooms.HotelID)
+	if err != nil {
+		return hotelOrderResponse, err
 	}
 
 	dateNow := "2006-01-02"
@@ -895,7 +903,7 @@ func (u *hotelOrderUsecase) CreateHotelOrder(userID uint, hotelOrderInput dtos.H
 
 	createHotelOrder := models.HotelOrder{
 		UserID:           userID,
-		HotelID:          uint(hotelOrderInput.HotelID),
+		HotelID:          getHotels.ID,
 		HotelRoomID:      uint(hotelOrderInput.HotelRoomID),
 		QuantityAdult:    hotelOrderInput.QuantityAdult,
 		QuantityInfant:   hotelOrderInput.QuantityInfant,
