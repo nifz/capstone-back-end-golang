@@ -88,6 +88,10 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	hotelRoomUsecase := usecases.NewHotelRoomUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository)
 	hotelRoomController := controllers.NewHotelRoomController(hotelRoomUsecase)
 
+	hotelRatingsRepository := repositories.NewHotelRatingsRepository(db)
+	hotelRatingsUsecase := usecases.NewHotelRatingsUsecase(hotelRatingsRepository, hotelRepository, userRepository)
+	hotelRatingsController := controllers.NewHotelRatingsController(hotelRatingsUsecase)
+
 	// Middleware CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"}, // Izinkan semua domain
@@ -126,6 +130,10 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.GET("/history-search", historySearchController.HistorySearchGetAll)
 	user.POST("/history-search", historySearchController.HistorySearchCreate)
 	user.DELETE("/history-search/:id", historySearchController.HistorySearchDelete)
+
+	// ratings hotel
+	// public.GET("/hotel/ratings", hotelController.GetAllHotelRatings)
+	user.POST("/hotel-ratings", hotelRatingsController.CreateHotelRating)
 
 	// ADMIN
 
@@ -188,4 +196,9 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	public.PUT("/hotel-room/:id", hotelRoomController.UpdateHotelRoom)
 	admin.POST("/hotel-room", hotelRoomController.CreateHotelRoom)
 	admin.DELETE("/hotel-room/:id", hotelRoomController.DeleteHotelRoom)
+
+	// Hotel Ratings
+	// public.GET("/hotel/ratings", hotelRatingsController.GetAllHotelRatings)
+	admin.GET("/hotel-ratings/:id", hotelRatingsController.GetRatingsByHotelsId)
+
 }
