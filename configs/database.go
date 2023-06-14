@@ -190,6 +190,9 @@ func MigrateDB(db *gorm.DB) error {
 		&models.HotelRoom{},
 		&models.HotelRoomImage{},
 		&models.HotelRoomFacilities{},
+		&models.Notification{},
+		&models.TemplateMessage{},
 		&models.HotelRating{},
+
 	)
 }

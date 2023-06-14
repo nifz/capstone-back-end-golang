@@ -25,9 +25,18 @@ func Init(e *echo.Echo, db *gorm.DB) {
 		log.Fatal("Error loading .env file")
 	}
 
+	templateMessageRepository := repositories.NewTemplateMessageRepository(db)
+	templateMessageUsecase := usecases.NewTemplateMessageUsecase(templateMessageRepository)
+	templateMessageController := controllers.NewTemplateMessageController(templateMessageUsecase)
+
 	userRepository := repositories.NewUserRepository(db)
-	userUsecase := usecases.NewUserUsecase(userRepository)
+	notificationRepository := repositories.NewNotificationRepository(db)
+
+	userUsecase := usecases.NewUserUsecase(userRepository, notificationRepository)
 	userController := controllers.NewUserController(userUsecase)
+
+	notificationUsecase := usecases.NewNotificationUsecase(notificationRepository, templateMessageRepository, userRepository)
+	notificationController := controllers.NewNotificationController(notificationUsecase)
 
 	cloudinaryUsecase := usecases.NewMediaUpload()
 	cloudinaryController := controllers.NewCloudinaryController(cloudinaryUsecase)
@@ -63,7 +72,7 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	historySearchController := controllers.NewHistorySearchController(historySearchUsecase)
 
 	ticketOrderRepository := repositories.NewTicketOrderRepository(db)
-	ticketOrderUsecase := usecases.NewTicketOrderUsecase(ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository, userRepository)
+	ticketOrderUsecase := usecases.NewTicketOrderUsecase(ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository, userRepository, notificationRepository)
 	ticketOrderController := controllers.NewTicketOrderController(ticketOrderUsecase)
 
 	hotelRepository := repositories.NewHotelRepository(db)
@@ -85,7 +94,7 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	hotelRatingsController := controllers.NewHotelRatingsController(hotelRatingsUsecase)
 
 	hotelOrderRepository := repositories.NewHotelOrderRepository(db)
-	hotelOrderUsecase := usecases.NewHotelOrderUsecase(hotelOrderRepository, hotelRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository, travelerDetailRepository, paymentRepository, userRepository)
+	hotelOrderUsecase := usecases.NewHotelOrderUsecase(hotelOrderRepository, hotelRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository, travelerDetailRepository, paymentRepository, userRepository, notificationRepository)
 	hotelOrderController := controllers.NewHotelOrderController(hotelOrderUsecase)
 
 	dashboardRepository := repositories.NewDashboardRepository(db)
@@ -143,9 +152,13 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.POST("/history-search", historySearchController.HistorySearchCreate)
 	user.DELETE("/history-search/:id", historySearchController.HistorySearchDelete)
 
+
+	user.GET("/notification/:id", notificationController.GetNotificationByUserID)
+  
 	// ratings hotel
 	// public.GET("/hotel/ratings", hotelController.GetAllHotelRatings)
 	user.POST("/hotel-ratings", hotelRatingsController.CreateHotelRating)
+
 
 	// ADMIN
 
@@ -212,8 +225,16 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.POST("/hotel-room", hotelRoomController.CreateHotelRoom)
 	admin.DELETE("/hotel-room/:id", hotelRoomController.DeleteHotelRoom)
 
+
+	public.GET("/template-message", templateMessageController.GetAllTemplateMessages)
+	public.GET("/template-message/:id", templateMessageController.GetTemplateMessageByID)
+	public.PUT("/template-message/:id", templateMessageController.UpdateTemplateMessage)
+	public.POST("/template-message", templateMessageController.CreateTemplateMessage)
+	public.DELETE("/template-message/:id", templateMessageController.DeleteTemplateMessage)
+
 	// Hotel Ratings
 	// public.GET("/hotel/ratings", hotelRatingsController.GetAllHotelRatings)
 	admin.GET("/hotel-ratings/:id", hotelRatingsController.GetRatingsByHotelsId)
+
 
 }
