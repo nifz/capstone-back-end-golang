@@ -72,7 +72,7 @@ func (u *userUsecase) UserLogin(input dtos.UserLoginInput) (dtos.UserInformation
 		return userResponse, err
 	}
 
-	for i := 2; i <= 3; i++ {
+	for i := 1; i <= 2; i++ {
 		createNotification := models.Notification{
 			UserID:     user.ID,
 			TemplateID: uint(i),
