@@ -849,7 +849,7 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 		}
 
 		for _, ticketTravelerDetailDeparture := range ticketOrderInput.TicketTravelerDetailDeparture {
-			if ticketTravelerDetailDeparture.TrainID < 1 || ticketTravelerDetailDeparture.TrainCarriageID < 1 || ticketTravelerDetailDeparture.TrainSeatID < 1 || ticketTravelerDetailDeparture.StationOriginID < 1 || ticketTravelerDetailDeparture.StationDestinationID < 1 || ticketTravelerDetailDeparture.Date == "" {
+			if ticketTravelerDetailDeparture.TrainCarriageID < 1 || ticketTravelerDetailDeparture.TrainSeatID < 1 || ticketTravelerDetailDeparture.StationOriginID < 1 || ticketTravelerDetailDeparture.StationDestinationID < 1 || ticketTravelerDetailDeparture.Date == "" {
 				return ticketOrderResponse, errors.New("Failed to create ticket order")
 			}
 			dateDepartureParse, err := helpers.FormatStringToDate(ticketTravelerDetailDeparture.Date)
@@ -857,15 +857,16 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 				return ticketOrderResponse, errors.New("Failed to parsing date")
 			}
 
-			getTrain, err := u.trainRepo.GetTrainByID2(uint(ticketTravelerDetailDeparture.TrainID))
-			if err != nil {
-				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
-				return ticketOrderResponse, errors.New("Failed to get train id")
-			}
 			getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(uint(ticketTravelerDetailDeparture.TrainCarriageID))
 			if err != nil {
 				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 				return ticketOrderResponse, errors.New("Failed to get train carriage id")
+			}
+
+			getTrain, err := u.trainRepo.GetTrainByID2(uint(getTrainCarriage.TrainID))
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train id")
 			}
 
 			if travelerDetail.IDCardNumber != "" {
@@ -972,7 +973,7 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 
 		if createTicketOrder.WithReturn {
 			for _, ticketTravelerDetailReturn := range ticketOrderInput.TicketTravelerDetailReturn {
-				if ticketTravelerDetailReturn.TrainID < 1 || ticketTravelerDetailReturn.TrainCarriageID < 1 || ticketTravelerDetailReturn.TrainSeatID < 1 || ticketTravelerDetailReturn.StationOriginID < 1 || ticketTravelerDetailReturn.StationDestinationID < 1 || ticketTravelerDetailReturn.Date == "" {
+				if ticketTravelerDetailReturn.TrainCarriageID < 1 || ticketTravelerDetailReturn.TrainSeatID < 1 || ticketTravelerDetailReturn.StationOriginID < 1 || ticketTravelerDetailReturn.StationDestinationID < 1 || ticketTravelerDetailReturn.Date == "" {
 					return ticketOrderResponse, errors.New("Failed to create ticket order")
 				}
 				dateReturn, err := helpers.FormatStringToDate(ticketTravelerDetailReturn.Date)
@@ -980,15 +981,16 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 					return ticketOrderResponse, errors.New("Failed to parsing date")
 				}
 
-				getTrain, err := u.trainRepo.GetTrainByID2(uint(ticketTravelerDetailReturn.TrainID))
-				if err != nil {
-					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
-					return ticketOrderResponse, errors.New("Failed to get train id")
-				}
 				getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(uint(ticketTravelerDetailReturn.TrainCarriageID))
 				if err != nil {
 					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 					return ticketOrderResponse, errors.New("Failed to get train carriage id")
+				}
+
+				getTrain, err := u.trainRepo.GetTrainByID2(getTrainCarriage.TrainID)
+				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get train id")
 				}
 
 				if travelerDetail.IDCardNumber != "" {
