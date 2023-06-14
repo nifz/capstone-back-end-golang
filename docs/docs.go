@@ -5713,11 +5713,8 @@ const docTemplate = `{
                     "type": "string",
                     "example": "me@hanifz.com"
                 },
-                "hotel_id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "hotel_room_id": {
+                    "description": "HotelID          int                   ` + "`" + `form:\"hotel_id\" json:\"hotel_id\" example:\"1\"` + "`" + `",
                     "type": "integer",
                     "example": 1
                 },
@@ -6709,10 +6706,7 @@ const docTemplate = `{
                     "example": 1
                 },
                 "train_carriage_id": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "train_id": {
+                    "description": "TrainID              int    ` + "`" + `form:\"train_id\" json:\"train_id\" example:\"1\"` + "`" + `",
                     "type": "integer",
                     "example": 1
                 },

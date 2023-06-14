@@ -89,6 +89,10 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	hotelRoomUsecase := usecases.NewHotelRoomUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository)
 	hotelRoomController := controllers.NewHotelRoomController(hotelRoomUsecase)
 
+	hotelRatingsRepository := repositories.NewHotelRatingsRepository(db)
+	hotelRatingsUsecase := usecases.NewHotelRatingsUsecase(hotelRatingsRepository, hotelRepository, userRepository)
+	hotelRatingsController := controllers.NewHotelRatingsController(hotelRatingsUsecase)
+
 	hotelOrderRepository := repositories.NewHotelOrderRepository(db)
 	hotelOrderUsecase := usecases.NewHotelOrderUsecase(hotelOrderRepository, hotelRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository, travelerDetailRepository, paymentRepository, userRepository, notificationRepository)
 	hotelOrderController := controllers.NewHotelOrderController(hotelOrderUsecase)
@@ -100,6 +104,7 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	articleRepository := repositories.NewArticleRepository(db)
 	articleUsecase := usecases.NewArticleUsecase(articleRepository)
 	articleController := controllers.NewArticleController(articleUsecase)
+
 
 	// Middleware CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -147,7 +152,13 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.POST("/history-search", historySearchController.HistorySearchCreate)
 	user.DELETE("/history-search/:id", historySearchController.HistorySearchDelete)
 
+
 	user.GET("/notification/:id", notificationController.GetNotificationByUserID)
+  
+	// ratings hotel
+	// public.GET("/hotel/ratings", hotelController.GetAllHotelRatings)
+	user.POST("/hotel-ratings", hotelRatingsController.CreateHotelRating)
+
 
 	// ADMIN
 
@@ -214,9 +225,16 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.POST("/hotel-room", hotelRoomController.CreateHotelRoom)
 	admin.DELETE("/hotel-room/:id", hotelRoomController.DeleteHotelRoom)
 
+
 	public.GET("/template-message", templateMessageController.GetAllTemplateMessages)
 	public.GET("/template-message/:id", templateMessageController.GetTemplateMessageByID)
 	public.PUT("/template-message/:id", templateMessageController.UpdateTemplateMessage)
 	public.POST("/template-message", templateMessageController.CreateTemplateMessage)
 	public.DELETE("/template-message/:id", templateMessageController.DeleteTemplateMessage)
+
+	// Hotel Ratings
+	// public.GET("/hotel/ratings", hotelRatingsController.GetAllHotelRatings)
+	admin.GET("/hotel-ratings/:id", hotelRatingsController.GetRatingsByHotelsId)
+
+
 }
