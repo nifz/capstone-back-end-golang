@@ -441,10 +441,9 @@ definitions:
       email_order:
         example: me@hanifz.com
         type: string
-      hotel_id:
-        example: 1
-        type: integer
       hotel_room_id:
+        description: HotelID          int                   `form:"hotel_id" json:"hotel_id"
+          example:"1"`
         example: 1
         type: integer
       name_order:
@@ -1110,9 +1109,8 @@ definitions:
         example: 1
         type: integer
       train_carriage_id:
-        example: 1
-        type: integer
-      train_id:
+        description: TrainID              int    `form:"train_id" json:"train_id"
+          example:"1"`
         example: 1
         type: integer
       train_seat_id:

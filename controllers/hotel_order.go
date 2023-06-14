@@ -138,10 +138,10 @@ func (c *hotelOrderController) GetHotelOrdersByAdmin(ctx echo.Context) error {
 }
 
 func (c *hotelOrderController) GetHotelOrderDetailByAdmin(ctx echo.Context) error {
-	hotelIdParam := ctx.QueryParam("hotel_id")
-	hotelId, _ := strconv.Atoi(hotelIdParam)
+	hotelOrderIdParam := ctx.QueryParam("hotel_order_id")
+	hotelOrderId, _ := strconv.Atoi(hotelOrderIdParam)
 
-	hotelOrder, err := c.hotelOrderUsecase.GetHotelOrdersDetailByAdmin(uint(hotelId))
+	hotelOrder, err := c.hotelOrderUsecase.GetHotelOrdersDetailByAdmin(uint(hotelOrderId))
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
