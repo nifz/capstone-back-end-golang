@@ -65,9 +65,18 @@ func (c *ticketOrderController) GetTicketOrders(ctx echo.Context) error {
 		limit = 1000
 	}
 
+	// @Param search query string false "Search order"
+	// @Param class query string false "Filter by class train"
+	// @Param name query string false "Filter by name train"
+	// @Param order_by query string false "Filter order by"
+
+	searchParam := ctx.QueryParam("search")
+	classParam := ctx.QueryParam("class")
+	nameParam := ctx.QueryParam("name")
+	orderByParam := ctx.QueryParam("order_by")
 	statusParam := ctx.QueryParam("status")
 
-	ticketOrder, count, err := c.ticketOrderUsecase.GetTicketOrders(page, limit, userId, statusParam)
+	ticketOrder, count, err := c.ticketOrderUsecase.GetTicketOrders(page, limit, userId, searchParam, classParam, nameParam, orderByParam, statusParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,

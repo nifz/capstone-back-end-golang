@@ -503,6 +503,12 @@ definitions:
       hotel_order_id:
         example: 1
         type: integer
+      is_check_in:
+        example: false
+        type: boolean
+      is_check_out:
+        example: false
+        type: boolean
       name_order:
         example: Mochammad Hanif
         type: string
@@ -1731,7 +1737,7 @@ definitions:
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: localhost:8088
+host: api.tripease.my.id
 info:
   contact:
     name: Capstone Alterra Group 7
@@ -2243,7 +2249,7 @@ paths:
         in: query
         name: date_end
         type: string
-      - description: Order by name
+      - description: Filter order by
         in: query
         name: order_by
         type: string
@@ -4576,6 +4582,26 @@ paths:
         in: query
         name: limit
         type: integer
+      - description: Search order
+        in: query
+        name: search
+        type: string
+      - description: Filter by name hotel
+        in: query
+        name: name
+        type: string
+      - description: Filter by address hotel
+        in: query
+        name: address
+        type: string
+      - description: Filter by order date hotel
+        in: query
+        name: order_date
+        type: string
+      - description: Filter order by
+        in: query
+        name: order_by
+        type: string
       - description: Filter by status order
         in: query
         name: status
@@ -4623,6 +4649,14 @@ paths:
         name: hotel_order_id
         required: true
         type: integer
+      - description: Update status order check in
+        in: query
+        name: update_check_in
+        type: boolean
+      - description: Update status order check out
+        in: query
+        name: update_check_out
+        type: boolean
       produces:
       - application/json
       responses:
@@ -4669,6 +4703,22 @@ paths:
         in: query
         name: limit
         type: integer
+      - description: Search order
+        in: query
+        name: search
+        type: string
+      - description: Filter by class train
+        in: query
+        name: class
+        type: string
+      - description: Filter by name train
+        in: query
+        name: name
+        type: string
+      - description: Filter order by
+        in: query
+        name: order_by
+        type: string
       - description: Filter by status order
         in: query
         name: status

@@ -27,5 +27,7 @@ type HotelOrder struct {
 	PhoneNumberOrder string
 	SpecialRequest   string
 	HotelOrderCode   string
+	IsCheckIn        bool  `gorm:"default:false"`
+	IsCheckOut       bool  `gorm:"default:false"`
 	Status           string `gorm:"type:ENUM('unpaid', 'paid', 'done', 'canceled', 'refund')"`
 }
