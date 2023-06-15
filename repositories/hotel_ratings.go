@@ -12,6 +12,7 @@ type HotelRatingsRepository interface {
 	GetHotelRatingsByIdOrders(id uint) (models.HotelRating, error)
 	CheckExistHotelRating(order_id, user_id uint) (bool, error)
 	GetAllHotelRatingsByIdHotels(page, limit int, hotel_id uint) ([]models.HotelRating, int, error)
+	GetAllHotelRatingsByIdHotels2(hotel_id uint) ([]models.HotelRating, error)
 	// admin
 	GetHotelRatingsByHotelID(page, limit int, id uint, filter string) (map[int]int, []models.HotelRating, int, error)
 }
@@ -103,4 +104,13 @@ func (r *hotelRatingsRepository) GetAllHotelRatingsByIdHotels(page, limit int, h
 	err = r.db.Where("hotel_id = ?", hotel_id).Order("id DESC").Limit(limit).Offset(offset).Find(&hotelRatings).Error
 
 	return hotelRatings, int(count), err
+}
+func (r *hotelRatingsRepository) GetAllHotelRatingsByIdHotels2(hotel_id uint) ([]models.HotelRating, error) {
+	var (
+		hotelRatings []models.HotelRating
+	)
+
+	err := r.db.Where("hotel_id = ?", hotel_id).Order("id DESC").Limit(10).Find(&hotelRatings).Error
+
+	return hotelRatings, err
 }
