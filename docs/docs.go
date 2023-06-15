@@ -4230,6 +4230,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/notification/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get notification by user id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user - Hotel"
+                ],
+                "summary": "Get notification by user id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetNotificationByUserIDStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/order/hotel": {
             "get": {
                 "security": [
@@ -5324,6 +5391,22 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.GetNotificationByUserIDStatusOKResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.NotificationResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get notification"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
         "dtos.HistorySearchCreeatedResponse": {
             "type": "object",
             "properties": {
@@ -5630,11 +5713,8 @@ const docTemplate = `{
                     "type": "string",
                     "example": "me@hanifz.com"
                 },
-                "hotel_id": {
-                    "type": "integer",
-                    "example": 1
-                },
                 "hotel_room_id": {
+                    "description": "HotelID          int                   ` + "`" + `form:\"hotel_id\" json:\"hotel_id\" example:\"1\"` + "`" + `",
                     "type": "integer",
                     "example": 1
                 },
@@ -6191,6 +6271,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.NotificationResponse": {
+            "type": "object",
+            "properties": {
+                "notification_content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.TemplateMessageByUserIDResponse"
+                    }
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.PaymentCreeatedResponse": {
             "type": "object",
             "properties": {
@@ -6432,6 +6526,25 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.TemplateMessageByUserIDResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
         "dtos.TicketOrderCreeatedResponse": {
             "type": "object",
             "properties": {
@@ -6593,10 +6706,7 @@ const docTemplate = `{
                     "example": 1
                 },
                 "train_carriage_id": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "train_id": {
+                    "description": "TrainID              int    ` + "`" + `form:\"train_id\" json:\"train_id\" example:\"1\"` + "`" + `",
                     "type": "integer",
                     "example": 1
                 },
@@ -7359,7 +7469,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "capstone.hanifz.com",
+	Host:             "localhost:8088",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Tripease API Documentation",
