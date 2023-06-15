@@ -3973,6 +3973,75 @@
                 }
             }
         },
+        "/user/hotel-rating": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new hotel rating",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Hotel Rating"
+                ],
+                "summary": "Create a new hotel rating",
+                "parameters": [
+                    {
+                        "description": "Payload Body [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelRatingInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelRatingCreeatedResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/hotel/order": {
             "post": {
                 "security": [
@@ -4237,7 +4306,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "user - Hotel"
+                    "user - Notification"
                 ],
                 "summary": "Get notification by user id",
                 "parameters": [
@@ -5493,6 +5562,12 @@
                 "hotel_policy": {
                     "$ref": "#/definitions/dtos.HotelPoliciesResponse"
                 },
+                "hotel_rating": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.RatingInfo"
+                    }
+                },
                 "hotel_room": {
                     "type": "array",
                     "items": {
@@ -5927,6 +6002,62 @@
                 },
                 "time_check_out": {
                     "type": "string"
+                }
+            }
+        },
+        "dtos.HotelRatingCreeatedResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelRatingResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully created hotel rating"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 201
+                }
+            }
+        },
+        "dtos.HotelRatingInput": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_order_id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "review": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.HotelRatingResponse": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_order_id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "review": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -6380,6 +6511,30 @@
                 "status_code": {
                     "type": "integer",
                     "example": 200
+                }
+            }
+        },
+        "dtos.RatingInfo": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "format": "2006-01-02 15:04:05"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "review": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "user_image": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },

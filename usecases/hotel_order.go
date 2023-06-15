@@ -35,10 +35,11 @@ type hotelOrderUsecase struct {
 	paymentRepo             repositories.PaymentRepository
 	userRepo                repositories.UserRepository
 	notificationRepo        repositories.NotificationRepository
+	hotelRatingRepo         repositories.HotelRatingsRepository
 }
 
-func NewHotelOrderUsecase(hotelOrderRepo repositories.HotelOrderRepository, hotelRepo repositories.HotelRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, travelerDetailRepo repositories.TravelerDetailRepository, paymentRepo repositories.PaymentRepository, userRepo repositories.UserRepository, notificationRepo repositories.NotificationRepository) HotelOrderUsecase {
-	return &hotelOrderUsecase{hotelOrderRepo, hotelRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, travelerDetailRepo, paymentRepo, userRepo, notificationRepo}
+func NewHotelOrderUsecase(hotelOrderRepo repositories.HotelOrderRepository, hotelRepo repositories.HotelRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, travelerDetailRepo repositories.TravelerDetailRepository, paymentRepo repositories.PaymentRepository, userRepo repositories.UserRepository, notificationRepo repositories.NotificationRepository, hotelRatingRepo repositories.HotelRatingsRepository) HotelOrderUsecase {
+	return &hotelOrderUsecase{hotelOrderRepo, hotelRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, travelerDetailRepo, paymentRepo, userRepo, notificationRepo, hotelRatingRepo}
 }
 
 // GetHotelOrders godoc
@@ -1164,6 +1165,23 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 		createNotification := models.Notification{
 			UserID:     userID,
 			TemplateID: 8,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return hotelOrderResponses, err
+		}
+	}
+
+	checkExistHotelRating, err := u.hotelRatingRepo.CheckExistHotelRating(hotelOrder.ID, hotelOrder.UserID)
+	if err == nil {
+		return hotelOrderResponses, err
+	}
+
+	if hotelOrder.ID > 0 && hotelOrder.Status == "done" && checkExistHotelRating == false {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 6,
 		}
 
 		_, err = u.notificationRepo.CreateNotification(createNotification)

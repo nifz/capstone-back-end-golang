@@ -29,10 +29,12 @@ type hotelUsecase struct {
 	hotelFacilitiesRepo     repositories.HotelFacilitiesRepository
 	hotelPoliciesRepo       repositories.HotelPoliciesRepository
 	historySearchRepo       repositories.HistorySearchRepository
+	hotelRatingRepo         repositories.HotelRatingsRepository
+	userRepo                repositories.UserRepository
 }
 
-func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository, historySearchRepo repositories.HistorySearchRepository) HotelUsecase {
-	return &hotelUsecase{hotelRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo, historySearchRepo}
+func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository, historySearchRepo repositories.HistorySearchRepository, hotelRatingRepo repositories.HotelRatingsRepository, userRepo repositories.UserRepository) HotelUsecase {
+	return &hotelUsecase{hotelRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo, historySearchRepo, hotelRatingRepo, userRepo}
 }
 
 // =============================== ADMIN ================================== \\
@@ -288,6 +290,30 @@ func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelByIDResponse, error) {
 		IsPet:              getPolicy.IsPet,
 	}
 
+	var hotelRatingsResponse []dtos.RatingInfo
+
+	hotelRatings, err := u.hotelRatingRepo.GetAllHotelRatingsByIdHotels2(id)
+	if err != nil {
+		return hotelResponses, errors.New("Hotel ID is not found")
+	}
+
+	for _, rating := range hotelRatings {
+		userDetail, err := u.userRepo.UserGetById2(rating.UserID)
+		if err != nil {
+			return hotelResponses, errors.New("User ID is not valid")
+		}
+
+		ratingInfo := dtos.RatingInfo{
+			UserID:    rating.UserID,
+			Username:  userDetail.FullName,
+			UserImage: userDetail.ProfilePicture,
+			Rating:    rating.Rating,
+			Review:    rating.Review,
+			CreatedAt: rating.CreatedAt,
+		}
+		hotelRatingsResponse = append(hotelRatingsResponse, ratingInfo)
+	}
+
 	hotelResponse := dtos.HotelByIDResponse{
 		HotelID:         hotel.ID,
 		Name:            hotel.Name,
@@ -300,6 +326,7 @@ func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelByIDResponse, error) {
 		HotelImage:      hotelImageResponses,
 		HotelFacilities: hotelFacilitiesResponses,
 		HotelPolicy:     hotelPoliciesResponses,
+		HotelRating:     hotelRatingsResponse,
 		CreatedAt:       hotel.CreatedAt,
 		UpdatedAt:       hotel.UpdatedAt,
 	}

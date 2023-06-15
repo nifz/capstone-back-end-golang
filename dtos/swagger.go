@@ -319,3 +319,9 @@ type GetNotificationByUserIDStatusOKResponses struct {
 	Message    string               `json:"message" example:"Successfully get notification"`
 	Data       NotificationResponse `json:"data"`
 }
+
+type HotelRatingCreeatedResponses struct {
+	StatusCode int                 `json:"status_code" example:"201"`
+	Message    string              `json:"message" example:"Successfully created hotel rating"`
+	Data       HotelRatingResponse `json:"data"`
+}

@@ -310,6 +310,10 @@ definitions:
         type: array
       hotel_policy:
         $ref: '#/definitions/dtos.HotelPoliciesResponse'
+      hotel_rating:
+        items:
+          $ref: '#/definitions/dtos.RatingInfo'
+        type: array
       hotel_room:
         items:
           $ref: '#/definitions/dtos.HotelRoomHotelIDResponse'
@@ -609,6 +613,43 @@ definitions:
         type: string
       time_check_out:
         type: string
+    type: object
+  dtos.HotelRatingCreeatedResponses:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.HotelRatingResponse'
+      message:
+        example: Successfully created hotel rating
+        type: string
+      status_code:
+        example: 201
+        type: integer
+    type: object
+  dtos.HotelRatingInput:
+    properties:
+      hotel_id:
+        type: integer
+      hotel_order_id:
+        type: integer
+      rating:
+        type: integer
+      review:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dtos.HotelRatingResponse:
+    properties:
+      hotel_id:
+        type: integer
+      hotel_order_id:
+        type: integer
+      rating:
+        type: integer
+      review:
+        type: string
+      user_id:
+        type: integer
     type: object
   dtos.HotelResponse:
     properties:
@@ -917,6 +958,22 @@ definitions:
       status_code:
         example: 200
         type: integer
+    type: object
+  dtos.RatingInfo:
+    properties:
+      created_at:
+        format: "2006-01-02 15:04:05"
+        type: string
+      rating:
+        type: integer
+      review:
+        type: string
+      user_id:
+        type: integer
+      user_image:
+        type: string
+      username:
+        type: string
     type: object
   dtos.StationCreeatedResponse:
     properties:
@@ -4257,6 +4314,50 @@ paths:
       summary: Delete a history search
       tags:
       - User - History Search
+  /user/hotel-rating:
+    post:
+      consumes:
+      - application/json
+      description: Create a new hotel rating
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.HotelRatingInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.HotelRatingCreeatedResponses'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new hotel rating
+      tags:
+      - User - Hotel Rating
   /user/hotel/order:
     patch:
       consumes:
@@ -4460,7 +4561,7 @@ paths:
       - BearerAuth: []
       summary: Get notification by user id
       tags:
-      - user - Hotel
+      - user - Notification
   /user/order/hotel:
     get:
       consumes:

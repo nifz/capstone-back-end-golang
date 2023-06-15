@@ -21,19 +21,36 @@ type hotelRatingsUsecase struct {
 	hotelRepository        repositories.HotelRepository
 	userRepository         repositories.UserRepository
 	hotelOrderRepository   repositories.HotelOrderRepository
+	notificationRepository repositories.NotificationRepository
 }
 
-func NewHotelRatingsUsecase(hotelRatingsRepository repositories.HotelRatingsRepository, hotelRepository repositories.HotelRepository, userRepository repositories.UserRepository, hotelOrderRepository repositories.HotelOrderRepository) HotelRatingsUsecase {
+func NewHotelRatingsUsecase(hotelRatingsRepository repositories.HotelRatingsRepository, hotelRepository repositories.HotelRepository, userRepository repositories.UserRepository, hotelOrderRepository repositories.HotelOrderRepository, notificationRepository repositories.NotificationRepository) HotelRatingsUsecase {
 	return &hotelRatingsUsecase{
 		hotelRatingsRepository,
 		hotelRepository,
 		userRepository,
 		hotelOrderRepository,
+		notificationRepository,
 	}
 }
 
 // Implementasi fungsi-fungsi dari interface ItemUsecase
 
+// CreateHotelRating godoc
+// @Summary      Create a new hotel rating
+// @Description  Create a new hotel rating
+// @Tags         User - Hotel Rating
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.HotelRatingInput true "Payload Body [RAW]"
+// @Success      201 {object} dtos.HotelRatingCreeatedResponses
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user/hotel-rating [post]
+// @Security BearerAuth
 func (u *hotelRatingsUsecase) CreateHotelRating(hotelRatingInput dtos.HotelRatingInput) (dtos.HotelRatingResponse, error) {
 	var hotelRatingResponse dtos.HotelRatingResponse
 
@@ -77,6 +94,18 @@ func (u *hotelRatingsUsecase) CreateHotelRating(hotelRatingInput dtos.HotelRatin
 	createdRating, err := u.hotelRatingsRepository.CreateHotelRating(hotelRating)
 	if err != nil {
 		return hotelRatingResponse, err
+	}
+
+	if createdRating.ID > 0 {
+		createNotification := models.Notification{
+			UserID:     createdRating.UserID,
+			TemplateID: 5,
+		}
+
+		_, err = u.notificationRepository.CreateNotification(createNotification)
+		if err != nil {
+			return hotelRatingResponse, err
+		}
 	}
 
 	// Fill the response with the created rating
