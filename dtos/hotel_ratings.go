@@ -1,17 +1,21 @@
 package dtos
 
+import "time"
+
 type HotelRatingInput struct {
-	HotelID uint   `form:"hotel_id" json:"hotel_id"`
-	UserID  uint   `form:"user_id" json:"user_id"`
-	Rating  int    `form:"rating" json:"rating"`
-	Review  string `form:"review" json:"review"`
+	HotelOrderID uint   `form:"hotel_order_id" json:"hotel_order_id"`
+	HotelID      uint   `form:"hotel_id" json:"hotel_id"`
+	UserID       uint   `form:"user_id" json:"user_id"`
+	Rating       int    `form:"rating" json:"rating"`
+	Review       string `form:"review" json:"review"`
 }
 
 type HotelRatingResponse struct {
-	HotelID uint   `form:"hotel_id" json:"hotel_id"`
-	UserID  uint   `form:"user_id" json:"user_id"`
-	Rating  int    `form:"rating" json:"rating"`
-	Review  string `form:"review" json:"review"`
+	HotelOrderID uint   `form:"hotel_order_id" json:"hotel_order_id"`
+	HotelID      uint   `form:"hotel_id" json:"hotel_id"`
+	UserID       uint   `form:"user_id" json:"user_id"`
+	Rating       int    `form:"rating" json:"rating"`
+	Review       string `form:"review" json:"review"`
 }
 
 type HotelRatingsByIdHotels struct {
@@ -28,9 +32,10 @@ type HotelRatingsByIdHotels struct {
 }
 
 type RatingInfo struct {
-	UserID    uint   `json:"user_id"`
-	Username  string `json:"username"`
-	UserImage string `json:"user_image"`
-	Rating    int    `json:"rating"`
-	Review    string `json:"review"`
+	UserID    uint      `json:"user_id"`
+	Username  string    `json:"username"`
+	UserImage string    `json:"user_image"`
+	Rating    int       `json:"rating"`
+	Review    string    `json:"review"`
+	CreatedAt time.Time `json:"created_at" format:"2006-01-02 15:04:05"`
 }

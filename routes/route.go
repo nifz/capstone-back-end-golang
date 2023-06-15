@@ -89,13 +89,13 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	hotelRoomUsecase := usecases.NewHotelRoomUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository)
 	hotelRoomController := controllers.NewHotelRoomController(hotelRoomUsecase)
 
-	hotelRatingsRepository := repositories.NewHotelRatingsRepository(db)
-	hotelRatingsUsecase := usecases.NewHotelRatingsUsecase(hotelRatingsRepository, hotelRepository, userRepository)
-	hotelRatingsController := controllers.NewHotelRatingsController(hotelRatingsUsecase)
-
 	hotelOrderRepository := repositories.NewHotelOrderRepository(db)
 	hotelOrderUsecase := usecases.NewHotelOrderUsecase(hotelOrderRepository, hotelRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository, travelerDetailRepository, paymentRepository, userRepository, notificationRepository)
 	hotelOrderController := controllers.NewHotelOrderController(hotelOrderUsecase)
+
+	hotelRatingsRepository := repositories.NewHotelRatingsRepository(db)
+	hotelRatingsUsecase := usecases.NewHotelRatingsUsecase(hotelRatingsRepository, hotelRepository, userRepository, hotelOrderRepository)
+	hotelRatingsController := controllers.NewHotelRatingsController(hotelRatingsUsecase)
 
 	dashboardRepository := repositories.NewDashboardRepository(db)
 	dashboardUsecase := usecases.NewDashboardUsecase(dashboardRepository, userRepository, ticketOrderRepository, ticketTravelerDetailRepository, travelerDetailRepository, trainCarriageRepository, trainRepository, trainSeatRepository, stationRepository, trainStationRepository, paymentRepository)
@@ -104,7 +104,6 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	articleRepository := repositories.NewArticleRepository(db)
 	articleUsecase := usecases.NewArticleUsecase(articleRepository)
 	articleController := controllers.NewArticleController(articleUsecase)
-
 
 	// Middleware CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -158,10 +157,11 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	// ratings hotel
 	// public.GET("/hotel/ratings", hotelController.GetAllHotelRatings)
 	user.POST("/hotel-ratings", hotelRatingsController.CreateHotelRating)
+	user.GET("/hotel-ratings-order/:id", hotelRatingsController.GetHotelRatingsByIdOrders)
+	user.GET("/hotel-ratings-all/:id", hotelRatingsController.GetAllHotelRatingsByIdHotels)
 
 
 	// ADMIN
-
 	admin := api.Group("/admin")
 	admin.Use(middlewares.JWTMiddleware, middlewares.RoleMiddleware("admin"))
 
