@@ -1151,7 +1151,7 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 	if hotelOrder.ID > 0 && hotelOrder.Status == "paid" {
 		createNotification := models.Notification{
 			UserID:     userID,
-			TemplateID: 4,
+			TemplateID: 5,
 		}
 
 		_, err = u.notificationRepo.CreateNotification(createNotification)
