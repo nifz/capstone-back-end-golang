@@ -32,10 +32,11 @@ type ticketOrderUsecase struct {
 	trainStationRepo         repositories.TrainStationRepository
 	paymentRepo              repositories.PaymentRepository
 	userRepo                 repositories.UserRepository
+	notificationRepo         repositories.NotificationRepository
 }
 
-func NewTicketOrderUsecase(ticketOrderRepo repositories.TicketOrderRepository, ticketTravelerDetailRepo repositories.TicketTravelerDetailRepository, travelerDetailRepo repositories.TravelerDetailRepository, trainCarriageRepo repositories.TrainCarriageRepository, trainRepo repositories.TrainRepository, trainSeatRepo repositories.TrainSeatRepository, stationRepo repositories.StationRepository, trainStationRepo repositories.TrainStationRepository, paymentRepo repositories.PaymentRepository, userRepo repositories.UserRepository) TicketOrderUsecase {
-	return &ticketOrderUsecase{ticketOrderRepo, ticketTravelerDetailRepo, travelerDetailRepo, trainCarriageRepo, trainRepo, trainSeatRepo, stationRepo, trainStationRepo, paymentRepo, userRepo}
+func NewTicketOrderUsecase(ticketOrderRepo repositories.TicketOrderRepository, ticketTravelerDetailRepo repositories.TicketTravelerDetailRepository, travelerDetailRepo repositories.TravelerDetailRepository, trainCarriageRepo repositories.TrainCarriageRepository, trainRepo repositories.TrainRepository, trainSeatRepo repositories.TrainSeatRepository, stationRepo repositories.StationRepository, trainStationRepo repositories.TrainStationRepository, paymentRepo repositories.PaymentRepository, userRepo repositories.UserRepository, notificationRepo repositories.NotificationRepository) TicketOrderUsecase {
+	return &ticketOrderUsecase{ticketOrderRepo, ticketTravelerDetailRepo, travelerDetailRepo, trainCarriageRepo, trainRepo, trainSeatRepo, stationRepo, trainStationRepo, paymentRepo, userRepo, notificationRepo}
 }
 
 // GetTicketOrders godoc
@@ -830,6 +831,18 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 		return ticketOrderResponse, err
 	}
 
+	if createTicketOrder.ID > 0 && createTicketOrder.Status == "unpaid" {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 7,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return ticketOrderResponse, err
+		}
+	}
+
 	var ticketTravelerDetailDepartureResponses []dtos.TicketTravelerDetailResponse
 
 	for _, travelerDetail := range ticketOrderInput.TravelerDetail {
@@ -1167,6 +1180,30 @@ func (u *ticketOrderUsecase) UpdateTicketOrder(userID, ticketOrderID uint, statu
 	createTicketOrder, err = u.ticketOrderRepo.UpdateTicketOrder(createTicketOrder)
 	if err != nil {
 		return ticketOrderResponse, err
+	}
+
+	if createTicketOrder.ID > 0 && createTicketOrder.Status == "paid" {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 4,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return ticketOrderResponse, err
+		}
+	}
+
+	if createTicketOrder.ID > 0 && createTicketOrder.Status == "canceled" {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 8,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return ticketOrderResponse, err
+		}
 	}
 
 	getTicketTravelerDetail, err := u.ticketTravelerDetailRepo.GetTicketTravelerDetailByTicketOrderID(createTicketOrder.ID)

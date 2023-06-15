@@ -34,10 +34,11 @@ type hotelOrderUsecase struct {
 	travelerDetailRepo      repositories.TravelerDetailRepository
 	paymentRepo             repositories.PaymentRepository
 	userRepo                repositories.UserRepository
+	notificationRepo        repositories.NotificationRepository
 }
 
-func NewHotelOrderUsecase(hotelOrderRepo repositories.HotelOrderRepository, hotelRepo repositories.HotelRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, travelerDetailRepo repositories.TravelerDetailRepository, paymentRepo repositories.PaymentRepository, userRepo repositories.UserRepository) HotelOrderUsecase {
-	return &hotelOrderUsecase{hotelOrderRepo, hotelRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, travelerDetailRepo, paymentRepo, userRepo}
+func NewHotelOrderUsecase(hotelOrderRepo repositories.HotelOrderRepository, hotelRepo repositories.HotelRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, travelerDetailRepo repositories.TravelerDetailRepository, paymentRepo repositories.PaymentRepository, userRepo repositories.UserRepository, notificationRepo repositories.NotificationRepository) HotelOrderUsecase {
+	return &hotelOrderUsecase{hotelOrderRepo, hotelRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, travelerDetailRepo, paymentRepo, userRepo, notificationRepo}
 }
 
 // GetHotelOrders godoc
@@ -931,6 +932,18 @@ func (u *hotelOrderUsecase) CreateHotelOrder(userID uint, hotelOrderInput dtos.H
 		return hotelOrderResponse, err
 	}
 
+	if createHotelOrder.ID > 0 && createHotelOrder.Status == "unpaid" {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 7,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return hotelOrderResponse, err
+		}
+	}
+
 	var travelerDetailResponses []dtos.TravelerDetailResponse
 	for _, travelerDetail := range hotelOrderInput.TravelerDetail {
 		travelerDetailResponse := models.TravelerDetail{
@@ -1133,6 +1146,30 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 	hotelOrder, err = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
 	if err != nil {
 		return hotelOrderResponses, err
+	}
+
+	if hotelOrder.ID > 0 && hotelOrder.Status == "paid" {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 5,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return hotelOrderResponses, err
+		}
+	}
+
+	if hotelOrder.ID > 0 && hotelOrder.Status == "canceled" {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 8,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return hotelOrderResponses, err
+		}
 	}
 
 	getHotel, err := u.hotelRepo.GetHotelByID(hotelOrder.HotelID)
