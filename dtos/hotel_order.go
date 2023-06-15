@@ -31,6 +31,8 @@ type HotelOrderResponse struct {
 	PhoneNumberOrder string                   `json:"phone_number_order" example:"085115151515"`
 	SpecialRequest   string                   `json:"special_request" example:"Minta 1 Bed"`
 	HotelOrderCode   string                   `json:"ticket_order_code" example:"RANDOMCODE123"`
+	IsCheckIn        bool                     `json:"is_check_in" example:"false"`
+	IsCheckOut       bool                     `json:"is_check_out" example:"false"`
 	Status           string                   `json:"status" example:"unpaid"`
 	Hotel            HotelByIDResponses       `json:"hotel"`
 	Payment          PaymentResponses         `json:"payment,omitempty"`

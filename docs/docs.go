@@ -807,7 +807,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Order by name",
+                        "description": "Filter order by",
                         "name": "order_by",
                         "in": "query"
                     },
@@ -4330,6 +4330,36 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "Search order",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by name hotel",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by address hotel",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by order date hotel",
+                        "name": "order_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter order by",
+                        "name": "order_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Filter by status order",
                         "name": "status",
                         "in": "query"
@@ -4400,6 +4430,18 @@ const docTemplate = `{
                         "name": "hotel_order_id",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Update status order check in",
+                        "name": "update_check_in",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Update status order check out",
+                        "name": "update_check_out",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -4471,6 +4513,30 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Number of items per page",
                         "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search order",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by class train",
+                        "name": "class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by name train",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter order by",
+                        "name": "order_by",
                         "in": "query"
                     },
                     {
@@ -5775,6 +5841,14 @@ const docTemplate = `{
                 "hotel_order_id": {
                     "type": "integer",
                     "example": 1
+                },
+                "is_check_in": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "is_check_out": {
+                    "type": "boolean",
+                    "example": false
                 },
                 "name_order": {
                     "type": "string",
@@ -7469,7 +7543,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8088",
+	Host:             "api.tripease.my.id",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Tripease API Documentation",
