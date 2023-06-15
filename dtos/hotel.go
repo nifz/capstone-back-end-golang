@@ -41,6 +41,7 @@ type HotelByIDResponse struct {
 	HotelFacilities []HotelFacilitiesResponse  `form:"hotel_facilities" json:"hotel_facilities"`
 	HotelPolicy     HotelPoliciesResponse      `form:"hotel_policy" json:"hotel_policy"`
 	HotelRoom       []HotelRoomHotelIDResponse `form:"hotel_room" json:"hotel_room"`
+	HotelRating     []RatingInfo               `form:"hotel_rating" json:"hotel_rating"`
 	CreatedAt       time.Time                  `json:"created_at" example:"2023-05-17T15:07:16.504+07:00"`
 	UpdatedAt       time.Time                  `json:"updated_at" example:"2023-05-17T15:07:16.504+07:00"`
 }

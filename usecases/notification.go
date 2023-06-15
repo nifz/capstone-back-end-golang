@@ -24,7 +24,7 @@ func NewNotificationUsecase(notificationRepo repositories.NotificationRepository
 // GetNotificationByUserID godoc
 // @Summary      Get notification by user id
 // @Description  Get notification by user id
-// @Tags         user - Hotel
+// @Tags         user - Notification
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "user id"
