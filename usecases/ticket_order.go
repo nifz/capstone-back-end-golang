@@ -13,7 +13,7 @@ import (
 )
 
 type TicketOrderUsecase interface {
-	GetTicketOrders(page, limit int, userID uint, status string) ([]dtos.TicketTravelerDetailOrderResponse, int, error)
+	GetTicketOrders(page, limit int, userID uint, search, class, name, orderBy, status string) ([]dtos.TicketTravelerDetailOrderResponse, int, error)
 	GetTicketOrdersByAdmin(page, limit int, search, dateStart, dateEnd, orderBy, filter string) ([]dtos.TicketTravelerDetailOrderResponse, int, error)
 	GetTicketOrdersDetailByAdmin(ticketOrderId, trainId uint) (dtos.TicketTravelerDetailOrderResponse, error)
 	GetTicketOrderByID(userID, ticketTravelerDetailId, ticketOrderId uint) (dtos.TicketTravelerDetailOrderResponse, error)
@@ -47,6 +47,10 @@ func NewTicketOrderUsecase(ticketOrderRepo repositories.TicketOrderRepository, t
 // @Produce      json
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
+// @Param search query string false "Search order"
+// @Param class query string false "Filter by class train"
+// @Param name query string false "Filter by name train"
+// @Param order_by query string false "Filter order by"
 // @Param status query string false "Filter by status order"
 // @Success      200 {object} dtos.GetAllTicketTravelerDetailOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
@@ -56,7 +60,7 @@ func NewTicketOrderUsecase(ticketOrderRepo repositories.TicketOrderRepository, t
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/order/ticket [get]
 // @Security BearerAuth
-func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, status string) ([]dtos.TicketTravelerDetailOrderResponse, int, error) {
+func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, search, class, name, orderBy, status string) ([]dtos.TicketTravelerDetailOrderResponse, int, error) {
 	var ticketTravelerDetailResponses []dtos.TicketTravelerDetailOrderResponse
 
 	ticketTravelerDetail, _, err := u.ticketTravelerDetailRepo.GetAllTicketTravelerDetails()
@@ -114,6 +118,24 @@ func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, statu
 		getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByTicketOrderID2(ticketTravelerDetail.TicketOrderID)
 		if err != nil {
 			return ticketTravelerDetailResponses, 0, err
+		}
+
+		// Check if the search query matches the hotel name, address
+		if search != "" &&
+			!strings.Contains(strings.ToLower(ticketTravelerDetail.BoardingTicketCode), strings.ToLower(search)) &&
+			!strings.Contains(strings.ToLower(getStationOrigin.Name), strings.ToLower(search)) &&
+			!strings.Contains(strings.ToLower(getStationOrigin.Origin), strings.ToLower(search)) &&
+			!strings.Contains(strings.ToLower(getStationDestination.Origin), strings.ToLower(search)) &&
+			!strings.Contains(strings.ToLower(getStationDestination.Name), strings.ToLower(search)) {
+			continue // Skip hotel order if it doesn't match the search query
+		}
+
+		// Apply filters based on nameHotel, addressHotel, orderDateHotel
+		if class != "" && !strings.Contains(strings.ToLower(getTrainCarriage.Class), strings.ToLower(class)) {
+			continue
+		}
+		if name != "" && !strings.Contains(strings.ToLower(getTrain.Name), strings.ToLower(name)) {
+			continue
 		}
 
 		var travelerDetailResponses []dtos.TravelerDetailResponse
@@ -188,6 +210,29 @@ func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, statu
 		ticketTravelerDetailResponses = append(ticketTravelerDetailResponses, ticketTravelerDetailResponse)
 	}
 
+	// Sort ticketTravelerDetailResponses based on the orderBy parameter
+	switch orderBy {
+	case "higher_price":
+		// Sort ticketTravelerDetailResponses by descending order of Price
+		sort.SliceStable(ticketTravelerDetailResponses, func(i, j int) bool {
+			return ticketTravelerDetailResponses[i].Train.TrainPrice > ticketTravelerDetailResponses[j].Train.TrainPrice
+		})
+	case "lower_price":
+		// Sort ticketTravelerDetailResponses by ascending order of Train.TrainPrice
+		sort.SliceStable(ticketTravelerDetailResponses, func(i, j int) bool {
+			return ticketTravelerDetailResponses[i].Train.TrainPrice < ticketTravelerDetailResponses[j].Train.TrainPrice
+		})
+	case "last_departure":
+		// Sort ticketTravelerDetailResponses by descending order of Last Departure
+		sort.SliceStable(ticketTravelerDetailResponses, func(i, j int) bool {
+			return ticketTravelerDetailResponses[i].StationOrigin.ArriveTime > ticketTravelerDetailResponses[j].StationOrigin.ArriveTime
+		})
+	case "early_departure":
+		// Sort ticketTravelerDetailResponses by ascending order of Early Departure
+		sort.SliceStable(ticketTravelerDetailResponses, func(i, j int) bool {
+			return ticketTravelerDetailResponses[i].StationOrigin.ArriveTime < ticketTravelerDetailResponses[j].StationOrigin.ArriveTime
+		})
+	}
 	// Apply offset and limit to ticketTravelerDetailResponses
 	start := (page - 1) * limit
 	end := start + limit

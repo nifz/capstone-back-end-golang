@@ -151,15 +151,13 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.POST("/history-search", historySearchController.HistorySearchCreate)
 	user.DELETE("/history-search/:id", historySearchController.HistorySearchDelete)
 
-
 	user.GET("/notification/:id", notificationController.GetNotificationByUserID)
-  
+
 	// ratings hotel
 	// public.GET("/hotel/ratings", hotelController.GetAllHotelRatings)
 	user.POST("/hotel-ratings", hotelRatingsController.CreateHotelRating)
 	user.GET("/hotel-ratings-order/:id", hotelRatingsController.GetHotelRatingsByIdOrders)
 	user.GET("/hotel-ratings-all/:id", hotelRatingsController.GetAllHotelRatingsByIdHotels)
-
 
 	// ADMIN
 	admin := api.Group("/admin")
@@ -225,7 +223,6 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	admin.POST("/hotel-room", hotelRoomController.CreateHotelRoom)
 	admin.DELETE("/hotel-room/:id", hotelRoomController.DeleteHotelRoom)
 
-
 	public.GET("/template-message", templateMessageController.GetAllTemplateMessages)
 	public.GET("/template-message/:id", templateMessageController.GetTemplateMessageByID)
 	public.PUT("/template-message/:id", templateMessageController.UpdateTemplateMessage)
@@ -235,6 +232,5 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	// Hotel Ratings
 	// public.GET("/hotel/ratings", hotelRatingsController.GetAllHotelRatings)
 	admin.GET("/hotel-ratings/:id", hotelRatingsController.GetRatingsByHotelsId)
-
 
 }

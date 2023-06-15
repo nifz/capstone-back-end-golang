@@ -65,9 +65,14 @@ func (c *hotelOrderController) GetHotelOrders(ctx echo.Context) error {
 		limit = 1000
 	}
 
+	searchParam := ctx.QueryParam("search")
+	nameParam := ctx.QueryParam("name")
+	addressParam := ctx.QueryParam("address")
+	orderDateParam := ctx.QueryParam("order_date")
+	sortParam := ctx.QueryParam("order_by")
 	statusParam := ctx.QueryParam("status")
 
-	hotelOrder, count, err := c.hotelOrderUsecase.GetHotelOrders(page, limit, userId, statusParam)
+	hotelOrder, count, err := c.hotelOrderUsecase.GetHotelOrders(page, limit, userId, searchParam, nameParam, addressParam, orderDateParam, sortParam, statusParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
@@ -191,7 +196,13 @@ func (c *hotelOrderController) GetHotelOrderByID(ctx echo.Context) error {
 	hotelOrderIdParam := ctx.QueryParam("hotel_order_id")
 	hotelOrderId, _ := strconv.Atoi(hotelOrderIdParam)
 
-	hotelOrder, err := c.hotelOrderUsecase.GetHotelOrderByID(userId, uint(hotelOrderId))
+	isCheckInParam := ctx.QueryParam("update_check_in")
+	isCheckIn, _ := strconv.ParseBool(isCheckInParam)
+
+	isCheckOutParam := ctx.QueryParam("update_check_out")
+	isCheckOut, _ := strconv.ParseBool(isCheckOutParam)
+
+	hotelOrder, err := c.hotelOrderUsecase.GetHotelOrderByID(userId, uint(hotelOrderId), isCheckIn, isCheckOut)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,

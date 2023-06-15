@@ -14,10 +14,10 @@ import (
 )
 
 type HotelOrderUsecase interface {
-	GetHotelOrders(page, limit int, userID uint, status string) ([]dtos.HotelOrderResponse, int, error)
+	GetHotelOrders(page, limit int, userID uint, search, nameHotel, addressHotel, orderDateHotel, sort, status string) ([]dtos.HotelOrderResponse, int, error)
 	GetHotelOrdersByAdmin(page, limit, ratingClass int, search, dateStart, dateEnd, orderBy, status string) ([]dtos.HotelOrderResponse, int, error)
 	GetHotelOrdersDetailByAdmin(hotelOrderId uint) (dtos.HotelOrderResponse, error)
-	GetHotelOrderByID(userID, hotelOrderId uint) (dtos.HotelOrderResponse, error)
+	GetHotelOrderByID(userID, hotelOrderId uint, isCheckIn, isCheckOut bool) (dtos.HotelOrderResponse, error)
 	CreateHotelOrder(userID uint, hotelOrderInput dtos.HotelOrderInput) (dtos.HotelOrderResponse, error)
 	UpdateHotelOrder(userID, hotelOrderID uint, status string) (dtos.HotelOrderResponse, error)
 }
@@ -49,6 +49,11 @@ func NewHotelOrderUsecase(hotelOrderRepo repositories.HotelOrderRepository, hote
 // @Produce      json
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
+// @Param search query string false "Search order"
+// @Param name query string false "Filter by name hotel"
+// @Param address query string false "Filter by address hotel"
+// @Param order_date query string false "Filter by order date hotel"
+// @Param order_by query string false "Filter order by"
 // @Param status query string false "Filter by status order"
 // @Success      200 {object} dtos.GetAllHotelOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
@@ -58,7 +63,7 @@ func NewHotelOrderUsecase(hotelOrderRepo repositories.HotelOrderRepository, hote
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/order/hotel [get]
 // @Security BearerAuth
-func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, status string) ([]dtos.HotelOrderResponse, int, error) {
+func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search, nameHotel, addressHotel, orderDateHotel, orderBy, status string) ([]dtos.HotelOrderResponse, int, error) {
 	var hotelOrderResponses []dtos.HotelOrderResponse
 
 	hotelOrders, _, err := u.hotelOrderRepo.GetHotelOrders(page, limit, userID, status)
@@ -71,6 +76,26 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, status 
 		if err != nil {
 			return hotelOrderResponses, 0, err
 		}
+
+		// Check if the search query matches the hotel name, address
+		if search != "" &&
+			!strings.Contains(strings.ToLower(hotelOrder.HotelOrderCode), strings.ToLower(search)) &&
+			!strings.Contains(strings.ToLower(getHotel.Name), strings.ToLower(search)) &&
+			!strings.Contains(strings.ToLower(getHotel.Address), strings.ToLower(search)) {
+			continue // Skip hotel order if it doesn't match the search query
+		}
+
+		// Apply filters based on nameHotel, addressHotel, orderDateHotel
+		if nameHotel != "" && !strings.Contains(strings.ToLower(getHotel.Name), strings.ToLower(nameHotel)) {
+			continue
+		}
+		if addressHotel != "" && !strings.Contains(strings.ToLower(getHotel.Address), strings.ToLower(addressHotel)) {
+			continue
+		}
+		if orderDateHotel != "" && helpers.FormatDateToYMD(&hotelOrder.DateStart) != orderDateHotel || orderDateHotel != "" && helpers.FormatDateToYMD(&hotelOrder.DateEnd) != orderDateHotel {
+			continue
+		}
+
 		getHotelImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotelOrder.HotelID)
 		if err != nil {
 			return hotelOrderResponses, 0, err
@@ -223,22 +248,29 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, status 
 		hotelOrderResponses = append(hotelOrderResponses, hotelOrderResponse)
 	}
 
-	// Apply offset and limit to hotelOrderResponses
-	// start := (page - 1) * limit
-	// end := start + limit
-
-	// Ensure that `start` is within the range of hotelOrderResponses
-	// if start >= len(hotelOrderResponses) {
-	// 	return nil, 0, nil
-	// }
-
-	// Ensure that `end` does not exceed the length of hotelOrderResponses
-	// if end > len(hotelOrderResponses) {
-	// 	end = len(hotelOrderResponses)
-	// }
-
-	// subsetHotelOrderResponses := hotelOrderResponses[start:end]
-
+	// Sort hotelOrderResponses based on the orderBy parameter
+	switch orderBy {
+	case "latest":
+		// Sort hotelOrderResponses by descending order of CreatedAt
+		sort.SliceStable(hotelOrderResponses, func(i, j int) bool {
+			return hotelOrderResponses[i].CreatedAt.After(hotelOrderResponses[j].CreatedAt)
+		})
+	case "oldest":
+		// Sort hotelOrderResponses by ascending order of CreatedAt
+		sort.SliceStable(hotelOrderResponses, func(i, j int) bool {
+			return hotelOrderResponses[i].CreatedAt.Before(hotelOrderResponses[j].CreatedAt)
+		})
+	case "highest_price":
+		// Sort hotelOrderResponses by descending order of Price
+		sort.SliceStable(hotelOrderResponses, func(i, j int) bool {
+			return hotelOrderResponses[i].TotalAmount > hotelOrderResponses[j].TotalAmount
+		})
+	case "lowest_price":
+		// Sort hotelOrderResponses by ascending order of TotalAmount
+		sort.SliceStable(hotelOrderResponses, func(i, j int) bool {
+			return hotelOrderResponses[i].TotalAmount < hotelOrderResponses[j].TotalAmount
+		})
+	}
 	return hotelOrderResponses, len(hotelOrderResponses), nil
 }
 
@@ -254,7 +286,7 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, status 
 // @Param search query string false "search hotel name"
 // @Param date_start query string false "Date start"
 // @Param date_end query string false "Date end"
-// @Param order_by query string false "Order by name"
+// @Param order_by query string false "Filter order by"
 // @Param status query string false "Filter by status order"
 // @Success      200 {object} dtos.GetAllHotelOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
@@ -678,6 +710,8 @@ func (u *hotelOrderUsecase) GetHotelOrdersDetailByAdmin(hotelOrderId uint) (dtos
 // @Accept       json
 // @Produce      json
 // @Param hotel_order_id query int true "Hotel Order ID"
+// @Param update_check_in query bool false "Update status order check in"
+// @Param update_check_out query bool false "Update status order check out"
 // @Success      200 {object} dtos.HotelOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -686,12 +720,23 @@ func (u *hotelOrderUsecase) GetHotelOrdersDetailByAdmin(hotelOrderId uint) (dtos
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/order/hotel/detail [get]
 // @Security BearerAuth
-func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint) (dtos.HotelOrderResponse, error) {
+func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint, isCheckIn, isCheckOut bool) (dtos.HotelOrderResponse, error) {
 	var hotelOrderResponses dtos.HotelOrderResponse
 
 	hotelOrder, err := u.hotelOrderRepo.GetHotelOrderByID(hotelOrderId, userID)
 	if err != nil {
 		return hotelOrderResponses, err
+	}
+
+	if hotelOrder.IsCheckIn == false && hotelOrder.IsCheckOut == false && isCheckIn == true {
+		hotelOrder.IsCheckIn = true
+		_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
+	}
+
+	if hotelOrder.IsCheckIn == true && hotelOrder.IsCheckOut == false && isCheckOut == true {
+		hotelOrder.IsCheckOut = true
+		hotelOrder.Status = "done"
+		_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
 	}
 
 	getHotel, err := u.hotelRepo.GetHotelByID(hotelOrder.HotelID)
@@ -791,6 +836,8 @@ func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint) (dtos.H
 		PhoneNumberOrder: hotelOrder.PhoneNumberOrder,
 		SpecialRequest:   hotelOrder.SpecialRequest,
 		HotelOrderCode:   hotelOrder.HotelOrderCode,
+		IsCheckIn:        hotelOrder.IsCheckIn,
+		IsCheckOut:       hotelOrder.IsCheckOut,
 		Status:           hotelOrder.Status,
 		Hotel: dtos.HotelByIDResponses{
 			HotelID:         getHotel.ID,
