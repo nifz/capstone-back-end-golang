@@ -1016,7 +1016,7 @@ func (u *hotelOrderUsecase) CreateHotelOrder(userID uint, hotelOrderInput dtos.H
 		travelerDetailResponses = append(travelerDetailResponses, travelerDetailResponseses)
 	}
 
-	hotelOrder, err := u.hotelOrderRepo.GetHotelOrderByID(createHotelOrder.HotelID, userID)
+	hotelOrder, err := u.hotelOrderRepo.GetHotelOrderByID(createHotelOrder.ID, userID)
 	if err != nil {
 		return hotelOrderResponse, err
 	}
