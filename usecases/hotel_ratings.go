@@ -49,7 +49,7 @@ func NewHotelRatingsUsecase(hotelRatingsRepository repositories.HotelRatingsRepo
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /user/hotel-rating [post]
+// @Router       /user/hotel-ratings [post]
 // @Security BearerAuth
 func (u *hotelRatingsUsecase) CreateHotelRating(hotelRatingInput dtos.HotelRatingInput) (dtos.HotelRatingResponse, error) {
 	var hotelRatingResponse dtos.HotelRatingResponse

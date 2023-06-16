@@ -35,9 +35,6 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	userUsecase := usecases.NewUserUsecase(userRepository, notificationRepository)
 	userController := controllers.NewUserController(userUsecase)
 
-	notificationUsecase := usecases.NewNotificationUsecase(notificationRepository, templateMessageRepository, userRepository)
-	notificationController := controllers.NewNotificationController(notificationUsecase)
-
 	cloudinaryUsecase := usecases.NewMediaUpload()
 	cloudinaryController := controllers.NewCloudinaryController(cloudinaryUsecase)
 
@@ -106,6 +103,9 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	articleRepository := repositories.NewArticleRepository(db)
 	articleUsecase := usecases.NewArticleUsecase(articleRepository)
 	articleController := controllers.NewArticleController(articleUsecase)
+
+	notificationUsecase := usecases.NewNotificationUsecase(notificationRepository, templateMessageRepository, userRepository, hotelOrderRepository, ticketOrderRepository)
+	notificationController := controllers.NewNotificationController(notificationUsecase)
 
 	// Middleware CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
