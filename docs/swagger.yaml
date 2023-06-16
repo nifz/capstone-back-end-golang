@@ -1737,7 +1737,7 @@ definitions:
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: api.tripease.my.id
+host: localhost:8088
 info:
   contact:
     name: Capstone Alterra Group 7
@@ -4320,7 +4320,7 @@ paths:
       summary: Delete a history search
       tags:
       - User - History Search
-  /user/hotel-rating:
+  /user/hotel-ratings:
     post:
       consumes:
       - application/json
@@ -4567,7 +4567,7 @@ paths:
       - BearerAuth: []
       summary: Get notification by user id
       tags:
-      - user - Notification
+      - User - Notification
   /user/order/hotel:
     get:
       consumes:

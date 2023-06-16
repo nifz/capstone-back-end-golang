@@ -13,7 +13,7 @@
         },
         "version": "1.0"
     },
-    "host": "api.tripease.my.id",
+    "host": "localhost:8088",
     "basePath": "/api/v1",
     "paths": {
         "/admin/article": {
@@ -3973,7 +3973,7 @@
                 }
             }
         },
-        "/user/hotel-rating": {
+        "/user/hotel-ratings": {
             "post": {
                 "security": [
                     {
@@ -4306,7 +4306,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "user - Notification"
+                    "User - Notification"
                 ],
                 "summary": "Get notification by user id",
                 "parameters": [

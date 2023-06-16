@@ -3,7 +3,6 @@ package usecases
 import (
 	"back-end-golang/dtos"
 	"back-end-golang/repositories"
-	"fmt"
 	"strings"
 )
 
@@ -15,16 +14,18 @@ type notificationUsecase struct {
 	notificationRepo    repositories.NotificationRepository
 	templateMessageRepo repositories.TemplateMessageRepository
 	userRepo            repositories.UserRepository
+	hotelOrderRepo      repositories.HotelOrderRepository
+	ticketOrderRepo     repositories.TicketOrderRepository
 }
 
-func NewNotificationUsecase(notificationRepo repositories.NotificationRepository, templateMessageRepo repositories.TemplateMessageRepository, userRepo repositories.UserRepository) NotificationUsecase {
-	return &notificationUsecase{notificationRepo, templateMessageRepo, userRepo}
+func NewNotificationUsecase(notificationRepo repositories.NotificationRepository, templateMessageRepo repositories.TemplateMessageRepository, userRepo repositories.UserRepository, hotelOrderRepo repositories.HotelOrderRepository, ticketOrderRepo repositories.TicketOrderRepository) NotificationUsecase {
+	return &notificationUsecase{notificationRepo, templateMessageRepo, userRepo, hotelOrderRepo, ticketOrderRepo}
 }
 
 // GetNotificationByUserID godoc
 // @Summary      Get notification by user id
 // @Description  Get notification by user id
-// @Tags         user - Notification
+// @Tags         User - Notification
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "user id"
@@ -51,16 +52,33 @@ func (u *notificationUsecase) GetNotificationByUserID(id uint) (dtos.Notificatio
 	var templateContentResponses []dtos.TemplateMessageByUserIDResponse
 
 	for _, notification := range notifications {
-		fmt.Print(notification)
 		getTemplate, err := u.templateMessageRepo.GetTemplateMessageByID(notification.TemplateID)
 		if err != nil {
 			return notificationResponsee, err
 		}
 
+		var orderCode string
+
+		if notification.HotelOrderID > 0 && notification.TicketOrderID < 1 {
+			getHotelOrderCode, err := u.hotelOrderRepo.GetHotelOrderByID(notification.HotelOrderID, notification.UserID)
+			if err != nil {
+				return notificationResponsee, err
+			}
+			orderCode = getHotelOrderCode.HotelOrderCode
+		} else if notification.TicketOrderID > 0 && notification.HotelOrderID < 1 {
+			getTicketOrderCode, err := u.ticketOrderRepo.GetTicketOrderByID(notification.TicketOrderID, notification.UserID)
+			if err != nil {
+				return notificationResponsee, err
+			}
+			orderCode = getTicketOrderCode.TicketOrderCode
+		}
+
+		newTitle := strings.Replace(getTemplate.Title, "[Order Code]", orderCode, -1)
 		newContent := strings.Replace(getTemplate.Content, "[Nama Pengguna]", getUser.FullName, -1)
+		newContent = strings.Replace(newContent, "[Order Code]", orderCode, -1)
 
 		templateContentResponse := dtos.TemplateMessageByUserIDResponse{
-			Title:     getTemplate.Title,
+			Title:     newTitle,
 			Content:   newContent,
 			CreatedAt: notification.CreatedAt,
 			UpdatedAt: notification.UpdatedAt,
