@@ -982,13 +982,15 @@ func (u *hotelOrderUsecase) CreateHotelOrder(userID uint, hotelOrderInput dtos.H
 
 	if createHotelOrder.ID > 0 && createHotelOrder.Status == "unpaid" {
 		createNotification := models.Notification{
-			UserID:     userID,
-			TemplateID: 7,
+			UserID:        userID,
+			TemplateID:    7,
+			HotelOrderID:  createHotelOrder.ID,
+			TicketOrderID: 0,
 		}
 
 		_, err = u.notificationRepo.CreateNotification(createNotification)
 		if err != nil {
-			return hotelOrderResponse, err
+			return hotelOrderResponse, errors.New("Create Notification")
 		}
 	}
 
@@ -1198,8 +1200,9 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 
 	if hotelOrder.ID > 0 && hotelOrder.Status == "paid" {
 		createNotification := models.Notification{
-			UserID:     userID,
-			TemplateID: 5,
+			UserID:       userID,
+			TemplateID:   3,
+			HotelOrderID: hotelOrder.ID,
 		}
 
 		_, err = u.notificationRepo.CreateNotification(createNotification)
@@ -1210,8 +1213,22 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 
 	if hotelOrder.ID > 0 && hotelOrder.Status == "canceled" {
 		createNotification := models.Notification{
-			UserID:     userID,
-			TemplateID: 8,
+			UserID:       userID,
+			TemplateID:   8,
+			HotelOrderID: hotelOrder.ID,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return hotelOrderResponses, err
+		}
+	}
+
+	if hotelOrder.ID > 0 && hotelOrder.Status == "refund" {
+		createNotification := models.Notification{
+			UserID:       userID,
+			TemplateID:   9,
+			HotelOrderID: hotelOrder.ID,
 		}
 
 		_, err = u.notificationRepo.CreateNotification(createNotification)
@@ -1227,8 +1244,9 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 
 	if hotelOrder.ID > 0 && hotelOrder.Status == "done" && checkExistHotelRating == false {
 		createNotification := models.Notification{
-			UserID:     userID,
-			TemplateID: 6,
+			UserID:       userID,
+			TemplateID:   6,
+			HotelOrderID: hotelOrder.ID,
 		}
 
 		_, err = u.notificationRepo.CreateNotification(createNotification)
