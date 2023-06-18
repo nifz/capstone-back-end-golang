@@ -27,11 +27,12 @@ type UserUsecase interface {
 }
 
 type userUsecase struct {
-	userRepo repositories.UserRepository
+	userRepo         repositories.UserRepository
+	notificationRepo repositories.NotificationRepository
 }
 
-func NewUserUsecase(userRepo repositories.UserRepository) UserUsecase {
-	return &userUsecase{userRepo}
+func NewUserUsecase(userRepo repositories.UserRepository, notificationRepo repositories.NotificationRepository) UserUsecase {
+	return &userUsecase{userRepo, notificationRepo}
 }
 
 // UserLogin godoc
@@ -69,6 +70,18 @@ func (u *userUsecase) UserLogin(input dtos.UserLoginInput) (dtos.UserInformation
 	accessToken, err = middlewares.CreateToken(user.ID, user.Role)
 	if err != nil {
 		return userResponse, err
+	}
+
+	for i := 1; i <= 2; i++ {
+		createNotification := models.Notification{
+			UserID:     user.ID,
+			TemplateID: uint(i),
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return userResponse, err
+		}
 	}
 
 	userResponse.ID = user.ID
@@ -456,7 +469,7 @@ func (u *userUsecase) UserGetAll(page, limit int, search, sortBy, filter string)
 
 		userResponse := dtos.UserInformationResponse{
 			ID:             user.ID,
-			FullName:       user.FullName,
+			FullName:       strings.ToUpper(user.FullName),
 			Email:          user.Email,
 			PhoneNumber:    user.PhoneNumber,
 			BirthDate:      helpers.FormatDateToYMD(user.BirthDate),

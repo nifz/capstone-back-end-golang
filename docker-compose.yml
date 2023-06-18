@@ -6,5 +6,5 @@ services:
     ports:
       - "443:443"
     volumes:
-      - /etc/letsencrypt/live/capstone.hanifz.com/fullchain.pem:/etc/nginx/ssl/fullchain.pem
-      - /etc/letsencrypt/live/capstone.hanifz.com/privkey.pem:/etc/nginx/ssl/privkey.pem
+      - /etc/letsencrypt/live/api.tripease.my.id/fullchain.pem:/etc/nginx/ssl/fullchain.pem
+      - /etc/letsencrypt/live/api.tripease.my.id/privkey.pem:/etc/nginx/ssl/privkey.pem

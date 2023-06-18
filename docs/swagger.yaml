@@ -106,6 +106,19 @@ definitions:
         example: 200
         type: integer
     type: object
+  dtos.GetAllHotelOrderStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.HotelOrderResponse'
+      message:
+        example: Successfully get ticket order
+        type: string
+      meta:
+        $ref: '#/definitions/helpers.Meta'
+      status_code:
+        example: 200
+        type: integer
+    type: object
   dtos.GetAllHotelRoomStatusOKResponses:
     properties:
       data:
@@ -223,6 +236,17 @@ definitions:
         example: 200
         type: integer
     type: object
+  dtos.GetNotificationByUserIDStatusOKResponses:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.NotificationResponse'
+      message:
+        example: Successfully get notification
+        type: string
+      status_code:
+        example: 200
+        type: integer
+    type: object
   dtos.HistorySearchCreeatedResponse:
     properties:
       data:
@@ -266,7 +290,48 @@ definitions:
       address:
         type: string
       class:
+        type: integer
+      created_at:
+        example: "2023-05-17T15:07:16.504+07:00"
         type: string
+      description:
+        type: string
+      email:
+        type: string
+      hotel_facilities:
+        items:
+          $ref: '#/definitions/dtos.HotelFacilitiesResponse'
+        type: array
+      hotel_id:
+        type: integer
+      hotel_image:
+        items:
+          $ref: '#/definitions/dtos.HotelImageResponse'
+        type: array
+      hotel_policy:
+        $ref: '#/definitions/dtos.HotelPoliciesResponse'
+      hotel_rating:
+        items:
+          $ref: '#/definitions/dtos.RatingInfo'
+        type: array
+      hotel_room:
+        items:
+          $ref: '#/definitions/dtos.HotelRoomHotelIDResponse'
+        type: array
+      name:
+        type: string
+      phone_number:
+        type: string
+      updated_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+    type: object
+  dtos.HotelByIDResponses:
+    properties:
+      address:
+        type: string
+      class:
+        type: integer
       created_at:
         example: "2023-05-17T15:07:16.504+07:00"
         type: string
@@ -287,9 +352,7 @@ definitions:
       hotel_policy:
         $ref: '#/definitions/dtos.HotelPoliciesResponse'
       hotel_room:
-        items:
-          $ref: '#/definitions/dtos.HotelRoomHotelIDResponse'
-        type: array
+        $ref: '#/definitions/dtos.HotelRoomHotelIDResponse'
       name:
         type: string
       phone_number:
@@ -334,8 +397,6 @@ definitions:
     type: object
   dtos.HotelImageInput:
     properties:
-      hotel_id:
-        type: integer
       image_url:
         type: string
     type: object
@@ -351,7 +412,7 @@ definitions:
       address:
         type: string
       class:
-        type: string
+        type: integer
       description:
         type: string
       email:
@@ -372,6 +433,132 @@ definitions:
         type: string
       phone_number:
         type: string
+    type: object
+  dtos.HotelOrderCreeatedResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.HotelOrderResponse'
+      message:
+        example: Successfully created ticket order
+        type: string
+      status_code:
+        example: 201
+        type: integer
+    type: object
+  dtos.HotelOrderInput:
+    properties:
+      date_end:
+        example: "2023-05-02"
+        type: string
+      date_start:
+        example: "2023-05-01"
+        type: string
+      email_order:
+        example: me@hanifz.com
+        type: string
+      hotel_room_id:
+        description: HotelID          int                   `form:"hotel_id" json:"hotel_id"
+          example:"1"`
+        example: 1
+        type: integer
+      name_order:
+        example: Mochammad Hanif
+        type: string
+      payment_id:
+        example: 1
+        type: integer
+      phone_number_order:
+        example: "085115151515"
+        type: string
+      quantity_adult:
+        example: 1
+        type: integer
+      quantity_infant:
+        example: 1
+        type: integer
+      special_request:
+        example: Tambah 1 Bed
+        type: string
+      traveler_detail:
+        items:
+          $ref: '#/definitions/dtos.TravelerDetailInput'
+        type: array
+    type: object
+  dtos.HotelOrderResponse:
+    properties:
+      check_in_date:
+        example: "2023-05-01"
+        type: string
+      check_out_date:
+        example: "2023-05-02"
+        type: string
+      created_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+      email_order:
+        example: me@hanifz.com
+        type: string
+      hotel:
+        $ref: '#/definitions/dtos.HotelByIDResponses'
+      hotel_order_id:
+        example: 1
+        type: integer
+      is_check_in:
+        example: false
+        type: boolean
+      is_check_out:
+        example: false
+        type: boolean
+      name_order:
+        example: Mochammad Hanif
+        type: string
+      number_of_night:
+        example: 1
+        type: integer
+      payment:
+        $ref: '#/definitions/dtos.PaymentResponses'
+      phone_number_order:
+        example: "085115151515"
+        type: string
+      price:
+        example: 50000
+        type: integer
+      quantity_adult:
+        example: 1
+        type: integer
+      quantity_infant:
+        example: 1
+        type: integer
+      special_request:
+        example: Minta 1 Bed
+        type: string
+      status:
+        example: unpaid
+        type: string
+      ticket_order_code:
+        example: RANDOMCODE123
+        type: string
+      total_amount:
+        example: 50000
+        type: integer
+      traveler_detail:
+        items:
+          $ref: '#/definitions/dtos.TravelerDetailResponse'
+        type: array
+      updated_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+    type: object
+  dtos.HotelOrderStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.HotelOrderResponse'
+      message:
+        example: Successfully get ticket order
+        type: string
+      status_code:
+        example: 200
+        type: integer
     type: object
   dtos.HotelPoliciesInput:
     properties:
@@ -433,12 +620,49 @@ definitions:
       time_check_out:
         type: string
     type: object
+  dtos.HotelRatingCreeatedResponses:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.HotelRatingResponse'
+      message:
+        example: Successfully created hotel rating
+        type: string
+      status_code:
+        example: 201
+        type: integer
+    type: object
+  dtos.HotelRatingInput:
+    properties:
+      hotel_id:
+        type: integer
+      hotel_order_id:
+        type: integer
+      rating:
+        type: integer
+      review:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  dtos.HotelRatingResponse:
+    properties:
+      hotel_id:
+        type: integer
+      hotel_order_id:
+        type: integer
+      rating:
+        type: integer
+      review:
+        type: string
+      user_id:
+        type: integer
+    type: object
   dtos.HotelResponse:
     properties:
       address:
         type: string
       class:
-        type: string
+        type: integer
       created_at:
         example: "2023-05-17T15:07:16.504+07:00"
         type: string
@@ -478,6 +702,11 @@ definitions:
       status_code:
         example: 201
         type: integer
+    type: object
+  dtos.HotelRoomFacilitiesInput:
+    properties:
+      name:
+        type: string
     type: object
   dtos.HotelRoomFacilitiesResponse:
     properties:
@@ -523,6 +752,11 @@ definitions:
       size_of_room:
         type: integer
     type: object
+  dtos.HotelRoomImageInput:
+    properties:
+      image_url:
+        type: string
+    type: object
   dtos.HotelRoomImageResponse:
     properties:
       hotel_id:
@@ -542,11 +776,11 @@ definitions:
         type: integer
       hotel_room_facility:
         items:
-          $ref: '#/definitions/dtos.HotelRoomFacilitiesResponse'
+          $ref: '#/definitions/dtos.HotelRoomFacilitiesInput'
         type: array
       hotel_room_image:
         items:
-          $ref: '#/definitions/dtos.HotelRoomImageResponse'
+          $ref: '#/definitions/dtos.HotelRoomImageInput'
         type: array
       mattress_size:
         type: string
@@ -646,6 +880,15 @@ definitions:
         example: 404
         type: integer
     type: object
+  dtos.NotificationResponse:
+    properties:
+      notification_content:
+        items:
+          $ref: '#/definitions/dtos.TemplateMessageByUserIDResponse'
+        type: array
+      user_id:
+        type: integer
+    type: object
   dtos.PaymentCreeatedResponse:
     properties:
       data:
@@ -721,6 +964,22 @@ definitions:
       status_code:
         example: 200
         type: integer
+    type: object
+  dtos.RatingInfo:
+    properties:
+      created_at:
+        format: "2006-01-02 15:04:05"
+        type: string
+      rating:
+        type: integer
+      review:
+        type: string
+      user_id:
+        type: integer
+      user_image:
+        type: string
+      username:
+        type: string
     type: object
   dtos.StationCreeatedResponse:
     properties:
@@ -807,6 +1066,29 @@ definitions:
       status_code:
         example: 200
         type: integer
+    type: object
+  dtos.StatusOKResponse:
+    properties:
+      data: {}
+      message:
+        example: Successfully
+        type: string
+      status_code:
+        example: 200
+        type: integer
+    type: object
+  dtos.TemplateMessageByUserIDResponse:
+    properties:
+      content:
+        type: string
+      created_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+      title:
+        type: string
+      updated_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
     type: object
   dtos.TicketOrderCreeatedResponse:
     properties:
@@ -923,9 +1205,8 @@ definitions:
         example: 1
         type: integer
       train_carriage_id:
-        example: 1
-        type: integer
-      train_id:
+        description: TrainID              int    `form:"train_id" json:"train_id"
+          example:"1"`
         example: 1
         type: integer
       train_seat_id:
@@ -958,7 +1239,7 @@ definitions:
         example: 1
         type: integer
       quantity_infant:
-        example: 1
+        example: 0
         type: integer
       station_destination:
         $ref: '#/definitions/dtos.StationResponseSimply'
@@ -1446,10 +1727,17 @@ definitions:
         example: 1
         type: integer
     type: object
+  models.Url:
+    properties:
+      url:
+        type: string
+    required:
+    - url
+    type: object
 externalDocs:
   description: OpenAPI
   url: https://swagger.io/resources/open-api/
-host: capstone.hanifz.com
+host: api.tripease.my.id
 info:
   contact:
     name: Capstone Alterra Group 7
@@ -1931,6 +2219,119 @@ paths:
       summary: Update hotel
       tags:
       - Admin - Hotel
+  /admin/order/hotel:
+    get:
+      consumes:
+      - application/json
+      description: Get Hotel Order User
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Hotel rating class
+        in: query
+        name: rating_class
+        type: integer
+      - description: search hotel name
+        in: query
+        name: search
+        type: string
+      - description: Date start
+        in: query
+        name: date_start
+        type: string
+      - description: Date end
+        in: query
+        name: date_end
+        type: string
+      - description: Filter order by
+        in: query
+        name: order_by
+        type: string
+      - description: Filter by status order
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllHotelOrderStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Hotel Order User
+      tags:
+      - Admin - Order
+  /admin/order/hotel/detail:
+    get:
+      consumes:
+      - application/json
+      description: Get Hotel Order User
+      parameters:
+      - description: Hotel Order ID
+        in: query
+        name: hotel_order_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.HotelOrderStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Hotel Order User
+      tags:
+      - Admin - Order
   /admin/order/ticket:
     get:
       consumes:
@@ -3063,6 +3464,88 @@ paths:
       summary: Get article by ID
       tags:
       - Admin - Article
+  /public/cloudinary/file-upload:
+    post:
+      consumes:
+      - application/json
+      description: Upload file to cloudinary
+      parameters:
+      - description: Photo file
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Upload file
+      tags:
+      - Cloudinary
+  /public/cloudinary/url-upload:
+    post:
+      consumes:
+      - application/json
+      description: Upload file to cloudinary
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Url'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Upload file
+      tags:
+      - Cloudinary
   /public/hotel:
     get:
       consumes:
@@ -3107,6 +3590,91 @@ paths:
       summary: Get all hotel
       tags:
       - Admin - Hotel
+  /public/hotel-room:
+    get:
+      consumes:
+      - application/json
+      description: Get all hotel room
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllHotelRoomStatusOKResponses'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Get all hotel room
+      tags:
+      - Admin - Hotel Room
+  /public/hotel-room/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get hotel room by ID
+      parameters:
+      - description: ID Hotel Room
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.HotelRoomStatusOKResponses'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      summary: Get hotel room by ID
+      tags:
+      - Admin - Hotel Room
   /public/hotel/{id}:
     get:
       consumes:
@@ -3368,6 +3936,22 @@ paths:
       - application/json
       description: Get all train carriage
       parameters:
+      - description: Train id
+        in: query
+        name: train_id
+        type: integer
+      - description: Class train
+        in: query
+        name: class
+        type: string
+      - description: Date order
+        in: query
+        name: date
+        type: string
+      - description: Status train
+        in: query
+        name: status
+        type: string
       - description: Page number
         in: query
         name: page
@@ -3488,76 +4072,6 @@ paths:
       summary: Get train by ID
       tags:
       - Admin - Train
-  /public/train/search:
-    get:
-      consumes:
-      - application/json
-      description: Search Train
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: integer
-      - description: Number of items per page
-        in: query
-        name: limit
-        type: integer
-      - description: Station origin id
-        in: query
-        name: station_origin_id
-        required: true
-        type: integer
-      - description: Station destination id
-        in: query
-        name: station_destination_id
-        required: true
-        type: integer
-      - description: Filter by train id
-        in: query
-        name: sort_by_train_id
-        type: integer
-      - description: Filter by class name
-        in: query
-        name: sort_by_class
-        type: string
-      - description: Filter by price
-        in: query
-        name: sort_by_price
-        type: string
-      - description: Filter by arrive time
-        in: query
-        name: sort_by_arrive_time
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.GetAllTrainStatusOKResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.BadRequestResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dtos.UnauthorizedResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/dtos.ForbiddenResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/dtos.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dtos.InternalServerErrorResponse'
-      summary: Search Train Available
-      tags:
-      - User - Train
   /register:
     post:
       consumes:
@@ -3806,27 +4320,25 @@ paths:
       summary: Delete a history search
       tags:
       - User - History Search
-  /user/hotel-room:
-    get:
+  /user/hotel-ratings:
+    post:
       consumes:
       - application/json
-      description: Get all hotel room
+      description: Create a new hotel rating
       parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: integer
-      - description: Number of items per page
-        in: query
-        name: limit
-        type: integer
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.HotelRatingInput'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            $ref: '#/definitions/dtos.GetAllHotelRoomStatusOKResponses'
+            $ref: '#/definitions/dtos.HotelRatingCreeatedResponses'
         "400":
           description: Bad Request
           schema:
@@ -3847,16 +4359,179 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dtos.InternalServerErrorResponse'
-      summary: Get all hotel room
+      security:
+      - BearerAuth: []
+      summary: Create a new hotel rating
       tags:
-      - Admin - Hotel Room
-  /user/hotel-room/{id}:
+      - User - Hotel Rating
+  /user/hotel/order:
+    patch:
+      consumes:
+      - application/json
+      description: Update Order Hotel
+      parameters:
+      - description: Hotel Order ID
+        in: query
+        name: hotel_order_id
+        required: true
+        type: integer
+      - description: Update Status Order ID
+        in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.HotelOrderStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update Order Hotel
+      tags:
+      - User - Hotel
+    post:
+      consumes:
+      - application/json
+      description: Order Hotel
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.HotelOrderInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.HotelOrderCreeatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Order Hotel
+      tags:
+      - User - Hotel
+  /user/hotel/search:
     get:
       consumes:
       - application/json
-      description: Get hotel room by ID
+      description: Search Hotel
       parameters:
-      - description: ID Hotel Room
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter minimum price
+        in: query
+        name: minimum_price
+        type: integer
+      - description: Filter maximum price
+        in: query
+        name: maximum_price
+        type: integer
+      - description: Filter rating class
+        in: query
+        name: rating_class
+        type: integer
+      - description: Search address hotel
+        in: query
+        name: address
+        type: string
+      - description: Search name hotel
+        in: query
+        name: name
+        type: string
+      - description: Filter by price
+        in: query
+        name: sort_by_price
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllHotelStatusOKResponses'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Search Hotel Available
+      tags:
+      - User - Hotel
+  /user/notification/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get notification by user id
+      parameters:
+      - description: user id
         in: path
         name: id
         required: true
@@ -3867,7 +4542,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dtos.HotelRoomStatusOKResponses'
+            $ref: '#/definitions/dtos.GetNotificationByUserIDStatusOKResponses'
         "400":
           description: Bad Request
           schema:
@@ -3888,9 +4563,132 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dtos.InternalServerErrorResponse'
-      summary: Get hotel room by ID
+      security:
+      - BearerAuth: []
+      summary: Get notification by user id
       tags:
-      - Admin - Hotel Room
+      - User - Notification
+  /user/order/hotel:
+    get:
+      consumes:
+      - application/json
+      description: Get Hotel Order User
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search order
+        in: query
+        name: search
+        type: string
+      - description: Filter by name hotel
+        in: query
+        name: name
+        type: string
+      - description: Filter by address hotel
+        in: query
+        name: address
+        type: string
+      - description: Filter by order date hotel
+        in: query
+        name: order_date
+        type: string
+      - description: Filter order by
+        in: query
+        name: order_by
+        type: string
+      - description: Filter by status order
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllHotelOrderStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Hotel Order User
+      tags:
+      - User - Order
+  /user/order/hotel/detail:
+    get:
+      consumes:
+      - application/json
+      description: Get Hotel Order User by ID
+      parameters:
+      - description: Hotel Order ID
+        in: query
+        name: hotel_order_id
+        required: true
+        type: integer
+      - description: Update status order check in
+        in: query
+        name: update_check_in
+        type: boolean
+      - description: Update status order check out
+        in: query
+        name: update_check_out
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.HotelOrderStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Hotel Order User by ID
+      tags:
+      - User - Order
   /user/order/ticket:
     get:
       consumes:
@@ -3905,6 +4703,22 @@ paths:
         in: query
         name: limit
         type: integer
+      - description: Search order
+        in: query
+        name: search
+        type: string
+      - description: Filter by class train
+        in: query
+        name: class
+        type: string
+      - description: Filter by name train
+        in: query
+        name: name
+        type: string
+      - description: Filter order by
+        in: query
+        name: order_by
+        type: string
       - description: Filter by status order
         in: query
         name: status
@@ -4078,6 +4892,78 @@ paths:
       security:
       - BearerAuth: []
       summary: Order ticket KA
+      tags:
+      - User - Train
+  /user/train/search:
+    get:
+      consumes:
+      - application/json
+      description: Search Train
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Station origin id
+        in: query
+        name: station_origin_id
+        required: true
+        type: integer
+      - description: Station destination id
+        in: query
+        name: station_destination_id
+        required: true
+        type: integer
+      - description: Filter by train id
+        in: query
+        name: sort_by_train_id
+        type: integer
+      - description: Filter by class name
+        in: query
+        name: sort_by_class
+        type: string
+      - description: Filter by price
+        in: query
+        name: sort_by_price
+        type: string
+      - description: Filter by arrive time
+        in: query
+        name: sort_by_arrive_time
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllTrainStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Search Train Available
       tags:
       - User - Train
   /user/update-password:

@@ -29,7 +29,7 @@ type TravelerDetailResponse struct {
 }
 
 type TicketTravelerDetailInput struct {
-	TrainID              int    `form:"train_id" json:"train_id" example:"1"`
+	// TrainID              int    `form:"train_id" json:"train_id" example:"1"`
 	TrainCarriageID      int    `form:"train_carriage_id" json:"train_carriage_id" example:"1"`
 	TrainSeatID          int    `form:"train_seat_id" json:"train_seat_id" example:"2"`
 	StationOriginID      int    `form:"station_origin_id" json:"station_origin_id" example:"1"`
@@ -67,7 +67,7 @@ type TicketTravelerDetailResponse struct {
 type TicketTravelerDetailOrderResponse struct {
 	TicketOrderID      int                       `json:"ticket_order_id" example:"1"`
 	QuantityAdult      int                       `json:"quantity_adult" example:"1"`
-	QuantityInfant     int                       `json:"quantity_infant" example:"1"`
+	QuantityInfant     int                       `json:"quantity_infant" example:"0"`
 	NameOrder          string                    `json:"name_order" example:"Mochammad Hanif"`
 	EmailOrder         string                    `json:"email_order" example:"me@hanifz.com"`
 	PhoneNumberOrder   string                    `json:"phone_number_order" example:"085115151515"`

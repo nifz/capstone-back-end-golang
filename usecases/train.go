@@ -156,22 +156,21 @@ func (u *trainUsecase) GetAllTrainsByAdmin(page, limit int, search, sortBy, filt
 		if err != nil {
 			return trainResponses, 0, err
 		}
-
 		deletedTrain := ""
 
-		if filter == "inactive" && getTrain.DeletedAt.Time.IsZero() {
-			continue
-		} else if filter == "active" && !getTrain.DeletedAt.Time.IsZero() {
-			continue
+		if filter != "" {
+			isAvailable := getTrain.Status == "available" && getTrain.DeletedAt.Time.IsZero()
+
+			if filter == "active" && !isAvailable {
+				continue
+			} else if filter != "active" && isAvailable {
+				continue
+			}
 		}
 
 		if !getTrain.DeletedAt.Time.IsZero() {
 			deletedTrain = getTrain.DeletedAt.Time.Format("2006-01-02T15:04:05.000-07:00")
 		}
-
-		// if getTrain.Status != "available" {
-		// 	continue
-		// }
 
 		getTrainStation, err := u.trainRepo.GetTrainStationByTrainID(getTrain.ID)
 		if err != nil {
@@ -201,8 +200,8 @@ func (u *trainUsecase) GetAllTrainsByAdmin(page, limit int, search, sortBy, filt
 
 		trainResponse := dtos.TrainResponses{
 			TrainID:   getTrain.ID,
-			CodeTrain: getTrain.CodeTrain,
-			Name:      getTrain.Name,
+			CodeTrain: strings.ToUpper(getTrain.CodeTrain),
+			Name:      strings.ToUpper(getTrain.Name),
 			Route:     trainStationResponses,
 			Status:    getTrain.Status,
 			CreatedAt: getTrain.CreatedAt,
@@ -418,6 +417,9 @@ func (u *trainUsecase) UpdateTrain(id uint, train dtos.TrainInput) (dtos.TrainRe
 		return trainResponse, err
 	}
 
+	train.Name = strings.ToUpper(train.Name)
+	train.CodeTrain = strings.ToUpper(train.CodeTrain)
+
 	trains.CodeTrain = train.CodeTrain
 	trains.Name = train.Name
 	trains.Status = train.Status
@@ -533,7 +535,8 @@ func (u *trainUsecase) DeleteTrain(id uint) error {
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /public/train/search [get]
+// @Router       /user/train/search [get]
+// @Security BearerAuth
 func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, stationDestinationId, sortByTrainId int, sortClassName, sortByPrice, sortByArriveTime string) ([]dtos.TrainResponse, int, error) {
 	trains, err := u.trainRepo.GetAllTrains(sortClassName, sortByTrainId)
 	if err != nil {

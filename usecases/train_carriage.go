@@ -5,10 +5,11 @@ import (
 	"back-end-golang/models"
 	"back-end-golang/repositories"
 	"errors"
+	"strings"
 )
 
 type TrainCarriageUsecase interface {
-	GetAllTrainCarriages(page, limit int) ([]dtos.TrainCarriageResponse, int, error)
+	GetAllTrainCarriages(trainId, page, limit int, class, date, status string) ([]dtos.TrainCarriageSeatResponses, int, error)
 	GetTrainCarriageByID(id uint) (dtos.TrainCarriageResponse, error)
 	CreateTrainCarriage(trainCarriage []dtos.TrainCarriageInput) ([]dtos.TrainCarriageResponse, error)
 	UpdateTrainCarriage(id uint, trainCarriageInput dtos.TrainCarriageInput) (dtos.TrainCarriageResponse, error)
@@ -16,12 +17,13 @@ type TrainCarriageUsecase interface {
 }
 
 type trainCarriageUsecase struct {
-	trainCarriageRepo repositories.TrainCarriageRepository
-	trainRepo         repositories.TrainRepository
+	trainCarriageRepo        repositories.TrainCarriageRepository
+	trainRepo                repositories.TrainRepository
+	ticketTravelerDetailRepo repositories.TicketTravelerDetailRepository
 }
 
-func NewTrainCarriageUsecase(TrainCarriageRepo repositories.TrainCarriageRepository, TrainRepo repositories.TrainRepository) TrainCarriageUsecase {
-	return &trainCarriageUsecase{TrainCarriageRepo, TrainRepo}
+func NewTrainCarriageUsecase(TrainCarriageRepo repositories.TrainCarriageRepository, TrainRepo repositories.TrainRepository, ticketTravelerDetailRepo repositories.TicketTravelerDetailRepository) TrainCarriageUsecase {
+	return &trainCarriageUsecase{TrainCarriageRepo, TrainRepo, ticketTravelerDetailRepo}
 }
 
 // GetAllTrainCarriages godoc
@@ -30,6 +32,10 @@ func NewTrainCarriageUsecase(TrainCarriageRepo repositories.TrainCarriageReposit
 // @Tags         Admin - Train Carriage
 // @Accept       json
 // @Produce      json
+// @Param train_id query int false "Train id"
+// @Param class query string false "Class train"
+// @Param date query string false "Date order"
+// @Param status query string false "Status train"
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
 // @Success      200 {object} dtos.GetAllTrainCarriageStatusOKResponse
@@ -39,13 +45,15 @@ func NewTrainCarriageUsecase(TrainCarriageRepo repositories.TrainCarriageReposit
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /public/train-carriage [get]
-func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.TrainCarriageResponse, int, error) {
+func (u *trainCarriageUsecase) GetAllTrainCarriages(trainId, page, limit int, class, date, status string) ([]dtos.TrainCarriageSeatResponses, int, error) {
 	trainCarriages, count, err := u.trainCarriageRepo.GetAllTrainCarriages(page, limit)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	var trainCarriageResponses []dtos.TrainCarriageResponse
+	status = strings.ToLower(status)
+
+	var trainCarriageResponses []dtos.TrainCarriageSeatResponses
 	visitedIDs := make(map[uint]map[uint]bool)
 	for _, trainCarriage := range trainCarriages {
 		trainStationResponses := make([]dtos.TrainStationResponse, 0) // Reset trainStationResponses for each trainCarriage
@@ -55,16 +63,37 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.Tra
 			return trainCarriageResponses, 0, err
 		}
 
+		// Filter by trainId
+		if trainId > 0 && int(train.ID) != trainId {
+			continue
+		}
+
+		if class != "" && strings.ToLower(class) != strings.ToLower(trainCarriage.Class) {
+			continue
+		}
+
+		if status != "" && strings.ToLower(status) != strings.ToLower(train.Status) {
+			continue
+		}
 		trainSeat, err := u.trainCarriageRepo.GetTrainSeatsByClass(trainCarriage.Class)
 		if err != nil {
 			return trainCarriageResponses, 0, err
 		}
 
-		var trainSeatResponses []dtos.TrainSeatResponse
+		var trainSeatResponses []dtos.TrainSeatAvailableResponse
 		for _, trainSeat := range trainSeat {
-			trainSeatRespon := dtos.TrainSeatResponse{
-				ID:   int(trainSeat.ID),
-				Name: trainSeat.Name,
+			isAvailable := true
+			if date != "" && trainId != 0 {
+				trainOrder, _ := u.ticketTravelerDetailRepo.GetTicketTravelerDetailByTrainSeatID(trainCarriage.TrainID, trainSeat.ID, date)
+				if trainOrder.ID > 0 {
+					isAvailable = false
+				}
+			}
+
+			trainSeatRespon := dtos.TrainSeatAvailableResponse{
+				ID:        int(trainSeat.ID),
+				Name:      trainSeat.Name,
+				Available: isAvailable,
 			}
 			trainSeatResponses = append(trainSeatResponses, trainSeatRespon)
 		}
@@ -101,9 +130,9 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(page, limit int) ([]dtos.Tra
 			trainStationResponses = append(trainStationResponses, trainStationResponse)
 		}
 
-		trainCarriageResponse := dtos.TrainCarriageResponse{
+		trainCarriageResponse := dtos.TrainCarriageSeatResponses{
 			TrainCarriageID: trainCarriage.ID,
-			Train: dtos.TrainResponse{
+			Train: dtos.TrainResponse2{
 				TrainID:   trainCarriage.TrainID,
 				CodeTrain: train.CodeTrain,
 				Name:      train.Name,

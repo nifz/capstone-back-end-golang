@@ -21,10 +21,10 @@ import (
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
-// capstone.hanifz.com
+// api.tripease.my.id
 // localhost:8088
 
-// @host      capstone.hanifz.com
+// @host      api.tripease.my.id
 // @BasePath  /api/v1
 
 // @securityDefinitions.apikey BearerAuth
@@ -70,5 +70,4 @@ func main() {
 	if err != nil {
 		log.Fatal("StartTLS: ", err)
 	}
-
 }

@@ -12,6 +12,7 @@ type TicketOrderRepository interface {
 	GetTicketOrderByID(id, userID uint) (models.TicketOrder, error)
 	CreateTicketOrder(ticketOrder models.TicketOrder) (models.TicketOrder, error)
 	UpdateTicketOrder(ticketOrder models.TicketOrder) (models.TicketOrder, error)
+	DeleteTicketOrder(ticketOrder models.TicketOrder) (models.TicketOrder, error)
 }
 
 type ticketOrderRepository struct {
@@ -66,5 +67,10 @@ func (r *ticketOrderRepository) CreateTicketOrder(ticketOrder models.TicketOrder
 
 func (r *ticketOrderRepository) UpdateTicketOrder(ticketOrder models.TicketOrder) (models.TicketOrder, error) {
 	err := r.db.Save(ticketOrder).Error
+	return ticketOrder, err
+}
+
+func (r *ticketOrderRepository) DeleteTicketOrder(ticketOrder models.TicketOrder) (models.TicketOrder, error) {
+	err := r.db.Unscoped().Delete(&ticketOrder).Error
 	return ticketOrder, err
 }

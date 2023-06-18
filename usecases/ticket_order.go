@@ -13,7 +13,7 @@ import (
 )
 
 type TicketOrderUsecase interface {
-	GetTicketOrders(page, limit int, userID uint, status string) ([]dtos.TicketTravelerDetailOrderResponse, int, error)
+	GetTicketOrders(page, limit int, userID uint, search, class, name, orderBy, status string) ([]dtos.TicketTravelerDetailOrderResponse, int, error)
 	GetTicketOrdersByAdmin(page, limit int, search, dateStart, dateEnd, orderBy, filter string) ([]dtos.TicketTravelerDetailOrderResponse, int, error)
 	GetTicketOrdersDetailByAdmin(ticketOrderId, trainId uint) (dtos.TicketTravelerDetailOrderResponse, error)
 	GetTicketOrderByID(userID, ticketTravelerDetailId, ticketOrderId uint) (dtos.TicketTravelerDetailOrderResponse, error)
@@ -32,10 +32,11 @@ type ticketOrderUsecase struct {
 	trainStationRepo         repositories.TrainStationRepository
 	paymentRepo              repositories.PaymentRepository
 	userRepo                 repositories.UserRepository
+	notificationRepo         repositories.NotificationRepository
 }
 
-func NewTicketOrderUsecase(ticketOrderRepo repositories.TicketOrderRepository, ticketTravelerDetailRepo repositories.TicketTravelerDetailRepository, travelerDetailRepo repositories.TravelerDetailRepository, trainCarriageRepo repositories.TrainCarriageRepository, trainRepo repositories.TrainRepository, trainSeatRepo repositories.TrainSeatRepository, stationRepo repositories.StationRepository, trainStationRepo repositories.TrainStationRepository, paymentRepo repositories.PaymentRepository, userRepo repositories.UserRepository) TicketOrderUsecase {
-	return &ticketOrderUsecase{ticketOrderRepo, ticketTravelerDetailRepo, travelerDetailRepo, trainCarriageRepo, trainRepo, trainSeatRepo, stationRepo, trainStationRepo, paymentRepo, userRepo}
+func NewTicketOrderUsecase(ticketOrderRepo repositories.TicketOrderRepository, ticketTravelerDetailRepo repositories.TicketTravelerDetailRepository, travelerDetailRepo repositories.TravelerDetailRepository, trainCarriageRepo repositories.TrainCarriageRepository, trainRepo repositories.TrainRepository, trainSeatRepo repositories.TrainSeatRepository, stationRepo repositories.StationRepository, trainStationRepo repositories.TrainStationRepository, paymentRepo repositories.PaymentRepository, userRepo repositories.UserRepository, notificationRepo repositories.NotificationRepository) TicketOrderUsecase {
+	return &ticketOrderUsecase{ticketOrderRepo, ticketTravelerDetailRepo, travelerDetailRepo, trainCarriageRepo, trainRepo, trainSeatRepo, stationRepo, trainStationRepo, paymentRepo, userRepo, notificationRepo}
 }
 
 // GetTicketOrders godoc
@@ -46,6 +47,10 @@ func NewTicketOrderUsecase(ticketOrderRepo repositories.TicketOrderRepository, t
 // @Produce      json
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
+// @Param search query string false "Search order"
+// @Param class query string false "Filter by class train"
+// @Param name query string false "Filter by name train"
+// @Param order_by query string false "Filter order by"
 // @Param status query string false "Filter by status order"
 // @Success      200 {object} dtos.GetAllTicketTravelerDetailOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
@@ -55,7 +60,7 @@ func NewTicketOrderUsecase(ticketOrderRepo repositories.TicketOrderRepository, t
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/order/ticket [get]
 // @Security BearerAuth
-func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, status string) ([]dtos.TicketTravelerDetailOrderResponse, int, error) {
+func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, search, class, name, orderBy, status string) ([]dtos.TicketTravelerDetailOrderResponse, int, error) {
 	var ticketTravelerDetailResponses []dtos.TicketTravelerDetailOrderResponse
 
 	ticketTravelerDetail, _, err := u.ticketTravelerDetailRepo.GetAllTicketTravelerDetails()
@@ -69,12 +74,12 @@ func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, statu
 		if status == "" {
 			getTicketOrder, err = u.ticketOrderRepo.GetTicketOrderByID(ticketTravelerDetail.TicketOrderID, userID)
 			if err != nil {
-				return ticketTravelerDetailResponses, 0, err
+				continue
 			}
 		} else {
 			getTicketOrder, err = u.ticketOrderRepo.GetTicketOrderByStatusAndID(ticketTravelerDetail.TicketOrderID, userID, status)
 			if err != nil {
-				return ticketTravelerDetailResponses, 0, err
+				continue
 			}
 		}
 
@@ -110,9 +115,27 @@ func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, statu
 			return ticketTravelerDetailResponses, 0, err
 		}
 
-		getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID2(ticketTravelerDetail.TicketOrderID)
+		getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByTicketOrderID2(ticketTravelerDetail.TicketOrderID)
 		if err != nil {
 			return ticketTravelerDetailResponses, 0, err
+		}
+
+		// Check if the search query matches the hotel name, address
+		if search != "" &&
+			!strings.Contains(strings.ToLower(ticketTravelerDetail.BoardingTicketCode), strings.ToLower(search)) &&
+			!strings.Contains(strings.ToLower(getStationOrigin.Name), strings.ToLower(search)) &&
+			!strings.Contains(strings.ToLower(getStationOrigin.Origin), strings.ToLower(search)) &&
+			!strings.Contains(strings.ToLower(getStationDestination.Origin), strings.ToLower(search)) &&
+			!strings.Contains(strings.ToLower(getStationDestination.Name), strings.ToLower(search)) {
+			continue // Skip hotel order if it doesn't match the search query
+		}
+
+		// Apply filters based on nameHotel, addressHotel, orderDateHotel
+		if class != "" && !strings.Contains(strings.ToLower(getTrainCarriage.Class), strings.ToLower(class)) {
+			continue
+		}
+		if name != "" && !strings.Contains(strings.ToLower(getTrain.Name), strings.ToLower(name)) {
+			continue
 		}
 
 		var travelerDetailResponses []dtos.TravelerDetailResponse
@@ -187,6 +210,29 @@ func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, statu
 		ticketTravelerDetailResponses = append(ticketTravelerDetailResponses, ticketTravelerDetailResponse)
 	}
 
+	// Sort ticketTravelerDetailResponses based on the orderBy parameter
+	switch orderBy {
+	case "higher_price":
+		// Sort ticketTravelerDetailResponses by descending order of Price
+		sort.SliceStable(ticketTravelerDetailResponses, func(i, j int) bool {
+			return ticketTravelerDetailResponses[i].Train.TrainPrice > ticketTravelerDetailResponses[j].Train.TrainPrice
+		})
+	case "lower_price":
+		// Sort ticketTravelerDetailResponses by ascending order of Train.TrainPrice
+		sort.SliceStable(ticketTravelerDetailResponses, func(i, j int) bool {
+			return ticketTravelerDetailResponses[i].Train.TrainPrice < ticketTravelerDetailResponses[j].Train.TrainPrice
+		})
+	case "last_departure":
+		// Sort ticketTravelerDetailResponses by descending order of Last Departure
+		sort.SliceStable(ticketTravelerDetailResponses, func(i, j int) bool {
+			return ticketTravelerDetailResponses[i].StationOrigin.ArriveTime > ticketTravelerDetailResponses[j].StationOrigin.ArriveTime
+		})
+	case "early_departure":
+		// Sort ticketTravelerDetailResponses by ascending order of Early Departure
+		sort.SliceStable(ticketTravelerDetailResponses, func(i, j int) bool {
+			return ticketTravelerDetailResponses[i].StationOrigin.ArriveTime < ticketTravelerDetailResponses[j].StationOrigin.ArriveTime
+		})
+	}
 	// Apply offset and limit to ticketTravelerDetailResponses
 	start := (page - 1) * limit
 	end := start + limit
@@ -246,7 +292,7 @@ func (u *ticketOrderUsecase) GetTicketOrdersByAdmin(page, limit int, search, dat
 		} else {
 			getTicketOrder, err = u.ticketOrderRepo.GetTicketOrderByStatusAndID(ticketTravelerDetail.TicketOrderID, 1, filter)
 			if err != nil {
-				return ticketTravelerDetailResponses, 0, err
+				continue
 			}
 		}
 
@@ -282,7 +328,7 @@ func (u *ticketOrderUsecase) GetTicketOrdersByAdmin(page, limit int, search, dat
 			return ticketTravelerDetailResponses, 0, err
 		}
 
-		getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID2(ticketTravelerDetail.TicketOrderID)
+		getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByTicketOrderID2(ticketTravelerDetail.TicketOrderID)
 		if err != nil {
 			return ticketTravelerDetailResponses, 0, err
 		}
@@ -346,7 +392,7 @@ func (u *ticketOrderUsecase) GetTicketOrdersByAdmin(page, limit int, search, dat
 			Train: dtos.TrainResponsesSimply{
 				TrainID:         getTrain.ID,
 				CodeTrain:       getTrain.CodeTrain,
-				Name:            getTrain.Name,
+				Name:            strings.ToUpper(getTrain.Name),
 				Class:           getTrainCarriage.Class,
 				TrainPrice:      ticketTravelerDetail.TrainPrice,
 				TrainCarriageID: getTrainCarriage.ID,
@@ -504,7 +550,7 @@ func (u *ticketOrderUsecase) GetTicketOrdersDetailByAdmin(ticketOrderId, trainId
 		return ticketTravelerDetailResponses, err
 	}
 
-	getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID2(ticketTravelerDetail.TicketOrderID)
+	getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByTicketOrderID2(ticketTravelerDetail.TicketOrderID)
 	if err != nil {
 		return ticketTravelerDetailResponses, err
 	}
@@ -705,7 +751,7 @@ func (u *ticketOrderUsecase) GetTicketOrderByID(userID, ticketOrderId, trainId u
 		return ticketTravelerDetailResponses, err
 	}
 
-	getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID2(ticketTravelerDetail.TicketOrderID)
+	getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByTicketOrderID2(ticketTravelerDetail.TicketOrderID)
 	if err != nil {
 		return ticketTravelerDetailResponses, err
 	}
@@ -820,9 +866,26 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 		Status:           "unpaid",
 	}
 
-	createTicketOrder, err := u.ticketOrderRepo.CreateTicketOrder(createTicketOrder)
+	getPayment, err := u.paymentRepo.GetPaymentByID2(uint(createTicketOrder.PaymentID))
+	if err != nil {
+		return ticketOrderResponse, errors.New("failed to get payment id")
+	}
+
+	createTicketOrder, err = u.ticketOrderRepo.CreateTicketOrder(createTicketOrder)
 	if err != nil {
 		return ticketOrderResponse, err
+	}
+
+	if createTicketOrder.ID > 0 && createTicketOrder.Status == "unpaid" {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 7,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return ticketOrderResponse, err
+		}
 	}
 
 	var ticketTravelerDetailDepartureResponses []dtos.TicketTravelerDetailResponse
@@ -833,7 +896,7 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 		}
 		createTravelerDetail := models.TravelerDetail{
 			UserID:        userID,
-			TicketOrderID: createTicketOrder.ID,
+			TicketOrderID: &createTicketOrder.ID,
 			Title:         travelerDetail.Title,
 			FullName:      travelerDetail.FullName,
 			IDCardNumber:  &travelerDetail.IDCardNumber,
@@ -844,7 +907,7 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 		}
 
 		for _, ticketTravelerDetailDeparture := range ticketOrderInput.TicketTravelerDetailDeparture {
-			if ticketTravelerDetailDeparture.TrainID < 1 || ticketTravelerDetailDeparture.TrainCarriageID < 1 || ticketTravelerDetailDeparture.TrainSeatID < 1 || ticketTravelerDetailDeparture.StationOriginID < 1 || ticketTravelerDetailDeparture.StationDestinationID < 1 || ticketTravelerDetailDeparture.Date == "" {
+			if ticketTravelerDetailDeparture.TrainCarriageID < 1 || ticketTravelerDetailDeparture.TrainSeatID < 1 || ticketTravelerDetailDeparture.StationOriginID < 1 || ticketTravelerDetailDeparture.StationDestinationID < 1 || ticketTravelerDetailDeparture.Date == "" {
 				return ticketOrderResponse, errors.New("Failed to create ticket order")
 			}
 			dateDepartureParse, err := helpers.FormatStringToDate(ticketTravelerDetailDeparture.Date)
@@ -852,13 +915,16 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 				return ticketOrderResponse, errors.New("Failed to parsing date")
 			}
 
-			getTrain, err := u.trainRepo.GetTrainByID(uint(ticketTravelerDetailDeparture.TrainID))
+			getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(uint(ticketTravelerDetailDeparture.TrainCarriageID))
 			if err != nil {
-				return ticketOrderResponse, err
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train carriage id")
 			}
-			getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID(uint(ticketTravelerDetailDeparture.TrainCarriageID))
+
+			getTrain, err := u.trainRepo.GetTrainByID2(uint(getTrainCarriage.TrainID))
 			if err != nil {
-				return ticketOrderResponse, err
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train id")
 			}
 
 			if travelerDetail.IDCardNumber != "" {
@@ -871,23 +937,28 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 
 			getTrainSeat, err := u.trainSeatRepo.GetTrainSeatByID(uint(ticketTravelerDetailDeparture.TrainSeatID))
 			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 				return ticketOrderResponse, err
 			}
-			getStationOrigin, err := u.stationRepo.GetStationByID(uint(ticketTravelerDetailDeparture.StationOriginID))
+			getStationOrigin, err := u.stationRepo.GetStationByID2(uint(ticketTravelerDetailDeparture.StationOriginID))
 			if err != nil {
-				return ticketOrderResponse, err
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get station origin id")
 			}
-			getStationDestination, err := u.stationRepo.GetStationByID(uint(ticketTravelerDetailDeparture.StationDestinationID))
+			getStationDestination, err := u.stationRepo.GetStationByID2(uint(ticketTravelerDetailDeparture.StationDestinationID))
 			if err != nil {
-				return ticketOrderResponse, err
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get station destination id")
 			}
 
 			trainStationOrigin, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationOrigin.ID)
 			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 				return ticketOrderResponse, err
 			}
 			trainStationDestination, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationDestination.ID)
 			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 				return ticketOrderResponse, err
 			}
 
@@ -907,11 +978,15 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 			}
 			createTicketTravelerDetail, err = u.ticketTravelerDetailRepo.CreateTicketTravelerDetail(createTicketTravelerDetail)
 			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
 				return ticketOrderResponse, err
 			}
 
 			getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID(createTicketTravelerDetail.TravelerDetailID)
 			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
 				return ticketOrderResponse, err
 			}
 
@@ -956,7 +1031,7 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 
 		if createTicketOrder.WithReturn {
 			for _, ticketTravelerDetailReturn := range ticketOrderInput.TicketTravelerDetailReturn {
-				if ticketTravelerDetailReturn.TrainID < 1 || ticketTravelerDetailReturn.TrainCarriageID < 1 || ticketTravelerDetailReturn.TrainSeatID < 1 || ticketTravelerDetailReturn.StationOriginID < 1 || ticketTravelerDetailReturn.StationDestinationID < 1 || ticketTravelerDetailReturn.Date == "" {
+				if ticketTravelerDetailReturn.TrainCarriageID < 1 || ticketTravelerDetailReturn.TrainSeatID < 1 || ticketTravelerDetailReturn.StationOriginID < 1 || ticketTravelerDetailReturn.StationDestinationID < 1 || ticketTravelerDetailReturn.Date == "" {
 					return ticketOrderResponse, errors.New("Failed to create ticket order")
 				}
 				dateReturn, err := helpers.FormatStringToDate(ticketTravelerDetailReturn.Date)
@@ -964,13 +1039,16 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 					return ticketOrderResponse, errors.New("Failed to parsing date")
 				}
 
-				getTrain, err := u.trainRepo.GetTrainByID(uint(ticketTravelerDetailReturn.TrainID))
+				getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(uint(ticketTravelerDetailReturn.TrainCarriageID))
 				if err != nil {
-					return ticketOrderResponse, err
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get train carriage id")
 				}
-				getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID(uint(ticketTravelerDetailReturn.TrainCarriageID))
+
+				getTrain, err := u.trainRepo.GetTrainByID2(getTrainCarriage.TrainID)
 				if err != nil {
-					return ticketOrderResponse, err
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get train id")
 				}
 
 				if travelerDetail.IDCardNumber != "" {
@@ -983,23 +1061,28 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 
 				getTrainSeat, err := u.trainSeatRepo.GetTrainSeatByID(uint(ticketTravelerDetailReturn.TrainSeatID))
 				if err != nil {
-					return ticketOrderResponse, err
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get train seat id")
 				}
 				getStationOrigin, err := u.stationRepo.GetStationByID(uint(ticketTravelerDetailReturn.StationOriginID))
 				if err != nil {
-					return ticketOrderResponse, err
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get station origin id")
 				}
 				getStationDestination, err := u.stationRepo.GetStationByID(uint(ticketTravelerDetailReturn.StationDestinationID))
 				if err != nil {
-					return ticketOrderResponse, err
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get station destination id")
 				}
 
 				trainStationOrigin, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationOrigin.ID)
 				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 					return ticketOrderResponse, err
 				}
 				trainStationDestination, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationDestination.ID)
 				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
 					return ticketOrderResponse, err
 				}
 
@@ -1019,11 +1102,15 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 				}
 				createTicketTravelerDetail, err = u.ticketTravelerDetailRepo.CreateTicketTravelerDetail(createTicketTravelerDetail)
 				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
 					return ticketOrderResponse, err
 				}
 
 				getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID(createTicketTravelerDetail.TravelerDetailID)
 				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
 					return ticketOrderResponse, err
 				}
 
@@ -1078,10 +1165,6 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 	}
 
 	getOrderTicket, err := u.ticketOrderRepo.GetTicketOrderByID(updateTicketOrder.ID, userID)
-	if err != nil {
-		return ticketOrderResponse, err
-	}
-	getPayment, err := u.paymentRepo.GetPaymentByID(uint(getOrderTicket.PaymentID))
 	if err != nil {
 		return ticketOrderResponse, err
 	}
@@ -1142,6 +1225,30 @@ func (u *ticketOrderUsecase) UpdateTicketOrder(userID, ticketOrderID uint, statu
 	createTicketOrder, err = u.ticketOrderRepo.UpdateTicketOrder(createTicketOrder)
 	if err != nil {
 		return ticketOrderResponse, err
+	}
+
+	if createTicketOrder.ID > 0 && createTicketOrder.Status == "paid" {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 4,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return ticketOrderResponse, err
+		}
+	}
+
+	if createTicketOrder.ID > 0 && createTicketOrder.Status == "canceled" {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 8,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return ticketOrderResponse, err
+		}
 	}
 
 	getTicketTravelerDetail, err := u.ticketTravelerDetailRepo.GetTicketTravelerDetailByTicketOrderID(createTicketOrder.ID)

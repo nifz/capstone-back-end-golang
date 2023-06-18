@@ -11,24 +11,24 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type TicketOrderController interface {
-	GetTicketOrders(c echo.Context) error
-	GetTicketOrdersByAdmin(c echo.Context) error
-	GetTicketOrderDetailByAdmin(c echo.Context) error
-	GetTicketOrderByID(c echo.Context) error
-	CreateTicketOrder(c echo.Context) error
-	UpdateTicketOrder(c echo.Context) error
+type HotelOrderController interface {
+	GetHotelOrders(c echo.Context) error
+	GetHotelOrdersByAdmin(c echo.Context) error
+	GetHotelOrderDetailByAdmin(c echo.Context) error
+	GetHotelOrderByID(c echo.Context) error
+	CreateHotelOrder(c echo.Context) error
+	UpdateHotelOrder(c echo.Context) error
 }
 
-type ticketOrderController struct {
-	ticketOrderUsecase usecases.TicketOrderUsecase
+type hotelOrderController struct {
+	hotelOrderUsecase usecases.HotelOrderUsecase
 }
 
-func NewTicketOrderController(ticketOrderUsecase usecases.TicketOrderUsecase) TicketOrderController {
-	return &ticketOrderController{ticketOrderUsecase}
+func NewHotelOrderController(hotelOrderUsecase usecases.HotelOrderUsecase) HotelOrderController {
+	return &hotelOrderController{hotelOrderUsecase}
 }
 
-func (c *ticketOrderController) GetTicketOrders(ctx echo.Context) error {
+func (c *hotelOrderController) GetHotelOrders(ctx echo.Context) error {
 	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
 	if tokenString == "" {
 		return ctx.JSON(
@@ -65,24 +65,20 @@ func (c *ticketOrderController) GetTicketOrders(ctx echo.Context) error {
 		limit = 1000
 	}
 
-	// @Param search query string false "Search order"
-	// @Param class query string false "Filter by class train"
-	// @Param name query string false "Filter by name train"
-	// @Param order_by query string false "Filter order by"
-
 	searchParam := ctx.QueryParam("search")
-	classParam := ctx.QueryParam("class")
 	nameParam := ctx.QueryParam("name")
-	orderByParam := ctx.QueryParam("order_by")
+	addressParam := ctx.QueryParam("address")
+	orderDateParam := ctx.QueryParam("order_date")
+	sortParam := ctx.QueryParam("order_by")
 	statusParam := ctx.QueryParam("status")
 
-	ticketOrder, count, err := c.ticketOrderUsecase.GetTicketOrders(page, limit, userId, searchParam, classParam, nameParam, orderByParam, statusParam)
+	hotelOrder, count, err := c.hotelOrderUsecase.GetHotelOrders(page, limit, userId, searchParam, nameParam, addressParam, orderDateParam, sortParam, statusParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get a ticket order",
+				"Failed to get a hotel order",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -92,8 +88,8 @@ func (c *ticketOrderController) GetTicketOrders(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewPaginationResponse(
 			http.StatusOK,
-			"Successfully to get order tickets",
-			ticketOrder,
+			"Successfully to get order hotels",
+			hotelOrder,
 			page,
 			limit,
 			count,
@@ -101,7 +97,7 @@ func (c *ticketOrderController) GetTicketOrders(ctx echo.Context) error {
 	)
 }
 
-func (c *ticketOrderController) GetTicketOrdersByAdmin(ctx echo.Context) error {
+func (c *hotelOrderController) GetHotelOrdersByAdmin(ctx echo.Context) error {
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -119,14 +115,15 @@ func (c *ticketOrderController) GetTicketOrdersByAdmin(ctx echo.Context) error {
 	dateEndParam := ctx.QueryParam("date_end")
 	orderByParam := ctx.QueryParam("order_by")
 	filterParam := ctx.QueryParam("filter")
+	ratingClass, _ := strconv.Atoi(ctx.QueryParam("rating_class"))
 
-	ticketOrder, count, err := c.ticketOrderUsecase.GetTicketOrdersByAdmin(page, limit, searchParam, dateStartParam, dateEndParam, orderByParam, filterParam)
+	hotelOrder, count, err := c.hotelOrderUsecase.GetHotelOrdersByAdmin(page, limit, ratingClass, searchParam, dateStartParam, dateEndParam, orderByParam, filterParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get a ticket order",
+				"Failed to get a hotel order",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -136,8 +133,8 @@ func (c *ticketOrderController) GetTicketOrdersByAdmin(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewPaginationResponse(
 			http.StatusOK,
-			"Successfully to get order tickets",
-			ticketOrder,
+			"Successfully to get order hotels",
+			hotelOrder,
 			page,
 			limit,
 			count,
@@ -145,19 +142,17 @@ func (c *ticketOrderController) GetTicketOrdersByAdmin(ctx echo.Context) error {
 	)
 }
 
-func (c *ticketOrderController) GetTicketOrderDetailByAdmin(ctx echo.Context) error {
-	trainIdParam := ctx.QueryParam("train_id")
-	trainId, _ := strconv.Atoi(trainIdParam)
-	ticketOrderIdParam := ctx.QueryParam("ticket_order_id")
-	ticketOrderId, _ := strconv.Atoi(ticketOrderIdParam)
+func (c *hotelOrderController) GetHotelOrderDetailByAdmin(ctx echo.Context) error {
+	hotelOrderIdParam := ctx.QueryParam("hotel_order_id")
+	hotelOrderId, _ := strconv.Atoi(hotelOrderIdParam)
 
-	ticketOrder, err := c.ticketOrderUsecase.GetTicketOrdersDetailByAdmin(uint(ticketOrderId), uint(trainId))
+	hotelOrder, err := c.hotelOrderUsecase.GetHotelOrdersDetailByAdmin(uint(hotelOrderId))
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get a ticket order",
+				"Failed to get a hotel order",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -167,13 +162,13 @@ func (c *ticketOrderController) GetTicketOrderDetailByAdmin(ctx echo.Context) er
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully to get order tickets",
-			ticketOrder,
+			"Successfully to get order hotels",
+			hotelOrder,
 		),
 	)
 }
 
-func (c *ticketOrderController) GetTicketOrderByID(ctx echo.Context) error {
+func (c *hotelOrderController) GetHotelOrderByID(ctx echo.Context) error {
 	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
 	if tokenString == "" {
 		return ctx.JSON(
@@ -198,18 +193,22 @@ func (c *ticketOrderController) GetTicketOrderByID(ctx echo.Context) error {
 		)
 	}
 
-	trainIdParam := ctx.QueryParam("train_id")
-	trainId, _ := strconv.Atoi(trainIdParam)
-	ticketOrderIdParam := ctx.QueryParam("ticket_order_id")
-	ticketOrderId, _ := strconv.Atoi(ticketOrderIdParam)
+	hotelOrderIdParam := ctx.QueryParam("hotel_order_id")
+	hotelOrderId, _ := strconv.Atoi(hotelOrderIdParam)
 
-	ticketOrder, err := c.ticketOrderUsecase.GetTicketOrderByID(userId, uint(ticketOrderId), uint(trainId))
+	isCheckInParam := ctx.QueryParam("update_check_in")
+	isCheckIn, _ := strconv.ParseBool(isCheckInParam)
+
+	isCheckOutParam := ctx.QueryParam("update_check_out")
+	isCheckOut, _ := strconv.ParseBool(isCheckOutParam)
+
+	hotelOrder, err := c.hotelOrderUsecase.GetHotelOrderByID(userId, uint(hotelOrderId), isCheckIn, isCheckOut)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to get a ticket order",
+				"Failed to get a hotel order",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -219,13 +218,13 @@ func (c *ticketOrderController) GetTicketOrderByID(ctx echo.Context) error {
 		http.StatusOK,
 		helpers.NewResponse(
 			http.StatusOK,
-			"Successfully to get order tickets",
-			ticketOrder,
+			"Successfully to get order hotels",
+			hotelOrder,
 		),
 	)
 }
 
-func (c *ticketOrderController) CreateTicketOrder(ctx echo.Context) error {
+func (c *hotelOrderController) CreateHotelOrder(ctx echo.Context) error {
 	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
 	if tokenString == "" {
 		return ctx.JSON(
@@ -250,25 +249,25 @@ func (c *ticketOrderController) CreateTicketOrder(ctx echo.Context) error {
 		)
 	}
 
-	var ticketOrderInput dtos.TicketOrderInput
-	if err := ctx.Bind(&ticketOrderInput); err != nil {
+	var hotelOrderInput dtos.HotelOrderInput
+	if err := ctx.Bind(&hotelOrderInput); err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding ticket order",
+				"Failed binding hotel order",
 				helpers.GetErrorData(err),
 			),
 		)
 	}
 
-	ticketOrder, err := c.ticketOrderUsecase.CreateTicketOrder(userId, ticketOrderInput)
+	hotelOrder, err := c.hotelOrderUsecase.CreateHotelOrder(userId, hotelOrderInput)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to created a ticket order",
+				"Failed to created a hotel order",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -278,13 +277,13 @@ func (c *ticketOrderController) CreateTicketOrder(ctx echo.Context) error {
 		http.StatusCreated,
 		helpers.NewResponse(
 			http.StatusCreated,
-			"Successfully to created a ticket order",
-			ticketOrder,
+			"Successfully to created a hotel order",
+			hotelOrder,
 		),
 	)
 }
 
-func (c *ticketOrderController) UpdateTicketOrder(ctx echo.Context) error {
+func (c *hotelOrderController) UpdateHotelOrder(ctx echo.Context) error {
 	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
 	if tokenString == "" {
 		return ctx.JSON(
@@ -309,30 +308,30 @@ func (c *ticketOrderController) UpdateTicketOrder(ctx echo.Context) error {
 		)
 	}
 
-	var ticketOrderInput dtos.TicketOrderInput
-	if err := ctx.Bind(&ticketOrderInput); err != nil {
+	var hotelOrderInput dtos.HotelOrderInput
+	if err := ctx.Bind(&hotelOrderInput); err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed binding ticket order",
+				"Failed binding hotel order",
 				helpers.GetErrorData(err),
 			),
 		)
 	}
 
-	ticketOrderIDParam := ctx.QueryParam("ticket_order_id")
-	ticketOrderID, _ := strconv.Atoi(ticketOrderIDParam)
+	hotelOrderIDParam := ctx.QueryParam("hotel_order_id")
+	hotelOrderID, _ := strconv.Atoi(hotelOrderIDParam)
 
 	statusParam := ctx.QueryParam("status")
 
-	ticketOrder, err := c.ticketOrderUsecase.UpdateTicketOrder(userId, uint(ticketOrderID), statusParam)
+	hotelOrder, err := c.hotelOrderUsecase.UpdateHotelOrder(userId, uint(hotelOrderID), statusParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			helpers.NewErrorResponse(
 				http.StatusBadRequest,
-				"Failed to update a ticket order",
+				"Failed to update a hotel order",
 				helpers.GetErrorData(err),
 			),
 		)
@@ -342,8 +341,8 @@ func (c *ticketOrderController) UpdateTicketOrder(ctx echo.Context) error {
 		http.StatusCreated,
 		helpers.NewResponse(
 			http.StatusCreated,
-			"Successfully to update a ticket order",
-			ticketOrder,
+			"Successfully to update a hotel order",
+			hotelOrder,
 		),
 	)
 

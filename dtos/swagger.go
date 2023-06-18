@@ -184,6 +184,12 @@ type HistorySearchCreeatedResponse struct {
 	Data       HistorySearchResponse `json:"data"`
 }
 
+type StatusOKResponse struct {
+	StatusCode int         `json:"status_code" example:"200"`
+	Message    string      `json:"message" example:"Successfully"`
+	Data       interface{} `json:"data"`
+}
+
 type StatusOKDeletedResponse struct {
 	StatusCode int         `json:"status_code" example:"200"`
 	Message    string      `json:"message" example:"Successfully deleted"`
@@ -259,8 +265,8 @@ type HotelStatusOKResponses struct {
 }
 
 type HotelByIDStatusOKResponses struct {
-	StatusCode int           `json:"status_code" example:"200"`
-	Message    string        `json:"message" example:"Successfully get hotel"`
+	StatusCode int               `json:"status_code" example:"200"`
+	Message    string            `json:"message" example:"Successfully get hotel"`
 	Data       HotelByIDResponse `json:"data"`
 }
 
@@ -287,4 +293,35 @@ type HotelRoomCreeatedResponses struct {
 	StatusCode int               `json:"status_code" example:"201"`
 	Message    string            `json:"message" example:"Successfully created hotel room"`
 	Data       HotelRoomResponse `json:"data"`
+}
+
+type GetAllHotelOrderStatusOKResponse struct {
+	StatusCode int                `json:"status_code" example:"200"`
+	Message    string             `json:"message" example:"Successfully get ticket order"`
+	Data       HotelOrderResponse `json:"data"`
+	Meta       helpers.Meta       `json:"meta"`
+}
+
+type HotelOrderStatusOKResponse struct {
+	StatusCode int                `json:"status_code" example:"200"`
+	Message    string             `json:"message" example:"Successfully get ticket order"`
+	Data       HotelOrderResponse `json:"data"`
+}
+
+type HotelOrderCreeatedResponse struct {
+	StatusCode int                `json:"status_code" example:"201"`
+	Message    string             `json:"message" example:"Successfully created ticket order"`
+	Data       HotelOrderResponse `json:"data"`
+}
+
+type GetNotificationByUserIDStatusOKResponses struct {
+	StatusCode int                  `json:"status_code" example:"200"`
+	Message    string               `json:"message" example:"Successfully get notification"`
+	Data       NotificationResponse `json:"data"`
+}
+
+type HotelRatingCreeatedResponses struct {
+	StatusCode int                 `json:"status_code" example:"201"`
+	Message    string              `json:"message" example:"Successfully created hotel rating"`
+	Data       HotelRatingResponse `json:"data"`
 }

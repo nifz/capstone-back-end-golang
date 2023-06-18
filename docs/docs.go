@@ -750,6 +750,181 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/order/hotel": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Hotel Order User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Order"
+                ],
+                "summary": "Get Hotel Order User",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Hotel rating class",
+                        "name": "rating_class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "search hotel name",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Date start",
+                        "name": "date_start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Date end",
+                        "name": "date_end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter order by",
+                        "name": "order_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status order",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllHotelOrderStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/order/hotel/detail": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Hotel Order User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Order"
+                ],
+                "summary": "Get Hotel Order User",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Hotel Order ID",
+                        "name": "hotel_order_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelOrderStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/order/ticket": {
             "get": {
                 "security": [
@@ -2497,6 +2672,131 @@ const docTemplate = `{
                 }
             }
         },
+        "/public/cloudinary/file-upload": {
+            "post": {
+                "description": "Upload file to cloudinary",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloudinary"
+                ],
+                "summary": "Upload file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Photo file",
+                        "name": "file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/cloudinary/url-upload": {
+            "post": {
+                "description": "Upload file to cloudinary",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloudinary"
+                ],
+                "summary": "Upload file",
+                "parameters": [
+                    {
+                        "description": "Payload Body [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Url"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/public/hotel": {
             "get": {
                 "description": "Get all hotel",
@@ -2529,6 +2829,135 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.GetAllHotelStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/hotel-room": {
+            "get": {
+                "description": "Get all hotel room",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel Room"
+                ],
+                "summary": "Get all hotel room",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllHotelRoomStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/public/hotel-room/{id}": {
+            "get": {
+                "description": "Get hotel room by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel Room"
+                ],
+                "summary": "Get hotel room by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Hotel Room",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelRoomStatusOKResponses"
                         }
                     },
                     "400": {
@@ -2967,6 +3396,30 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
+                        "description": "Train id",
+                        "name": "train_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Class train",
+                        "name": "class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Date order",
+                        "name": "date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Status train",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
                         "description": "Page number",
                         "name": "page",
                         "in": "query"
@@ -3045,111 +3498,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.TrainCarriageStatusOKResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/public/train/search": {
-            "get": {
-                "description": "Search Train",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User - Train"
-                ],
-                "summary": "Search Train Available",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of items per page",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Station origin id",
-                        "name": "station_origin_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Station destination id",
-                        "name": "station_destination_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Filter by train id",
-                        "name": "sort_by_train_id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by class name",
-                        "name": "sort_by_class",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by price",
-                        "name": "sort_by_price",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by arrive time",
-                        "name": "sort_by_arrive_time",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.GetAllTrainStatusOKResponse"
                         }
                     },
                     "400": {
@@ -3633,9 +3981,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/hotel-room": {
-            "get": {
-                "description": "Get all hotel room",
+        "/user/hotel-ratings": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new hotel rating",
                 "consumes": [
                     "application/json"
                 ],
@@ -3643,28 +3996,25 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin - Hotel Room"
+                    "User - Hotel Rating"
                 ],
-                "summary": "Get all hotel room",
+                "summary": "Create a new hotel rating",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of items per page",
-                        "name": "limit",
-                        "in": "query"
+                        "description": "Payload Body [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelRatingInput"
+                        }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/dtos.GetAllHotelRoomStatusOKResponses"
+                            "$ref": "#/definitions/dtos.HotelRatingCreeatedResponses"
                         }
                     },
                     "400": {
@@ -3700,9 +4050,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/hotel-room/{id}": {
-            "get": {
-                "description": "Get hotel room by ID",
+        "/user/hotel/order": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Order Hotel",
                 "consumes": [
                     "application/json"
                 ],
@@ -3710,13 +4065,262 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Admin - Hotel Room"
+                    "User - Hotel"
                 ],
-                "summary": "Get hotel room by ID",
+                "summary": "Order Hotel",
+                "parameters": [
+                    {
+                        "description": "Payload Body [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelOrderInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelOrderCreeatedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update Order Hotel",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Hotel"
+                ],
+                "summary": "Update Order Hotel",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID Hotel Room",
+                        "description": "Hotel Order ID",
+                        "name": "hotel_order_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Update Status Order ID",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelOrderStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/hotel/search": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Search Hotel",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Hotel"
+                ],
+                "summary": "Search Hotel Available",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter minimum price",
+                        "name": "minimum_price",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter maximum price",
+                        "name": "maximum_price",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter rating class",
+                        "name": "rating_class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search address hotel",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search name hotel",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by price",
+                        "name": "sort_by_price",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllHotelStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/notification/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get notification by user id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Notification"
+                ],
+                "summary": "Get notification by user id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -3726,7 +4330,194 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.HotelRoomStatusOKResponses"
+                            "$ref": "#/definitions/dtos.GetNotificationByUserIDStatusOKResponses"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/order/hotel": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Hotel Order User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Order"
+                ],
+                "summary": "Get Hotel Order User",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search order",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by name hotel",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by address hotel",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by order date hotel",
+                        "name": "order_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter order by",
+                        "name": "order_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by status order",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllHotelOrderStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/order/hotel/detail": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Hotel Order User by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Order"
+                ],
+                "summary": "Get Hotel Order User by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Hotel Order ID",
+                        "name": "hotel_order_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Update status order check in",
+                        "name": "update_check_in",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Update status order check out",
+                        "name": "update_check_out",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelOrderStatusOKResponse"
                         }
                     },
                     "400": {
@@ -3791,6 +4582,30 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Number of items per page",
                         "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search order",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by class train",
+                        "name": "class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by name train",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter order by",
+                        "name": "order_by",
                         "in": "query"
                     },
                     {
@@ -4020,6 +4835,116 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.TicketOrderStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/train/search": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Search Train",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Train"
+                ],
+                "summary": "Search Train Available",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Station origin id",
+                        "name": "station_origin_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Station destination id",
+                        "name": "station_destination_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter by train id",
+                        "name": "sort_by_train_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by class name",
+                        "name": "sort_by_class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by price",
+                        "name": "sort_by_price",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by arrive time",
+                        "name": "sort_by_arrive_time",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllTrainStatusOKResponse"
                         }
                     },
                     "400": {
@@ -4411,6 +5336,25 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.GetAllHotelOrderStatusOKResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelOrderResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get ticket order"
+                },
+                "meta": {
+                    "$ref": "#/definitions/helpers.Meta"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
         "dtos.GetAllHotelRoomStatusOKResponses": {
             "type": "object",
             "properties": {
@@ -4582,6 +5526,22 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.GetNotificationByUserIDStatusOKResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.NotificationResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get notification"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
         "dtos.HistorySearchCreeatedResponse": {
             "type": "object",
             "properties": {
@@ -4646,7 +5606,68 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "class": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "description": {
                     "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "hotel_facilities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelFacilitiesResponse"
+                    }
+                },
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_image": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelImageResponse"
+                    }
+                },
+                "hotel_policy": {
+                    "$ref": "#/definitions/dtos.HotelPoliciesResponse"
+                },
+                "hotel_rating": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.RatingInfo"
+                    }
+                },
+                "hotel_room": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelRoomHotelIDResponse"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
+        "dtos.HotelByIDResponses": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "integer"
                 },
                 "created_at": {
                     "type": "string",
@@ -4677,10 +5698,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/dtos.HotelPoliciesResponse"
                 },
                 "hotel_room": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dtos.HotelRoomHotelIDResponse"
-                    }
+                    "$ref": "#/definitions/dtos.HotelRoomHotelIDResponse"
                 },
                 "name": {
                     "type": "string"
@@ -4748,9 +5766,6 @@ const docTemplate = `{
         "dtos.HotelImageInput": {
             "type": "object",
             "properties": {
-                "hotel_id": {
-                    "type": "integer"
-                },
                 "image_url": {
                     "type": "string"
                 }
@@ -4774,7 +5789,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "class": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "description": {
                     "type": "string"
@@ -4805,6 +5820,179 @@ const docTemplate = `{
                 },
                 "phone_number": {
                     "type": "string"
+                }
+            }
+        },
+        "dtos.HotelOrderCreeatedResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelOrderResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully created ticket order"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 201
+                }
+            }
+        },
+        "dtos.HotelOrderInput": {
+            "type": "object",
+            "properties": {
+                "date_end": {
+                    "type": "string",
+                    "example": "2023-05-02"
+                },
+                "date_start": {
+                    "type": "string",
+                    "example": "2023-05-01"
+                },
+                "email_order": {
+                    "type": "string",
+                    "example": "me@hanifz.com"
+                },
+                "hotel_room_id": {
+                    "description": "HotelID          int                   ` + "`" + `form:\"hotel_id\" json:\"hotel_id\" example:\"1\"` + "`" + `",
+                    "type": "integer",
+                    "example": 1
+                },
+                "name_order": {
+                    "type": "string",
+                    "example": "Mochammad Hanif"
+                },
+                "payment_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "phone_number_order": {
+                    "type": "string",
+                    "example": "085115151515"
+                },
+                "quantity_adult": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "quantity_infant": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "special_request": {
+                    "type": "string",
+                    "example": "Tambah 1 Bed"
+                },
+                "traveler_detail": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.TravelerDetailInput"
+                    }
+                }
+            }
+        },
+        "dtos.HotelOrderResponse": {
+            "type": "object",
+            "properties": {
+                "check_in_date": {
+                    "type": "string",
+                    "example": "2023-05-01"
+                },
+                "check_out_date": {
+                    "type": "string",
+                    "example": "2023-05-02"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "email_order": {
+                    "type": "string",
+                    "example": "me@hanifz.com"
+                },
+                "hotel": {
+                    "$ref": "#/definitions/dtos.HotelByIDResponses"
+                },
+                "hotel_order_id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "is_check_in": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "is_check_out": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "name_order": {
+                    "type": "string",
+                    "example": "Mochammad Hanif"
+                },
+                "number_of_night": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "payment": {
+                    "$ref": "#/definitions/dtos.PaymentResponses"
+                },
+                "phone_number_order": {
+                    "type": "string",
+                    "example": "085115151515"
+                },
+                "price": {
+                    "type": "integer",
+                    "example": 50000
+                },
+                "quantity_adult": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "quantity_infant": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "special_request": {
+                    "type": "string",
+                    "example": "Minta 1 Bed"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "unpaid"
+                },
+                "ticket_order_code": {
+                    "type": "string",
+                    "example": "RANDOMCODE123"
+                },
+                "total_amount": {
+                    "type": "integer",
+                    "example": 50000
+                },
+                "traveler_detail": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.TravelerDetailResponse"
+                    }
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
+        "dtos.HotelOrderStatusOKResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelOrderResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get ticket order"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
                 }
             }
         },
@@ -4899,6 +6087,62 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.HotelRatingCreeatedResponses": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelRatingResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully created hotel rating"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 201
+                }
+            }
+        },
+        "dtos.HotelRatingInput": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_order_id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "review": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.HotelRatingResponse": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_order_id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "review": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.HotelResponse": {
             "type": "object",
             "properties": {
@@ -4906,7 +6150,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "class": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "created_at": {
                     "type": "string",
@@ -4964,6 +6208,14 @@ const docTemplate = `{
                 "status_code": {
                     "type": "integer",
                     "example": 201
+                }
+            }
+        },
+        "dtos.HotelRoomFacilitiesInput": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
                 }
             }
         },
@@ -5034,6 +6286,14 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.HotelRoomImageInput": {
+            "type": "object",
+            "properties": {
+                "image_url": {
+                    "type": "string"
+                }
+            }
+        },
         "dtos.HotelRoomImageResponse": {
             "type": "object",
             "properties": {
@@ -5063,13 +6323,13 @@ const docTemplate = `{
                 "hotel_room_facility": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dtos.HotelRoomFacilitiesResponse"
+                        "$ref": "#/definitions/dtos.HotelRoomFacilitiesInput"
                     }
                 },
                 "hotel_room_image": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dtos.HotelRoomImageResponse"
+                        "$ref": "#/definitions/dtos.HotelRoomImageInput"
                     }
                 },
                 "mattress_size": {
@@ -5216,6 +6476,20 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.NotificationResponse": {
+            "type": "object",
+            "properties": {
+                "notification_content": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.TemplateMessageByUserIDResponse"
+                    }
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dtos.PaymentCreeatedResponse": {
             "type": "object",
             "properties": {
@@ -5319,6 +6593,30 @@ const docTemplate = `{
                 "status_code": {
                     "type": "integer",
                     "example": 200
+                }
+            }
+        },
+        "dtos.RatingInfo": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "format": "2006-01-02 15:04:05"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "review": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "user_image": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
@@ -5440,6 +6738,39 @@ const docTemplate = `{
                 "status_code": {
                     "type": "integer",
                     "example": 200
+                }
+            }
+        },
+        "dtos.StatusOKResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string",
+                    "example": "Successfully"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "dtos.TemplateMessageByUserIDResponse": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
                 }
             }
         },
@@ -5604,10 +6935,7 @@ const docTemplate = `{
                     "example": 1
                 },
                 "train_carriage_id": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "train_id": {
+                    "description": "TrainID              int    ` + "`" + `form:\"train_id\" json:\"train_id\" example:\"1\"` + "`" + `",
                     "type": "integer",
                     "example": 1
                 },
@@ -5653,7 +6981,7 @@ const docTemplate = `{
                 },
                 "quantity_infant": {
                     "type": "integer",
-                    "example": 1
+                    "example": 0
                 },
                 "station_destination": {
                     "$ref": "#/definitions/dtos.StationResponseSimply"
@@ -6341,6 +7669,17 @@ const docTemplate = `{
                     "example": 1
                 }
             }
+        },
+        "models.Url": {
+            "type": "object",
+            "required": [
+                "url"
+            ],
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            }
         }
     },
     "securityDefinitions": {
@@ -6359,7 +7698,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "capstone.hanifz.com",
+	Host:             "api.tripease.my.id",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Tripease API Documentation",
