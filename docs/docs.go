@@ -5268,6 +5268,7 @@ const docTemplate = `{
         "dtos.DashboardResponse": {
             "type": "object",
             "properties": {
+                "count_hotel": {},
                 "count_order": {},
                 "count_train": {},
                 "count_user": {},
