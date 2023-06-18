@@ -58,6 +58,7 @@ definitions:
     type: object
   dtos.DashboardResponse:
     properties:
+      count_hotel: {}
       count_order: {}
       count_train: {}
       count_user: {}
