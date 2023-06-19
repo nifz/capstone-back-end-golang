@@ -104,6 +104,17 @@ func (c *hotelController) GetHotelByID(ctx echo.Context) error {
 }
 
 func (c *hotelController) CreateHotel(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var hotelDTO dtos.HotelInput
 	if err := ctx.Bind(&hotelDTO); err != nil {
 		return ctx.JSON(
@@ -189,6 +200,17 @@ func (c *hotelController) UpdateHotel(ctx echo.Context) error {
 }
 
 func (c *hotelController) DeleteHotel(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	err := c.hotelUsecase.DeleteHotel(uint(id))

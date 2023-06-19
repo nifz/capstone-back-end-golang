@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"back-end-golang/helpers"
+	"back-end-golang/middlewares"
 	"back-end-golang/usecases"
 	"net/http"
 
@@ -23,6 +24,17 @@ func NewDashboardController(dashboardUsecase usecases.DashboardUsecase) Dashboar
 // Implementasi fungsi-fungsi dari interface ItemController
 
 func (c *dashboardController) DashboardGetAll(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	dashboards, err := c.dashboardUsecase.DashboardGetAll()
 	if err != nil {
 		return ctx.JSON(

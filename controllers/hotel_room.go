@@ -3,6 +3,7 @@ package controllers
 import (
 	"back-end-golang/dtos"
 	"back-end-golang/helpers"
+	"back-end-golang/middlewares"
 	"back-end-golang/usecases"
 	"net/http"
 	"strconv"
@@ -94,6 +95,17 @@ func (c *hotelRoomController) GetHotelRoomByID(ctx echo.Context) error {
 }
 
 func (c *hotelRoomController) CreateHotelRoom(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var hotelRoomDTO dtos.HotelRoomInput
 	if err := ctx.Bind(&hotelRoomDTO); err != nil {
 		return ctx.JSON(
@@ -129,7 +141,17 @@ func (c *hotelRoomController) CreateHotelRoom(ctx echo.Context) error {
 }
 
 func (c *hotelRoomController) UpdateHotelRoom(ctx echo.Context) error {
-
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var hotelRoomInput dtos.HotelRoomInput
 	if err := ctx.Bind(&hotelRoomInput); err != nil {
 		return ctx.JSON(
@@ -179,6 +201,17 @@ func (c *hotelRoomController) UpdateHotelRoom(ctx echo.Context) error {
 }
 
 func (c *hotelRoomController) DeleteHotelRoom(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	err := c.hotelRoomUsecase.DeleteHotelRoom(uint(id))

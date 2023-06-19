@@ -3,6 +3,7 @@ package controllers
 import (
 	"back-end-golang/dtos"
 	"back-end-golang/helpers"
+	"back-end-golang/middlewares"
 	"back-end-golang/usecases"
 	"net/http"
 	"strconv"
@@ -68,6 +69,17 @@ func (c *stationController) GetAllStations(ctx echo.Context) error {
 }
 
 func (c *stationController) GetAllStationsByAdmin(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -136,6 +148,17 @@ func (c *stationController) GetStationByID(ctx echo.Context) error {
 }
 
 func (c *stationController) CreateStation(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var stationDTO dtos.StationInput
 	if err := ctx.Bind(&stationDTO); err != nil {
 		return ctx.JSON(
@@ -171,7 +194,17 @@ func (c *stationController) CreateStation(ctx echo.Context) error {
 }
 
 func (c *stationController) UpdateStation(ctx echo.Context) error {
-
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var stationInput dtos.StationInput
 	if err := ctx.Bind(&stationInput); err != nil {
 		return ctx.JSON(
@@ -221,6 +254,17 @@ func (c *stationController) UpdateStation(ctx echo.Context) error {
 }
 
 func (c *stationController) DeleteStation(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	err := c.stationUsecase.DeleteStation(uint(id))

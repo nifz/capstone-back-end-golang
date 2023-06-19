@@ -36,6 +36,7 @@ func GetTokenFromHeader(req *http.Request) string {
 		if len(splitHeader) == 2 {
 			return splitHeader[1]
 		}
+		return ""
 	}
 	return ""
 }

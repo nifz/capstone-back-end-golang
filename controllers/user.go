@@ -453,6 +453,17 @@ func (c *UserController) UserDeletePhotoProfile(ctx echo.Context) error {
 }
 
 func (c *UserController) UserGetAll(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -495,6 +506,17 @@ func (c *UserController) UserGetAll(ctx echo.Context) error {
 }
 
 func (c *UserController) UserGetDetail(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	idParam := ctx.QueryParam("id")
 	id, _ := strconv.Atoi(idParam)
 
@@ -524,6 +546,17 @@ func (c *UserController) UserGetDetail(ctx echo.Context) error {
 }
 
 func (c *UserController) UserAdminRegister(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var userInput dtos.UserRegisterInput
 	err := ctx.Bind(&userInput)
 	if err != nil {
@@ -560,6 +593,17 @@ func (c *UserController) UserAdminRegister(ctx echo.Context) error {
 }
 
 func (c *UserController) UserAdminUpdate(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	var userInput dtos.UserRegisterInputUpdateByAdmin
