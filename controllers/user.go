@@ -562,7 +562,7 @@ func (c *UserController) UserAdminRegister(ctx echo.Context) error {
 func (c *UserController) UserAdminUpdate(ctx echo.Context) error {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	var userInput dtos.UserRegisterInput
+	var userInput dtos.UserRegisterInputUpdateByAdmin
 	err := ctx.Bind(&userInput)
 	if err != nil {
 		return ctx.JSON(
