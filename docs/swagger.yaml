@@ -475,7 +475,7 @@ definitions:
         example: 1
         type: integer
       quantity_infant:
-        example: 1
+        example: 0
         type: integer
       special_request:
         example: Tambah 1 Bed
@@ -4458,6 +4458,50 @@ paths:
       summary: Order Hotel
       tags:
       - User - Hotel
+  /user/hotel/order/midtrans:
+    post:
+      consumes:
+      - application/json
+      description: Order Hotel
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.HotelOrderInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.HotelOrderCreeatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Order Hotel
+      tags:
+      - User - Hotel
   /user/hotel/search:
     get:
       consumes:
@@ -4642,6 +4686,57 @@ paths:
       tags:
       - User - Order
   /user/order/hotel/detail:
+    get:
+      consumes:
+      - application/json
+      description: Get Hotel Order User by ID
+      parameters:
+      - description: Hotel Order ID
+        in: query
+        name: hotel_order_id
+        required: true
+        type: integer
+      - description: Update status order check in
+        in: query
+        name: update_check_in
+        type: boolean
+      - description: Update status order check out
+        in: query
+        name: update_check_out
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.HotelOrderStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Hotel Order User by ID
+      tags:
+      - User - Order
+  /user/order/hotel/detail/midtrans:
     get:
       consumes:
       - application/json
@@ -4969,6 +5064,49 @@ paths:
       summary: Search Train Available
       tags:
       - User - Train
+  /user/transaction:
+    get:
+      consumes:
+      - application/json
+      description: Get Transaction
+      parameters:
+      - description: Order id
+        in: query
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllHotelOrderStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Transaction
+      tags:
+      - User - Order
   /user/update-password:
     put:
       consumes:

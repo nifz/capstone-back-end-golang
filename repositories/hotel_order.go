@@ -10,8 +10,12 @@ type HotelOrderRepository interface {
 	GetHotelOrders(page, limit int, userID uint, status string) ([]models.HotelOrder, int, error)
 	GetHotelOrderByStatusAndID(id, userID uint, status string) (models.HotelOrder, error)
 	GetHotelOrderByID(id, userID uint) (models.HotelOrder, error)
+	GetHotelOrderByID2(id, userID uint) (models.HotelOrderMidtrans, error)
+	GetHotelOrderID(orderId string) (models.HotelOrder, error)
 	CreateHotelOrder(hotelOrder models.HotelOrder) (models.HotelOrder, error)
+	CreateHotelOrder2(hotelOrder models.HotelOrderMidtrans) (models.HotelOrderMidtrans, error)
 	UpdateHotelOrder(hotelOrder models.HotelOrder) (models.HotelOrder, error)
+	UpdateHotelOrder2(hotelOrder models.HotelOrderMidtrans) (models.HotelOrderMidtrans, error)
 	DeleteHotelOrder(hotelOrder models.HotelOrder) (models.HotelOrder, error)
 }
 
@@ -85,12 +89,38 @@ func (r *hotelOrderRepository) GetHotelOrderByID(id, userID uint) (models.HotelO
 	return hotelOrder, err
 }
 
+func (r *hotelOrderRepository) GetHotelOrderByID2(id, userID uint) (models.HotelOrderMidtrans, error) {
+	var hotelOrder models.HotelOrderMidtrans
+	if userID == 1 {
+		err := r.db.Where("id = ?", id).First(&hotelOrder).Error
+		return hotelOrder, err
+	}
+	err := r.db.Where("id = ? AND user_id = ?", id, userID).First(&hotelOrder).Error
+	return hotelOrder, err
+}
+
+func (r *hotelOrderRepository) GetHotelOrderID(orderId string) (models.HotelOrder, error) {
+	var hotelOrder models.HotelOrder
+	err := r.db.Where("hotel_order_code = ?", orderId).First(&hotelOrder).Error
+	return hotelOrder, err
+}
+
 func (r *hotelOrderRepository) CreateHotelOrder(hotelOrder models.HotelOrder) (models.HotelOrder, error) {
 	err := r.db.Create(&hotelOrder).Error
 	return hotelOrder, err
 }
 
+func (r *hotelOrderRepository) CreateHotelOrder2(hotelOrder models.HotelOrderMidtrans) (models.HotelOrderMidtrans, error) {
+	err := r.db.Create(&hotelOrder).Error
+	return hotelOrder, err
+}
+
 func (r *hotelOrderRepository) UpdateHotelOrder(hotelOrder models.HotelOrder) (models.HotelOrder, error) {
+	err := r.db.Save(hotelOrder).Error
+	return hotelOrder, err
+}
+
+func (r *hotelOrderRepository) UpdateHotelOrder2(hotelOrder models.HotelOrderMidtrans) (models.HotelOrderMidtrans, error) {
 	err := r.db.Save(hotelOrder).Error
 	return hotelOrder, err
 }
