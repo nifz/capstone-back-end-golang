@@ -3,6 +3,7 @@ package controllers
 import (
 	"back-end-golang/dtos"
 	"back-end-golang/helpers"
+	"back-end-golang/middlewares"
 	"back-end-golang/usecases"
 	"net/http"
 	"strconv"
@@ -99,6 +100,17 @@ func (c *trainCarriageController) GetTrainCarriageByID(ctx echo.Context) error {
 }
 
 func (c *trainCarriageController) CreateTrainCarriage(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var trainCarriageDTO []dtos.TrainCarriageInput
 	if err := ctx.Bind(&trainCarriageDTO); err != nil {
 		return ctx.JSON(
@@ -134,7 +146,17 @@ func (c *trainCarriageController) CreateTrainCarriage(ctx echo.Context) error {
 }
 
 func (c *trainCarriageController) UpdateTrainCarriage(ctx echo.Context) error {
-
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var trainCarriageInput dtos.TrainCarriageInput
 	if err := ctx.Bind(&trainCarriageInput); err != nil {
 		return ctx.JSON(
@@ -184,6 +206,17 @@ func (c *trainCarriageController) UpdateTrainCarriage(ctx echo.Context) error {
 }
 
 func (c *trainCarriageController) DeleteTrainCarriage(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	err := c.trainCarriageUsecase.DeleteTrainCarriage(uint(id))

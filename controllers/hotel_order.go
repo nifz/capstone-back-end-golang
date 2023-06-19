@@ -98,6 +98,17 @@ func (c *hotelOrderController) GetHotelOrders(ctx echo.Context) error {
 }
 
 func (c *hotelOrderController) GetHotelOrdersByAdmin(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -143,6 +154,17 @@ func (c *hotelOrderController) GetHotelOrdersByAdmin(ctx echo.Context) error {
 }
 
 func (c *hotelOrderController) GetHotelOrderDetailByAdmin(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	hotelOrderIdParam := ctx.QueryParam("hotel_order_id")
 	hotelOrderId, _ := strconv.Atoi(hotelOrderIdParam)
 

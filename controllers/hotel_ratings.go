@@ -3,6 +3,7 @@ package controllers
 import (
 	"back-end-golang/dtos"
 	"back-end-golang/helpers"
+	"back-end-golang/middlewares"
 	"back-end-golang/usecases"
 	"net/http"
 	"strconv"
@@ -66,6 +67,17 @@ func (c *hotelRatingsController) CreateHotelRating(ctx echo.Context) error {
 }
 
 func (c *hotelRatingsController) GetRatingsByHotelsId(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -82,7 +94,6 @@ func (c *hotelRatingsController) GetRatingsByHotelsId(ctx echo.Context) error {
 	if filter == "" {
 		filter = "all"
 	}
-
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	hotelId := uint(id)

@@ -3,6 +3,7 @@ package controllers
 import (
 	"back-end-golang/dtos"
 	"back-end-golang/helpers"
+	"back-end-golang/middlewares"
 	"back-end-golang/models"
 	"back-end-golang/usecases"
 	"net/http"
@@ -96,6 +97,17 @@ func (c *articleController) GetArticleByID(ctx echo.Context) error {
 }
 
 func (c *articleController) CreateArticle(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var articleInput dtos.ArticleInput
 	if err := ctx.Bind(&articleInput); err != nil {
 		return ctx.JSON(
@@ -216,7 +228,17 @@ func (c *articleController) CreateArticle(ctx echo.Context) error {
 }
 
 func (c *articleController) UpdateArticle(ctx echo.Context) error {
-
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var articleInput dtos.ArticleInput
 	if err := ctx.Bind(&articleInput); err != nil {
 		return ctx.JSON(
@@ -351,6 +373,17 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 }
 
 func (c *articleController) DeleteArticle(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	err := c.articleUsecase.DeleteArticle(uint(id))
