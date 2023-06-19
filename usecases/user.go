@@ -23,7 +23,7 @@ type UserUsecase interface {
 	UserGetAll(page, limit int, search, sortBy, filter string) ([]dtos.UserInformationResponse, int, error)
 	UserGetDetail(id int, isDeleted bool) (dtos.UserInformationResponse, error)
 	UserAdminRegister(input dtos.UserRegisterInput) (dtos.UserInformationResponse, error)
-	UserAdminUpdate(id uint, input dtos.UserRegisterInput) (dtos.UserInformationResponse, error)
+	UserAdminUpdate(id uint, input dtos.UserRegisterInputUpdateByAdmin) (dtos.UserInformationResponse, error)
 }
 
 type userUsecase struct {
@@ -641,7 +641,7 @@ func (u *userUsecase) UserAdminRegister(input dtos.UserRegisterInput) (dtos.User
 // @Accept       json
 // @Produce      json
 // @Param id path integer true "ID user"
-// @Param        request body dtos.UserRegisterInput true "Payload Body [RAW]"
+// @Param        request body dtos.UserRegisterInputUpdateByAdmin true "Payload Body [RAW]"
 // @Success      201 {object} dtos.UserCreeatedResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -650,7 +650,7 @@ func (u *userUsecase) UserAdminRegister(input dtos.UserRegisterInput) (dtos.User
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/user/update/{id} [put]
 // @Security BearerAuth
-func (u *userUsecase) UserAdminUpdate(id uint, input dtos.UserRegisterInput) (dtos.UserInformationResponse, error) {
+func (u *userUsecase) UserAdminUpdate(id uint, input dtos.UserRegisterInputUpdateByAdmin) (dtos.UserInformationResponse, error) {
 	var (
 		user         models.User
 		userResponse dtos.UserInformationResponse
@@ -666,16 +666,7 @@ func (u *userUsecase) UserAdminUpdate(id uint, input dtos.UserRegisterInput) (dt
 		return userResponse, errors.New("Email already used")
 	}
 
-	if input.Password != input.ConfirmPassword {
-		return userResponse, errors.New("Password does not match")
-	}
-
-	password, err := helpers.HashPassword(input.Password)
-	if err != nil {
-		return userResponse, err
-	}
-
-	if input.Email == "" || input.FullName == "" || input.Password == "" || input.ConfirmPassword == "" || input.Role == "admin" || input.PhoneNumber == "" || *input.BirthDate == "" {
+	if input.Email == "" || input.FullName == "" || input.Role == "admin" || input.PhoneNumber == "" || *input.BirthDate == "" {
 		return userResponse, errors.New("Failed to create user")
 	}
 
@@ -691,7 +682,6 @@ func (u *userUsecase) UserAdminUpdate(id uint, input dtos.UserRegisterInput) (dt
 
 	user.FullName = input.FullName
 	user.Email = input.Email
-	user.Password = password
 	user.PhoneNumber = input.PhoneNumber
 	user.BirthDate = &birthDateParse
 	user.ProfilePicture = "https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"

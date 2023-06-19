@@ -10,6 +10,7 @@ type HotelRoomRepository interface {
 	GetAllHotelRooms(page, limit int) ([]models.HotelRoom, int, error)
 	GetAllHotelRoomByHotelID(id uint) ([]models.HotelRoom, error)
 	GetHotelRoomByID(id uint) (models.HotelRoom, error)
+	GetHotelRoomByID2(id uint) (models.HotelRoom, error)
 	GetMinimumPriceHotelRoomByHotelID(id uint) (models.HotelRoom, error)
 	CreateHotelRoom(hotelRoom models.HotelRoom) (models.HotelRoom, error)
 	UpdateHotelRoom(hotelRoom models.HotelRoom) (models.HotelRoom, error)
@@ -58,6 +59,12 @@ func (r *hotelRoomRepository) GetMinimumPriceHotelRoomByHotelID(id uint) (models
 func (r *hotelRoomRepository) GetHotelRoomByID(id uint) (models.HotelRoom, error) {
 	var hotelRoom models.HotelRoom
 	err := r.db.Where("id = ?", id).First(&hotelRoom).Error
+	return hotelRoom, err
+}
+
+func (r *hotelRoomRepository) GetHotelRoomByID2(id uint) (models.HotelRoom, error) {
+	var hotelRoom models.HotelRoom
+	err := r.db.Unscoped().Where("id = ?", id).First(&hotelRoom).Error
 	return hotelRoom, err
 }
 

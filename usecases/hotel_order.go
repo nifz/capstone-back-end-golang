@@ -125,7 +125,7 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search,
 			}
 			hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
 		}
-		getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
+		getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID2(hotelOrder.HotelRoomID)
 		if err != nil {
 			return hotelOrderResponses, 0, err
 		}
@@ -375,7 +375,7 @@ func (u *hotelOrderUsecase) GetHotelOrdersByAdmin(page, limit, ratingClass int, 
 			}
 			hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
 		}
-		getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
+		getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID2(hotelOrder.HotelRoomID)
 		if err != nil {
 			return hotelOrderResponses, 0, err
 		}
@@ -593,7 +593,7 @@ func (u *hotelOrderUsecase) GetHotelOrdersDetailByAdmin(hotelOrderId uint) (dtos
 		}
 		hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
 	}
-	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
+	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID2(hotelOrder.HotelRoomID)
 	if err != nil {
 		return hotelOrderResponses, err
 	}
@@ -785,7 +785,7 @@ func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint, isCheck
 		}
 		hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
 	}
-	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
+	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID2(hotelOrder.HotelRoomID)
 	if err != nil {
 		return hotelOrderResponses, err
 	}
@@ -1268,7 +1268,7 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 		}
 	}
 
-	getHotel, err := u.hotelRepo.GetHotelByID(hotelOrder.HotelID)
+	getHotel, err := u.hotelRepo.GetHotelByID2(hotelOrder.HotelID)
 	if err != nil {
 		return hotelOrderResponses, err
 	}
@@ -1300,7 +1300,7 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 		}
 		hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
 	}
-	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
+	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID2(hotelOrder.HotelRoomID)
 	if err != nil {
 		return hotelOrderResponses, err
 	}
