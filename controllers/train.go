@@ -3,6 +3,7 @@ package controllers
 import (
 	"back-end-golang/dtos"
 	"back-end-golang/helpers"
+	"back-end-golang/middlewares"
 	"back-end-golang/usecases"
 	"net/http"
 	"strconv"
@@ -74,6 +75,17 @@ func (c *trainController) GetAllTrains(ctx echo.Context) error {
 }
 
 func (c *trainController) GetAllTrainsByAdmin(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -142,6 +154,17 @@ func (c *trainController) GetTrainByID(ctx echo.Context) error {
 }
 
 func (c *trainController) CreateTrain(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var trainDTO dtos.TrainInput
 	if err := ctx.Bind(&trainDTO); err != nil {
 		return ctx.JSON(
@@ -177,7 +200,17 @@ func (c *trainController) CreateTrain(ctx echo.Context) error {
 }
 
 func (c *trainController) UpdateTrain(ctx echo.Context) error {
-
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var trainInput dtos.TrainInput
 	if err := ctx.Bind(&trainInput); err != nil {
 		return ctx.JSON(
@@ -227,6 +260,17 @@ func (c *trainController) UpdateTrain(ctx echo.Context) error {
 }
 
 func (c *trainController) DeleteTrain(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	err := c.trainUsecase.DeleteTrain(uint(id))

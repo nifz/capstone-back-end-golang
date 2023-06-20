@@ -80,3 +80,19 @@ type HotelOrderResponse2 struct {
 	CreatedAt        time.Time                 `json:"created_at" example:"2023-05-17T15:07:16.504+07:00"`
 	UpdatedAt        time.Time                 `json:"updated_at" example:"2023-05-17T15:07:16.504+07:00"`
 }
+
+type CsvHotelOrder struct {
+	HotelOrderCode   string    `json:"hotel_order_code"`
+	Hotel            string    `json:"hotel"`
+	HotelRoom        string    `json:"hotel_room"`
+	CheckIn          string    `json:"check_in"`
+	CheckOut         string    `json:"check_out"`
+	NumberOfNight    int       `json:"number_of_night"`
+	Price            int       `json:"price"`
+	TotalAmount      int       `json:"total_amount"`
+	NameOrder        string    `json:"name_order"`
+	EmailOrder       string    `json:"email_order"`
+	PhoneNumberOrder string    `json:"phone_number_order"`
+	Status           string    `json:"status"`
+	CreatedAt        time.Time `json:"created_at"`
+}

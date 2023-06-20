@@ -3,6 +3,7 @@ package controllers
 import (
 	"back-end-golang/dtos"
 	"back-end-golang/helpers"
+	"back-end-golang/middlewares"
 	"back-end-golang/models"
 	"back-end-golang/usecases"
 	"net/http"
@@ -95,6 +96,17 @@ func (c *paymentController) GetPaymentByID(ctx echo.Context) error {
 }
 
 func (c *paymentController) CreatePayment(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var paymentInput dtos.PaymentInput
 	if err := ctx.Bind(&paymentInput); err != nil {
 		return ctx.JSON(
@@ -215,6 +227,17 @@ func (c *paymentController) CreatePayment(ctx echo.Context) error {
 }
 
 func (c *paymentController) UpdatePayment(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	var paymentInput dtos.PaymentInput
 	if err := ctx.Bind(&paymentInput); err != nil {
 		return ctx.JSON(
@@ -349,6 +372,17 @@ func (c *paymentController) UpdatePayment(ctx echo.Context) error {
 }
 
 func (c *paymentController) DeletePayment(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	err := c.paymentUsecase.DeletePayment(uint(id))

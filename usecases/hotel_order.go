@@ -22,6 +22,7 @@ type HotelOrderUsecase interface {
 	CreateHotelOrder2(userID uint, hotelOrderInput dtos.HotelOrderMidtransInput) (dtos.HotelOrderResponse2, error)
 	UpdateHotelOrder(userID, hotelOrderID uint, status string) (dtos.HotelOrderResponse, error)
 	GetHotelOrderByID2(userID, hotelOrderId uint, isCheckIn, isCheckOut bool) (dtos.HotelOrderResponse2, error)
+	CsvHotelOrder() ([]dtos.CsvHotelOrder, error)
 }
 
 type hotelOrderUsecase struct {
@@ -127,7 +128,7 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search,
 			}
 			hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
 		}
-		getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
+		getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID2(hotelOrder.HotelRoomID)
 		if err != nil {
 			return hotelOrderResponses, 0, err
 		}
@@ -377,7 +378,7 @@ func (u *hotelOrderUsecase) GetHotelOrdersByAdmin(page, limit, ratingClass int, 
 			}
 			hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
 		}
-		getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
+		getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID2(hotelOrder.HotelRoomID)
 		if err != nil {
 			return hotelOrderResponses, 0, err
 		}
@@ -595,7 +596,7 @@ func (u *hotelOrderUsecase) GetHotelOrdersDetailByAdmin(hotelOrderId uint) (dtos
 		}
 		hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
 	}
-	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
+	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID2(hotelOrder.HotelRoomID)
 	if err != nil {
 		return hotelOrderResponses, err
 	}
@@ -803,7 +804,7 @@ func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint, isCheck
 		}
 		hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
 	}
-	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
+	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID2(hotelOrder.HotelRoomID)
 	if err != nil {
 		return hotelOrderResponses, err
 	}
@@ -1796,7 +1797,7 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 		}
 	}
 
-	getHotel, err := u.hotelRepo.GetHotelByID(hotelOrder.HotelID)
+	getHotel, err := u.hotelRepo.GetHotelByID2(hotelOrder.HotelID)
 	if err != nil {
 		return hotelOrderResponses, err
 	}
@@ -1828,7 +1829,7 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 		}
 		hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
 	}
-	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
+	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID2(hotelOrder.HotelRoomID)
 	if err != nil {
 		return hotelOrderResponses, err
 	}
@@ -1951,6 +1952,62 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 	}
 
 	return hotelOrderResponses, nil
+}
+
+// CsvHotelOrder godoc
+// @Summary      CSV Hotel Order
+// @Description  CSV
+// @Tags         Admin - Order
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} dtos.StatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/order/hotel/csv [post]
+// @Security BearerAuth
+func (u *hotelOrderUsecase) CsvHotelOrder() ([]dtos.CsvHotelOrder, error) {
+	var newOrderResponses []dtos.CsvHotelOrder
+	hotelOrder, _ := u.hotelOrderRepo.CsvHotelOrder()
+
+	for _, hotelOrder := range hotelOrder {
+
+		getHotelOrder, err := u.hotelOrderRepo.GetHotelOrderByID(hotelOrder.ID, 1)
+		if err != nil {
+			return newOrderResponses, err
+		}
+
+		getHotel, err := u.hotelRepo.GetHotelByID2(uint(getHotelOrder.HotelID))
+		if err != nil {
+			return newOrderResponses, err
+		}
+
+		getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByHotelID(uint(getHotelOrder.HotelID))
+		if err != nil {
+			return newOrderResponses, err
+		}
+
+		newHotelOrderResponse := dtos.CsvHotelOrder{
+			HotelOrderCode:   getHotelOrder.HotelOrderCode,
+			Hotel:            getHotel.Name,
+			HotelRoom:        getHotelRoom.Name,
+			CheckIn:          helpers.FormatDateToYMD(&getHotelOrder.DateStart),
+			CheckOut:         helpers.FormatDateToYMD(&getHotelOrder.DateEnd),
+			NumberOfNight:    getHotelOrder.NumberOfNight,
+			Price:            getHotelOrder.Price,
+			TotalAmount:      getHotelOrder.TotalAmount,
+			NameOrder:        getHotelOrder.NameOrder,
+			EmailOrder:       getHotel.Email,
+			PhoneNumberOrder: getHotelOrder.PhoneNumberOrder,
+			Status:           getHotelOrder.Status,
+			CreatedAt:        getHotelOrder.CreatedAt,
+		}
+		newOrderResponses = append(newOrderResponses, newHotelOrderResponse)
+	}
+
+	return newOrderResponses, nil
 }
 
 func hasMatchingTravelerDetail(hotelOrderID uint, search string, travelerDetailRepo repositories.TravelerDetailRepository) bool {

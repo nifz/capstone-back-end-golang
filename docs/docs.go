@@ -858,6 +858,64 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/order/hotel/csv": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "CSV",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Order"
+                ],
+                "summary": "CSV Hotel Order",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/order/hotel/detail": {
             "get": {
                 "security": [
@@ -2435,7 +2493,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dtos.UserRegisterInput"
+                            "$ref": "#/definitions/dtos.UserRegisterInputUpdateByAdmin"
                         }
                     }
                 ],
@@ -7806,6 +7864,35 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "example": "qweqwe123"
+                },
+                "phone_number": {
+                    "type": "string",
+                    "example": "0851555555151"
+                },
+                "role": {
+                    "type": "string",
+                    "example": "user"
+                }
+            }
+        },
+        "dtos.UserRegisterInputUpdateByAdmin": {
+            "type": "object",
+            "properties": {
+                "birth_date": {
+                    "type": "string",
+                    "example": "2002-09-12"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "me@hanifz.com"
+                },
+                "full_name": {
+                    "type": "string",
+                    "example": "Mochammad Hanif"
+                },
+                "is_active": {
+                    "type": "boolean",
+                    "example": true
                 },
                 "phone_number": {
                     "type": "string",

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"back-end-golang/models"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -17,6 +18,7 @@ type HotelOrderRepository interface {
 	UpdateHotelOrder(hotelOrder models.HotelOrder) (models.HotelOrder, error)
 	UpdateHotelOrder2(hotelOrder models.HotelOrderMidtrans) (models.HotelOrderMidtrans, error)
 	DeleteHotelOrder(hotelOrder models.HotelOrder) (models.HotelOrder, error)
+	CsvHotelOrder() ([]models.HotelOrder, error)
 }
 
 type hotelOrderRepository struct {
@@ -128,4 +130,19 @@ func (r *hotelOrderRepository) UpdateHotelOrder2(hotelOrder models.HotelOrderMid
 func (r *hotelOrderRepository) DeleteHotelOrder(hotelOrder models.HotelOrder) (models.HotelOrder, error) {
 	err := r.db.Unscoped().Delete(&hotelOrder).Error
 	return hotelOrder, err
+}
+
+func (r *hotelOrderRepository) CsvHotelOrder() ([]models.HotelOrder, error) {
+	newHotelOrder := []models.HotelOrder{}
+
+	currentYear, currentMonth, _ := time.Now().Date()
+	startOfMonth := time.Date(currentYear, currentMonth, 1, 0, 0, 0, 0, time.UTC)
+	endOfMonth := startOfMonth.AddDate(0, 1, 0).Add(-time.Nanosecond)
+
+	err := r.db.Where("created_at >= ? AND created_at <= ?", startOfMonth, endOfMonth).Order("id DESC").Find(&newHotelOrder).Error
+	if err != nil {
+		return []models.HotelOrder{}, err
+	}
+	return newHotelOrder, nil
+
 }

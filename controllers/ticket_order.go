@@ -102,6 +102,17 @@ func (c *ticketOrderController) GetTicketOrders(ctx echo.Context) error {
 }
 
 func (c *ticketOrderController) GetTicketOrdersByAdmin(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -146,6 +157,17 @@ func (c *ticketOrderController) GetTicketOrdersByAdmin(ctx echo.Context) error {
 }
 
 func (c *ticketOrderController) GetTicketOrderDetailByAdmin(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 	trainIdParam := ctx.QueryParam("train_id")
 	trainId, _ := strconv.Atoi(trainIdParam)
 	ticketOrderIdParam := ctx.QueryParam("ticket_order_id")

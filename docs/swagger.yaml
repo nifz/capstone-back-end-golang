@@ -1679,6 +1679,27 @@ definitions:
         example: user
         type: string
     type: object
+  dtos.UserRegisterInputUpdateByAdmin:
+    properties:
+      birth_date:
+        example: "2002-09-12"
+        type: string
+      email:
+        example: me@hanifz.com
+        type: string
+      full_name:
+        example: Mochammad Hanif
+        type: string
+      is_active:
+        example: true
+        type: boolean
+      phone_number:
+        example: "0851555555151"
+        type: string
+      role:
+        example: user
+        type: string
+    type: object
   dtos.UserStatusOKResponse:
     properties:
       data:
@@ -2290,6 +2311,43 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Hotel Order User
+      tags:
+      - Admin - Order
+  /admin/order/hotel/csv:
+    post:
+      consumes:
+      - application/json
+      description: CSV
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: CSV Hotel Order
       tags:
       - Admin - Order
   /admin/order/hotel/detail:
@@ -3307,7 +3365,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dtos.UserRegisterInput'
+          $ref: '#/definitions/dtos.UserRegisterInputUpdateByAdmin'
       produces:
       - application/json
       responses:
