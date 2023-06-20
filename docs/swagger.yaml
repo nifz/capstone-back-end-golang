@@ -107,6 +107,32 @@ definitions:
         example: 200
         type: integer
     type: object
+  dtos.GetAllHistorySeenHotelStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.HistorySeenHotelResponse'
+      message:
+        example: Successfully get history seen hotel
+        type: string
+      meta:
+        $ref: '#/definitions/helpers.Meta'
+      status_code:
+        example: 200
+        type: integer
+    type: object
+  dtos.GetAllHistorySeenStationStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.HistorySeenStationResponse'
+      message:
+        example: Successfully get history seen station
+        type: string
+      meta:
+        $ref: '#/definitions/helpers.Meta'
+      status_code:
+        example: 200
+        type: integer
+    type: object
   dtos.GetAllHotelOrderStatusOKResponse:
     properties:
       data:
@@ -286,6 +312,36 @@ definitions:
         example: 200
         type: integer
     type: object
+  dtos.HistorySeenHotelResponse:
+    properties:
+      created_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+      hotel:
+        $ref: '#/definitions/dtos.HotelByIDSimply'
+      id:
+        example: 1
+        type: integer
+      updated_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+    type: object
+  dtos.HistorySeenStationResponse:
+    properties:
+      created_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+      id:
+        example: 1
+        type: integer
+      station_destination:
+        $ref: '#/definitions/dtos.StationResponseSimply2'
+      station_origin:
+        $ref: '#/definitions/dtos.StationResponseSimply2'
+      updated_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+    type: object
   dtos.HotelByIDResponse:
     properties:
       address:
@@ -354,6 +410,39 @@ definitions:
         $ref: '#/definitions/dtos.HotelPoliciesResponse'
       hotel_room:
         $ref: '#/definitions/dtos.HotelRoomHotelIDResponse'
+      name:
+        type: string
+      phone_number:
+        type: string
+      updated_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+    type: object
+  dtos.HotelByIDSimply:
+    properties:
+      address:
+        type: string
+      class:
+        type: integer
+      created_at:
+        example: "2023-05-17T15:07:16.504+07:00"
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      hotel_facilities:
+        items:
+          $ref: '#/definitions/dtos.HotelFacilitiesResponse'
+        type: array
+      hotel_id:
+        type: integer
+      hotel_image:
+        items:
+          $ref: '#/definitions/dtos.HotelImageResponse'
+        type: array
+      hotel_policy:
+        $ref: '#/definitions/dtos.HotelPoliciesResponse'
       name:
         type: string
       phone_number:
@@ -475,7 +564,7 @@ definitions:
         example: 1
         type: integer
       quantity_infant:
-        example: 1
+        example: 0
         type: integer
       special_request:
         example: Tambah 1 Bed
@@ -1036,6 +1125,21 @@ definitions:
       arrive_time:
         example: "00:00"
         type: string
+      initial:
+        example: PSE
+        type: string
+      name:
+        example: Pasar Senen
+        type: string
+      origin:
+        example: Jakarta
+        type: string
+      station_id:
+        example: 1
+        type: integer
+    type: object
+  dtos.StationResponseSimply2:
+    properties:
       initial:
         example: PSE
         type: string
@@ -2257,14 +2361,20 @@ paths:
         in: query
         name: limit
         type: integer
-      - description: Hotel rating class
-        in: query
-        name: rating_class
-        type: integer
       - description: search hotel name
         in: query
         name: search
         type: string
+      - description: Hotel rating class
+        enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        in: query
+        name: rating_class
+        type: integer
       - description: Date start
         in: query
         name: date_start
@@ -2274,10 +2384,21 @@ paths:
         name: date_end
         type: string
       - description: Filter order by
+        enum:
+        - latest
+        - oldest
+        - highest_price
+        - lowest_price
         in: query
         name: order_by
         type: string
       - description: Filter by status order
+        enum:
+        - unpaid
+        - paid
+        - done
+        - canceled
+        - refund
         in: query
         name: status
         type: string
@@ -2420,10 +2541,19 @@ paths:
         name: date_end
         type: string
       - description: Order by name
+        enum:
+        - asc
+        - desc
         in: query
         name: order_by
         type: string
       - description: Filter by status order
+        enum:
+        - unpaid
+        - paid
+        - done
+        - canceled
+        - refund
         in: query
         name: filter
         type: string
@@ -2699,12 +2829,11 @@ paths:
         name: search
         type: string
       - description: Sort by name
+        enum:
+        - asc
+        - desc
         in: query
         name: sort_by
-        type: string
-      - description: Filter data
-        in: query
-        name: filter
         type: string
       produces:
       - application/json
@@ -2891,10 +3020,16 @@ paths:
         name: search
         type: string
       - description: Sort by name
+        enum:
+        - asc
+        - desc
         in: query
         name: sort_by
         type: string
       - description: Filter data
+        enum:
+        - active
+        - inactive
         in: query
         name: filter
         type: string
@@ -3220,10 +3355,16 @@ paths:
         name: search
         type: string
       - description: Sort by name
+        enum:
+        - asc
+        - desc
         in: query
         name: sort_by
         type: string
       - description: Filter data
+        enum:
+        - active
+        - inactive
         in: query
         name: filter
         type: string
@@ -3269,7 +3410,7 @@ paths:
         in: query
         name: id
         type: integer
-      - description: Update deleted user
+      - description: Use this params if user want to be delete
         in: query
         name: isDeleted
         type: boolean
@@ -3621,6 +3762,43 @@ paths:
         in: query
         name: limit
         type: integer
+      - description: Filter minimum price
+        in: query
+        name: minimum_price
+        type: integer
+      - description: Filter maximum price
+        in: query
+        name: maximum_price
+        type: integer
+      - description: Filter rating class
+        enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        in: query
+        name: rating_class
+        type: integer
+      - description: Search address hotel
+        in: query
+        name: address
+        type: string
+      - description: Search name hotel
+        in: query
+        name: name
+        type: string
+      - description: Filter by price
+        enum:
+        - asc
+        - desc
+        in: query
+        name: sort_by_price
+        type: string
+      - description: Recomendation filter
+        in: query
+        name: recomendation
+        type: boolean
       produces:
       - application/json
       responses:
@@ -3774,6 +3952,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get hotel by ID
       tags:
       - Admin - Hotel
@@ -4002,6 +4182,10 @@ paths:
         name: train_id
         type: integer
       - description: Class train
+        enum:
+        - Ekonomi
+        - Bisnis
+        - Eksekutif
         in: query
         name: class
         type: string
@@ -4010,6 +4194,9 @@ paths:
         name: date
         type: string
       - description: Status train
+        enum:
+        - available
+        - unavailable
         in: query
         name: status
         type: string
@@ -4381,6 +4568,98 @@ paths:
       summary: Delete a history search
       tags:
       - User - History Search
+  /user/history-seen-hotel:
+    get:
+      consumes:
+      - application/json
+      description: Get all history seen hotel by user id
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllHistorySeenHotelStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all history seen hotel by user id
+      tags:
+      - User - History Seen
+  /user/history-seen-station:
+    get:
+      consumes:
+      - application/json
+      description: Get all history seen station by user id
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllHistorySeenStationStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all history seen station by user id
+      tags:
+      - User - History Seen
   /user/hotel-ratings:
     post:
       consumes:
@@ -4516,6 +4795,50 @@ paths:
       summary: Order Hotel
       tags:
       - User - Hotel
+  /user/hotel/order/midtrans:
+    post:
+      consumes:
+      - application/json
+      description: Order Hotel
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.HotelOrderInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.HotelOrderCreeatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Order Hotel
+      tags:
+      - User - Hotel
   /user/hotel/search:
     get:
       consumes:
@@ -4539,6 +4862,12 @@ paths:
         name: maximum_price
         type: integer
       - description: Filter rating class
+        enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
         in: query
         name: rating_class
         type: integer
@@ -4551,6 +4880,9 @@ paths:
         name: name
         type: string
       - description: Filter by price
+        enum:
+        - asc
+        - desc
         in: query
         name: sort_by_price
         type: string
@@ -4586,17 +4918,11 @@ paths:
       summary: Search Hotel Available
       tags:
       - User - Hotel
-  /user/notification/{id}:
+  /user/notification:
     get:
       consumes:
       - application/json
       description: Get notification by user id
-      parameters:
-      - description: user id
-        in: path
-        name: id
-        required: true
-        type: integer
       produces:
       - application/json
       responses:
@@ -4660,10 +4986,21 @@ paths:
         name: order_date
         type: string
       - description: Filter order by
+        enum:
+        - latest
+        - oldest
+        - highest_price
+        - lowest_price
         in: query
         name: order_by
         type: string
       - description: Filter by status order
+        enum:
+        - unpaid
+        - paid
+        - done
+        - canceled
+        - refund
         in: query
         name: status
         type: string
@@ -4710,11 +5047,62 @@ paths:
         name: hotel_order_id
         required: true
         type: integer
-      - description: Update status order check in
+      - description: Use this params if want update status order check in
         in: query
         name: update_check_in
         type: boolean
-      - description: Update status order check out
+      - description: Use this params if want update status order check out
+        in: query
+        name: update_check_out
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.HotelOrderStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Hotel Order User by ID
+      tags:
+      - User - Order
+  /user/order/hotel/detail/midtrans:
+    get:
+      consumes:
+      - application/json
+      description: Get Hotel Order User by ID
+      parameters:
+      - description: Hotel Order ID
+        in: query
+        name: hotel_order_id
+        required: true
+        type: integer
+      - description: Use this params if update status order check in
+        in: query
+        name: update_check_in
+        type: boolean
+      - description: Use this params if update status order check out
         in: query
         name: update_check_out
         type: boolean
@@ -4769,6 +5157,12 @@ paths:
         name: search
         type: string
       - description: Filter by class train
+        enum:
+        - "1"
+        - "2"
+        - "3"
+        - "4"
+        - "5"
         in: query
         name: class
         type: string
@@ -4777,10 +5171,21 @@ paths:
         name: name
         type: string
       - description: Filter order by
+        enum:
+        - higher_price
+        - lower_price
+        - last_departure
+        - early_departure
         in: query
         name: order_by
         type: string
       - description: Filter by status order
+        enum:
+        - unpaid
+        - paid
+        - done
+        - canceled
+        - refund
         in: query
         name: status
         type: string
@@ -4984,14 +5389,24 @@ paths:
         name: sort_by_train_id
         type: integer
       - description: Filter by class name
+        enum:
+        - Ekonomi
+        - Bisnis
+        - Eksekutif
         in: query
         name: sort_by_class
         type: string
       - description: Filter by price
+        enum:
+        - asc
+        - desc
         in: query
         name: sort_by_price
         type: string
       - description: Filter by arrive time
+        enum:
+        - asc
+        - desc
         in: query
         name: sort_by_arrive_time
         type: string
@@ -5027,6 +5442,49 @@ paths:
       summary: Search Train Available
       tags:
       - User - Train
+  /user/transaction:
+    get:
+      consumes:
+      - application/json
+      description: Get Transaction order by midtrans
+      parameters:
+      - description: Order id
+        in: query
+        name: order_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.StatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Transaction order by midtrans
+      tags:
+      - User - Order
   /user/update-password:
     put:
       consumes:

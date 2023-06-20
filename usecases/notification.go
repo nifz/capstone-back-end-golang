@@ -28,14 +28,13 @@ func NewNotificationUsecase(notificationRepo repositories.NotificationRepository
 // @Tags         User - Notification
 // @Accept       json
 // @Produce      json
-// @Param id path integer true "user id"
 // @Success      200 {object} dtos.GetNotificationByUserIDStatusOKResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /user/notification/{id} [get]
+// @Router       /user/notification [get]
 // @Security BearerAuth
 func (u *notificationUsecase) GetNotificationByUserID(id uint) (dtos.NotificationResponse, error) {
 	var notificationResponsee dtos.NotificationResponse
@@ -62,13 +61,13 @@ func (u *notificationUsecase) GetNotificationByUserID(id uint) (dtos.Notificatio
 		if notification.HotelOrderID > 0 && notification.TicketOrderID < 1 {
 			getHotelOrderCode, err := u.hotelOrderRepo.GetHotelOrderByID(notification.HotelOrderID, notification.UserID)
 			if err != nil {
-				return notificationResponsee, err
+				continue
 			}
 			orderCode = getHotelOrderCode.HotelOrderCode
 		} else if notification.TicketOrderID > 0 && notification.HotelOrderID < 1 {
 			getTicketOrderCode, err := u.ticketOrderRepo.GetTicketOrderByID(notification.TicketOrderID, notification.UserID)
 			if err != nil {
-				return notificationResponsee, err
+				continue
 			}
 			orderCode = getTicketOrderCode.TicketOrderCode
 		}

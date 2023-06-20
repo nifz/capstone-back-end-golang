@@ -11,8 +11,8 @@ import (
 
 type HotelUsecase interface {
 	// admin
-	GetAllHotels(page, limit, minimumPrice, maximumPrice, ratingClass int, address, name, sortByPrice string) ([]dtos.HotelResponse, int, error)
-	GetHotelByID(id uint) (dtos.HotelByIDResponse, error)
+	GetAllHotels(page, limit, minimumPrice, maximumPrice, ratingClass int, address, name, sortByPrice string, recomendation bool) ([]dtos.HotelResponse, int, error)
+	GetHotelByID(userId, id uint) (dtos.HotelByIDResponse, error)
 	CreateHotel(hotel *dtos.HotelInput) (dtos.HotelResponse, error)
 	UpdateHotel(id uint, hotelInput dtos.HotelInput) (dtos.HotelResponse, error)
 	DeleteHotel(id uint) error
@@ -31,10 +31,11 @@ type hotelUsecase struct {
 	historySearchRepo       repositories.HistorySearchRepository
 	hotelRatingRepo         repositories.HotelRatingsRepository
 	userRepo                repositories.UserRepository
+	historySeenHotelUsecase HistorySeenHotelUsecase
 }
 
-func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository, historySearchRepo repositories.HistorySearchRepository, hotelRatingRepo repositories.HotelRatingsRepository, userRepo repositories.UserRepository) HotelUsecase {
-	return &hotelUsecase{hotelRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo, historySearchRepo, hotelRatingRepo, userRepo}
+func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo repositories.HotelRoomRepository, hotelRoomImageRepo repositories.HotelRoomImageRepository, hotelRoomFacilitiesRepo repositories.HotelRoomFacilitiesRepository, hotelImageRepo repositories.HotelImageRepository, hotelFacilitiesRepo repositories.HotelFacilitiesRepository, hotelPoliciesRepo repositories.HotelPoliciesRepository, historySearchRepo repositories.HistorySearchRepository, hotelRatingRepo repositories.HotelRatingsRepository, userRepo repositories.UserRepository, historySeenHotelUsecase HistorySeenHotelUsecase) HotelUsecase {
+	return &hotelUsecase{hotelRepo, hotelRoomRepo, hotelRoomImageRepo, hotelRoomFacilitiesRepo, hotelImageRepo, hotelFacilitiesRepo, hotelPoliciesRepo, historySearchRepo, hotelRatingRepo, userRepo, historySeenHotelUsecase}
 }
 
 // =============================== ADMIN ================================== \\
@@ -47,6 +48,13 @@ func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo repos
 // @Produce      json
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
+// @Param minimum_price query int false "Filter minimum price"
+// @Param maximum_price query int false "Filter maximum price"
+// @Param rating_class query int false "Filter rating class" Enums(1,2,3,4,5)
+// @Param address query string false "Search address hotel"
+// @Param name query string false "Search name hotel"
+// @Param sort_by_price query string false "Filter by price" Enums(asc, desc)
+// @Param recomendation query bool false "Recomendation filter"
 // @Success      200 {object} dtos.GetAllHotelStatusOKResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -54,7 +62,7 @@ func NewHotelUsecase(hotelRepo repositories.HotelRepository, hotelRoomRepo repos
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /public/hotel [get]
-func (u *hotelUsecase) GetAllHotels(page, limit, minimumPrice, maximumPrice, ratingClass int, address, name, sortByPrice string) ([]dtos.HotelResponse, int, error) {
+func (u *hotelUsecase) GetAllHotels(page, limit, minimumPrice, maximumPrice, ratingClass int, address, name, sortByPrice string, recomendation bool) ([]dtos.HotelResponse, int, error) {
 	hotels, count, err := u.hotelRepo.SearchHotelAvailable(page, limit, address, name)
 	if err != nil {
 		return nil, 0, err
@@ -156,6 +164,11 @@ func (u *hotelUsecase) GetAllHotels(page, limit, minimumPrice, maximumPrice, rat
 				return hotelResponses[i].HotelRoomStart > hotelResponses[j].HotelRoomStart
 			})
 		}
+		if recomendation {
+			sort.SliceStable(hotelResponses, func(i, j int) bool {
+				return hotelResponses[i].Class > hotelResponses[j].Class
+			})
+		}
 
 	}
 
@@ -176,9 +189,19 @@ func (u *hotelUsecase) GetAllHotels(page, limit, minimumPrice, maximumPrice, rat
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /public/hotel/{id} [get]
-func (u *hotelUsecase) GetHotelByID(id uint) (dtos.HotelByIDResponse, error) {
+// @Security BearerAuth
+func (u *hotelUsecase) GetHotelByID(userId, id uint) (dtos.HotelByIDResponse, error) {
 	var hotelResponses dtos.HotelByIDResponse
 	hotel, err := u.hotelRepo.GetHotelByID(id)
+	if err != nil {
+		return hotelResponses, err
+	}
+
+	historySeenHotelInput := dtos.HistorySeenHotelInput{
+		HotelID: hotel.ID,
+	}
+
+	_, err = u.historySeenHotelUsecase.CreateHistorySeenHotel(userId, historySeenHotelInput)
 	if err != nil {
 		return hotelResponses, err
 	}
@@ -683,10 +706,10 @@ func (u *hotelUsecase) DeleteHotel(id uint) error {
 // @Param limit query int false "Number of items per page"
 // @Param minimum_price query int false "Filter minimum price"
 // @Param maximum_price query int false "Filter maximum price"
-// @Param rating_class query int false "Filter rating class"
+// @Param rating_class query int false "Filter rating class" Enums(1,2,3,4,5)
 // @Param address query string false "Search address hotel"
 // @Param name query string false "Search name hotel"
-// @Param sort_by_price query string false "Filter by price"
+// @Param sort_by_price query string false "Filter by price" Enums(asc, desc)
 // @Success      200 {object} dtos.GetAllHotelStatusOKResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse

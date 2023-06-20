@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type HotelOrder struct {
+type HotelOrderMidtrans struct {
 	gorm.Model
 	UserID           uint      `form:"user_id" json:"user_id"`
 	User             User      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
@@ -20,13 +20,13 @@ type HotelOrder struct {
 	DateStart        time.Time `gorm:"type:DATE"`
 	DateEnd          time.Time `gorm:"type:DATE"`
 	Price            int
-	PaymentID        int
 	TotalAmount      int
 	NameOrder        string
 	EmailOrder       string
 	PhoneNumberOrder string
 	SpecialRequest   string
 	HotelOrderCode   string
+	PaymentURL       string
 	IsCheckIn        bool   `gorm:"default:false"`
 	IsCheckOut       bool   `gorm:"default:false"`
 	Status           string `gorm:"type:ENUM('unpaid', 'paid', 'done', 'canceled', 'refund')"`

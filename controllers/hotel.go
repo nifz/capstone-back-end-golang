@@ -52,7 +52,10 @@ func (c *hotelController) GetAllHotels(ctx echo.Context) error {
 	nameParam := ctx.QueryParam("name")
 
 	sortByPriceParam := ctx.QueryParam("sort_by_price")
-	hotels, count, err := c.hotelUsecase.GetAllHotels(page, limit, minimumPrice, maximumPrice, ratingClass, addressParam, nameParam, sortByPriceParam)
+
+	recomendationParam := ctx.QueryParam("recomendation")
+	recomendation, _ := strconv.ParseBool(recomendationParam)
+	hotels, count, err := c.hotelUsecase.GetAllHotels(page, limit, minimumPrice, maximumPrice, ratingClass, addressParam, nameParam, sortByPriceParam, recomendation)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
@@ -78,8 +81,32 @@ func (c *hotelController) GetAllHotels(ctx echo.Context) error {
 }
 
 func (c *hotelController) GetHotelByID(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
+
+	userId, err := middlewares.GetUserIdFromToken(tokenString)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
 	id, _ := strconv.Atoi(ctx.Param("id"))
-	hotel, err := c.hotelUsecase.GetHotelByID(uint(id))
+	hotel, err := c.hotelUsecase.GetHotelByID(userId, uint(id))
 
 	if err != nil {
 		return ctx.JSON(
@@ -150,7 +177,29 @@ func (c *hotelController) CreateHotel(ctx echo.Context) error {
 }
 
 func (c *hotelController) UpdateHotel(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
 
+	userId, err := middlewares.GetUserIdFromToken(tokenString)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
 	var hotelInput dtos.HotelInput
 	if err := ctx.Bind(&hotelInput); err != nil {
 		return ctx.JSON(
@@ -165,7 +214,7 @@ func (c *hotelController) UpdateHotel(ctx echo.Context) error {
 
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	hotel, err := c.hotelUsecase.GetHotelByID(uint(id))
+	hotel, err := c.hotelUsecase.GetHotelByID(userId, uint(id))
 	if hotel.HotelID == 0 {
 		return ctx.JSON(
 			http.StatusBadRequest,
