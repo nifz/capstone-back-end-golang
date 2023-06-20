@@ -1714,7 +1714,7 @@ func (u *hotelOrderUsecase) CreateHotelOrder2(userID uint, hotelOrderInput dtos.
 // @Accept       json
 // @Produce      json
 // @Param hotel_order_id query int true "Hotel Order ID"
-// @Param status query string true "Update Status Order ID"
+// @Param status query string true "Update Status Order ID" Enums(paid,done,canceled,refund)
 // @Success      200 {object} dtos.HotelOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
