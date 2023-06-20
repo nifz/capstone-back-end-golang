@@ -782,15 +782,22 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "Hotel rating class",
-                        "name": "rating_class",
-                        "in": "query"
-                    },
-                    {
                         "type": "string",
                         "description": "search hotel name",
                         "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "type": "integer",
+                        "description": "Hotel rating class",
+                        "name": "rating_class",
                         "in": "query"
                     },
                     {
@@ -806,12 +813,25 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "latest",
+                            "oldest",
+                            "highest_price",
+                            "lowest_price"
+                        ],
                         "type": "string",
                         "description": "Filter order by",
                         "name": "order_by",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "unpaid",
+                            "paid",
+                            "done",
+                            "canceled",
+                            "refund"
+                        ],
                         "type": "string",
                         "description": "Filter by status order",
                         "name": "status",
@@ -1033,12 +1053,23 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
                         "type": "string",
                         "description": "Order by name",
                         "name": "order_by",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "unpaid",
+                            "paid",
+                            "done",
+                            "canceled",
+                            "refund"
+                        ],
                         "type": "string",
                         "description": "Filter by status order",
                         "name": "filter",
@@ -1459,15 +1490,13 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
                         "type": "string",
                         "description": "Sort by name",
                         "name": "sort_by",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter data",
-                        "name": "filter",
                         "in": "query"
                     }
                 ],
@@ -1757,12 +1786,20 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
                         "type": "string",
                         "description": "Sort by name",
                         "name": "sort_by",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
                         "type": "string",
                         "description": "Filter data",
                         "name": "filter",
@@ -2268,12 +2305,20 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
                         "type": "string",
                         "description": "Sort by name",
                         "name": "sort_by",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
                         "type": "string",
                         "description": "Filter data",
                         "name": "filter",
@@ -2347,7 +2392,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "boolean",
-                        "description": "Update deleted user",
+                        "description": "Use this params if user want to be delete",
                         "name": "isDeleted",
                         "in": "query"
                     }
@@ -2880,6 +2925,59 @@ const docTemplate = `{
                         "description": "Number of items per page",
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter minimum price",
+                        "name": "minimum_price",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filter maximum price",
+                        "name": "maximum_price",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "type": "integer",
+                        "description": "Filter rating class",
+                        "name": "rating_class",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search address hotel",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search name hotel",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "Filter by price",
+                        "name": "sort_by_price",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Recomendation filter",
+                        "name": "recomendation",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3053,6 +3151,11 @@ const docTemplate = `{
         },
         "/public/hotel/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get hotel by ID",
                 "consumes": [
                     "application/json"
@@ -3459,6 +3562,11 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "Ekonomi",
+                            "Bisnis",
+                            "Eksekutif"
+                        ],
                         "type": "string",
                         "description": "Class train",
                         "name": "class",
@@ -3471,6 +3579,10 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "available",
+                            "unavailable"
+                        ],
                         "type": "string",
                         "description": "Status train",
                         "name": "status",
@@ -4039,6 +4151,150 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/history-seen-hotel": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all history seen hotel by user id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - History Seen"
+                ],
+                "summary": "Get all history seen hotel by user id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllHistorySeenHotelStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/history-seen-station": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get all history seen station by user id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - History Seen"
+                ],
+                "summary": "Get all history seen station by user id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllHistorySeenStationStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/hotel-ratings": {
             "post": {
                 "security": [
@@ -4249,6 +4505,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/hotel/order/midtrans": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Order Hotel",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Hotel"
+                ],
+                "summary": "Order Hotel",
+                "parameters": [
+                    {
+                        "description": "Payload Body [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelOrderInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelOrderCreeatedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/hotel/search": {
             "get": {
                 "security": [
@@ -4293,6 +4618,13 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
                         "type": "integer",
                         "description": "Filter rating class",
                         "name": "rating_class",
@@ -4311,6 +4643,10 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
                         "type": "string",
                         "description": "Filter by price",
                         "name": "sort_by_price",
@@ -4357,7 +4693,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/notification/{id}": {
+        "/user/notification": {
             "get": {
                 "security": [
                     {
@@ -4375,15 +4711,6 @@ const docTemplate = `{
                     "User - Notification"
                 ],
                 "summary": "Get notification by user id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "user id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -4480,12 +4807,25 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "latest",
+                            "oldest",
+                            "highest_price",
+                            "lowest_price"
+                        ],
                         "type": "string",
                         "description": "Filter order by",
                         "name": "order_by",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "unpaid",
+                            "paid",
+                            "done",
+                            "canceled",
+                            "refund"
+                        ],
                         "type": "string",
                         "description": "Filter by status order",
                         "name": "status",
@@ -4560,13 +4900,92 @@ const docTemplate = `{
                     },
                     {
                         "type": "boolean",
-                        "description": "Update status order check in",
+                        "description": "Use this params if want update status order check in",
                         "name": "update_check_in",
                         "in": "query"
                     },
                     {
                         "type": "boolean",
-                        "description": "Update status order check out",
+                        "description": "Use this params if want update status order check out",
+                        "name": "update_check_out",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.HotelOrderStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/order/hotel/detail/midtrans": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Hotel Order User by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Order"
+                ],
+                "summary": "Get Hotel Order User by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Hotel Order ID",
+                        "name": "hotel_order_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Use this params if update status order check in",
+                        "name": "update_check_in",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Use this params if update status order check out",
                         "name": "update_check_out",
                         "in": "query"
                     }
@@ -4649,6 +5068,13 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "1",
+                            "2",
+                            "3",
+                            "4",
+                            "5"
+                        ],
                         "type": "string",
                         "description": "Filter by class train",
                         "name": "class",
@@ -4661,12 +5087,25 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "higher_price",
+                            "lower_price",
+                            "last_departure",
+                            "early_departure"
+                        ],
                         "type": "string",
                         "description": "Filter order by",
                         "name": "order_by",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "unpaid",
+                            "paid",
+                            "done",
+                            "canceled",
+                            "refund"
+                        ],
                         "type": "string",
                         "description": "Filter by status order",
                         "name": "status",
@@ -4980,18 +5419,31 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "Ekonomi",
+                            "Bisnis",
+                            "Eksekutif"
+                        ],
                         "type": "string",
                         "description": "Filter by class name",
                         "name": "sort_by_class",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
                         "type": "string",
                         "description": "Filter by price",
                         "name": "sort_by_price",
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
                         "type": "string",
                         "description": "Filter by arrive time",
                         "name": "sort_by_arrive_time",
@@ -5003,6 +5455,73 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.GetAllTrainStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/transaction": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Transaction order by midtrans",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Order"
+                ],
+                "summary": "Get Transaction order by midtrans",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order id",
+                        "name": "order_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.StatusOKResponse"
                         }
                     },
                     "400": {
@@ -5395,6 +5914,44 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.GetAllHistorySeenHotelStatusOKResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HistorySeenHotelResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get history seen hotel"
+                },
+                "meta": {
+                    "$ref": "#/definitions/helpers.Meta"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "dtos.GetAllHistorySeenStationStatusOKResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HistorySeenStationResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get history seen station"
+                },
+                "meta": {
+                    "$ref": "#/definitions/helpers.Meta"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
         "dtos.GetAllHotelOrderStatusOKResponse": {
             "type": "object",
             "properties": {
@@ -5658,6 +6215,49 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.HistorySeenHotelResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "hotel": {
+                    "$ref": "#/definitions/dtos.HotelByIDSimply"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
+        "dtos.HistorySeenStationResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "station_destination": {
+                    "$ref": "#/definitions/dtos.StationResponseSimply2"
+                },
+                "station_origin": {
+                    "$ref": "#/definitions/dtos.StationResponseSimply2"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
         "dtos.HotelByIDResponse": {
             "type": "object",
             "properties": {
@@ -5758,6 +6358,55 @@ const docTemplate = `{
                 },
                 "hotel_room": {
                     "$ref": "#/definitions/dtos.HotelRoomHotelIDResponse"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                }
+            }
+        },
+        "dtos.HotelByIDSimply": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-05-17T15:07:16.504+07:00"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "hotel_facilities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelFacilitiesResponse"
+                    }
+                },
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "hotel_image": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.HotelImageResponse"
+                    }
+                },
+                "hotel_policy": {
+                    "$ref": "#/definitions/dtos.HotelPoliciesResponse"
                 },
                 "name": {
                     "type": "string"
@@ -5936,7 +6585,7 @@ const docTemplate = `{
                 },
                 "quantity_infant": {
                     "type": "integer",
-                    "example": 1
+                    "example": 0
                 },
                 "special_request": {
                     "type": "string",
@@ -6755,6 +7404,27 @@ const docTemplate = `{
                     "type": "string",
                     "example": "00:00"
                 },
+                "initial": {
+                    "type": "string",
+                    "example": "PSE"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Pasar Senen"
+                },
+                "origin": {
+                    "type": "string",
+                    "example": "Jakarta"
+                },
+                "station_id": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "dtos.StationResponseSimply2": {
+            "type": "object",
+            "properties": {
                 "initial": {
                     "type": "string",
                     "example": "PSE"

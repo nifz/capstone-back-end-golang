@@ -72,8 +72,7 @@ func (u *stationUsecase) GetAllStations(page, limit int) ([]dtos.StationResponse
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
 // @Param search query string false "Search data"
-// @Param sort_by query string false "Sort by name"
-// @Param filter query string false "Filter data"
+// @Param sort_by query string false "Sort by name" Enums(asc, desc)
 // @Success      200 {object} dtos.GetAllStationStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse

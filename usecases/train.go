@@ -19,16 +19,17 @@ type TrainUsecase interface {
 	DeleteTrain(id uint) error
 
 	// user
-	SearchTrainAvailable(page, limit, stationOrigin, stationDestination, sortByTrainId int, sortClassName, sortByPrice, sortByArriveTime string) ([]dtos.TrainResponse, int, error)
+	SearchTrainAvailable(userId uint, page, limit, stationOrigin, stationDestination, sortByTrainId int, sortClassName, sortByPrice, sortByArriveTime string) ([]dtos.TrainResponse, int, error)
 }
 
 type trainUsecase struct {
-	trainRepo        repositories.TrainRepository
-	trainStationRepo repositories.TrainStationRepository
+	trainRepo                 repositories.TrainRepository
+	trainStationRepo          repositories.TrainStationRepository
+	historySeenStationUsecase HistorySeenStationUsecase
 }
 
-func NewTrainUsecase(TrainRepo repositories.TrainRepository, TrainStationRepo repositories.TrainStationRepository) TrainUsecase {
-	return &trainUsecase{TrainRepo, TrainStationRepo}
+func NewTrainUsecase(TrainRepo repositories.TrainRepository, TrainStationRepo repositories.TrainStationRepository, historySeenStationUsecase HistorySeenStationUsecase) TrainUsecase {
+	return &trainUsecase{TrainRepo, TrainStationRepo, historySeenStationUsecase}
 }
 
 // =============================== ADMIN ================================== \\
@@ -131,8 +132,8 @@ func (u *trainUsecase) GetAllTrains(page, limit int) ([]dtos.TrainResponses, int
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
 // @Param search query string false "Search data"
-// @Param sort_by query string false "Sort by name"
-// @Param filter query string false "Filter data"
+// @Param sort_by query string false "Sort by name" Enums(asc, desc)
+// @Param filter query string false "Filter data" Enums(active, inactive)
 // @Success      200 {object} dtos.GetAllTrainStatusOKResponses
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -526,9 +527,9 @@ func (u *trainUsecase) DeleteTrain(id uint) error {
 // @Param station_origin_id query int true "Station origin id"
 // @Param station_destination_id query int true "Station destination id"
 // @Param sort_by_train_id query int false "Filter by train id"
-// @Param sort_by_class query string false "Filter by class name"
-// @Param sort_by_price query string false "Filter by price"
-// @Param sort_by_arrive_time query string false "Filter by arrive time"
+// @Param sort_by_class query string false "Filter by class name" Enums(Ekonomi, Bisnis, Eksekutif)
+// @Param sort_by_price query string false "Filter by price" Enums(asc, desc)
+// @Param sort_by_arrive_time query string false "Filter by arrive time" Enums(asc, desc)
 // @Success      200 {object} dtos.GetAllTrainStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -537,7 +538,7 @@ func (u *trainUsecase) DeleteTrain(id uint) error {
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/train/search [get]
 // @Security BearerAuth
-func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, stationDestinationId, sortByTrainId int, sortClassName, sortByPrice, sortByArriveTime string) ([]dtos.TrainResponse, int, error) {
+func (u *trainUsecase) SearchTrainAvailable(userId uint, page, limit, stationOriginId, stationDestinationId, sortByTrainId int, sortClassName, sortByPrice, sortByArriveTime string) ([]dtos.TrainResponse, int, error) {
 	trains, err := u.trainRepo.GetAllTrains(sortClassName, sortByTrainId)
 	if err != nil {
 		return nil, 0, err
@@ -574,7 +575,6 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 		if strings.ToLower(sortClassName) != "" && strings.ToLower(train.Class) != strings.ToLower(sortClassName) {
 			continue
 		}
-
 		var trainStationResponses []dtos.TrainStationResponse
 
 		for _, trainStation := range getTrainStation {
@@ -631,6 +631,17 @@ func (u *trainUsecase) SearchTrainAvailable(page, limit, stationOriginId, statio
 			})
 		}
 	}
+
+	historySeenStationInput := dtos.HistorySeenStationInput{
+		StationOriginID:      uint(stationOriginId),
+		StationDestinationID: uint(stationDestinationId),
+	}
+
+	_, err = u.historySeenStationUsecase.CreateHistorySeenStation(userId, historySeenStationInput)
+	if err != nil {
+		return trainResponses, 0, err
+	}
+
 	// Apply offset and limit to trainResponses
 	start := (page - 1) * limit
 	end := start + limit

@@ -48,10 +48,10 @@ func NewTicketOrderUsecase(ticketOrderRepo repositories.TicketOrderRepository, t
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
 // @Param search query string false "Search order"
-// @Param class query string false "Filter by class train"
+// @Param class query string false "Filter by class train" Enums(1,2,3,4,5)
 // @Param name query string false "Filter by name train"
-// @Param order_by query string false "Filter order by"
-// @Param status query string false "Filter by status order"
+// @Param order_by query string false "Filter order by" Enums(higher_price, lower_price, last_departure, early_departure)
+// @Param status query string false "Filter by status order" Enums(unpaid, paid, done, canceled, refund)
 // @Success      200 {object} dtos.GetAllTicketTravelerDetailOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -263,8 +263,8 @@ func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, searc
 // @Param search query string false "search train name"
 // @Param date_start query string false "Date start"
 // @Param date_end query string false "Date end"
-// @Param order_by query string false "Order by name"
-// @Param filter query string false "Filter by status order"
+// @Param order_by query string false "Order by name" Enums(asc, desc)
+// @Param filter query string false "Filter by status order" Enums(unpaid, paid, done, canceled, refund)
 // @Success      200 {object} dtos.GetAllTicketTravelerDetailOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse

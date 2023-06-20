@@ -33,9 +33,9 @@ func NewTrainCarriageUsecase(TrainCarriageRepo repositories.TrainCarriageReposit
 // @Accept       json
 // @Produce      json
 // @Param train_id query int false "Train id"
-// @Param class query string false "Class train"
+// @Param class query string false "Class train" Enums(Ekonomi, Bisnis, Eksekutif)
 // @Param date query string false "Date order"
-// @Param status query string false "Status train"
+// @Param status query string false "Status train" Enums(available, unavailable)
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
 // @Success      200 {object} dtos.GetAllTrainCarriageStatusOKResponse

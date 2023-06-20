@@ -299,6 +299,29 @@ func (c *trainController) DeleteTrain(ctx echo.Context) error {
 // =============================== USER ================================== \\
 
 func (c *trainController) SearchTrainAvailable(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
+
+	userId, err := middlewares.GetUserIdFromToken(tokenString)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
 	pageParam := ctx.QueryParam("page")
 	page, err := strconv.Atoi(pageParam)
 	if err != nil {
@@ -325,7 +348,7 @@ func (c *trainController) SearchTrainAvailable(ctx echo.Context) error {
 	stationDestinationIdParam := ctx.QueryParam("station_destination_id")
 	stationDestinationId, _ := strconv.Atoi(stationDestinationIdParam)
 
-	trains, count, err := c.trainUsecase.SearchTrainAvailable(page, limit, stationOriginId, stationDestinationId, sortByTrainId, classParam, sortByPriceParam, sortByArriveTimeParam)
+	trains, count, err := c.trainUsecase.SearchTrainAvailable(userId, page, limit, stationOriginId, stationDestinationId, sortByTrainId, classParam, sortByPriceParam, sortByArriveTimeParam)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,

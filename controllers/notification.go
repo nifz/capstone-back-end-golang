@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"back-end-golang/helpers"
+	"back-end-golang/middlewares"
 	"back-end-golang/usecases"
 	"net/http"
-	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -24,8 +24,30 @@ func NewNotificationController(notificationUsecase usecases.NotificationUsecase)
 // Implementasi fungsi-fungsi dari interface ItemController
 
 func (c *notificationController) GetNotificationByUserID(ctx echo.Context) error {
-	id, _ := strconv.Atoi(ctx.Param("id"))
-	notification, err := c.notificationUsecase.GetNotificationByUserID(uint(id))
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
+
+	userId, err := middlewares.GetUserIdFromToken(tokenString)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+	notification, err := c.notificationUsecase.GetNotificationByUserID(userId)
 
 	if err != nil {
 		return ctx.JSON(
