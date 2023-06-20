@@ -194,5 +194,7 @@ func MigrateDB(db *gorm.DB) error {
 		&models.TemplateMessage{},
 		&models.HotelRating{},
 		&models.HotelOrderMidtrans{},
+		&models.HistorySeenStation{},
+		&models.HistorySeenHotel{},
 	)
 }
