@@ -1639,10 +1639,6 @@ func (u *hotelOrderUsecase) CreateHotelOrder2(userID uint, hotelOrderInput dtos.
 		hotelOrder.Status = "canceled"
 		_, _ = u.hotelOrderRepo.UpdateHotelOrder2(hotelOrder)
 	}
-	if res.TransactionStatus == "" {
-		hotelOrder.Status = "canceled"
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder2(hotelOrder)
-	}
 
 	hotelOrderResponse = dtos.HotelOrderResponse2{
 		PaymentURL:       createMidtrans,
