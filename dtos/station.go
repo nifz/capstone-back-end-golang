@@ -25,3 +25,10 @@ type StationResponseSimply struct {
 	Initial    string `json:"initial" example:"PSE"`
 	ArriveTime string `json:"arrive_time" example:"00:00"`
 }
+
+type StationResponseSimply2 struct {
+	StationID uint   `json:"station_id" example:"1"`
+	Origin    string `json:"origin" example:"Jakarta"`
+	Name      string `json:"name" example:"Pasar Senen"`
+	Initial   string `json:"initial" example:"PSE"`
+}
