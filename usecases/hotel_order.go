@@ -509,7 +509,7 @@ func (u *hotelOrderUsecase) GetHotelOrdersByAdmin(page, limit, ratingClass int, 
 			UpdatedAt: hotelOrder.UpdatedAt,
 		}
 
-		if ratingClass > 0 && getHotel.Class < ratingClass {
+		if ratingClass != 0 && getHotel.Class != ratingClass {
 			continue // Skip the hotel if its rating class is below the specified ratingClass
 		}
 		hotelOrderResponses = append(hotelOrderResponses, hotelOrderResponse)

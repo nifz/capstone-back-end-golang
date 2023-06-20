@@ -814,7 +814,7 @@ func (u *hotelUsecase) SearchHotelAvailable(userId, page, limit, minimumPrice, m
 			UpdatedAt:       hotel.UpdatedAt,
 		}
 
-		if ratingClass > 0 && hotelResponse.Class < ratingClass {
+		if ratingClass != 0 && hotelResponse.Class != ratingClass {
 			continue // Skip the hotel if its rating class is below the specified ratingClass
 		}
 
