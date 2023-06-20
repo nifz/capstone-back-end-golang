@@ -4,8 +4,12 @@ import (
 	"back-end-golang/dtos"
 	"back-end-golang/helpers"
 	"back-end-golang/middlewares"
+	"back-end-golang/models"
 	"back-end-golang/usecases"
+	"encoding/csv"
+	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -18,6 +22,7 @@ type HotelOrderController interface {
 	GetHotelOrderByID(c echo.Context) error
 	CreateHotelOrder(c echo.Context) error
 	UpdateHotelOrder(c echo.Context) error
+	CsvHotelOrder(ctx echo.Context) error
 }
 
 type hotelOrderController struct {
@@ -368,4 +373,81 @@ func (c *hotelOrderController) UpdateHotelOrder(ctx echo.Context) error {
 		),
 	)
 
+}
+func (c *hotelOrderController) CsvHotelOrder(ctx echo.Context) error {
+	var cloudinary models.Url
+
+	// Mendapatkan data hotel order dari sumber data yang sesuai
+	hotelOrders, err := c.hotelOrderUsecase.CsvHotelOrder()
+	if err != nil {
+		fmt.Println("Gagal mendapatkan data hotel order:", err)
+		return err
+	}
+
+	uploadUrl, err := usecases.NewMediaUpload().RemoteUpload(models.Url{Url: "hotel_orders.csv"})
+	if err != nil {
+		return ctx.JSON(
+			http.StatusInternalServerError,
+			helpers.NewErrorResponse(
+				http.StatusInternalServerError,
+				"Error uploading photo",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+	cloudinary.Url = uploadUrl
+
+	// Buat file CSV
+	file, err := os.Create("hotel_orders.csv")
+	if err != nil {
+		fmt.Println("Gagal membuat file CSV:", err)
+		return err
+	}
+	defer file.Close()
+
+	// Buat writer CSV
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	// Tulis header kolom
+	header := []string{"Hotel Order Code", "Hotel", "Hotel Room", "Check In Date", "Check Out Date", "Number of Night", "Price", "Total Amount", "Name Order", "Email Order", "Phone Number Order", "Status", "Order Date"}
+	if err := writer.Write(header); err != nil {
+		fmt.Println("Gagal menulis header kolom:", err)
+		return err
+	}
+
+	// Tulis data
+	for _, order := range hotelOrders {
+		row := []string{
+			order.HotelOrderCode,
+			order.Hotel,
+			order.HotelRoom,
+			order.CheckIn,
+			order.CheckOut,
+			strconv.Itoa(order.NumberOfNight),
+			strconv.Itoa(order.Price),
+			strconv.Itoa(order.TotalAmount),
+			order.NameOrder,
+			order.EmailOrder,
+			order.PhoneNumberOrder,
+			order.Status,
+			order.CreatedAt.String(),
+		}
+
+		if err := writer.Write(row); err != nil {
+			fmt.Println("Gagal menulis data:", err)
+			return err
+		}
+	}
+
+	fmt.Println("File CSV berhasil dibuat.")
+
+	return ctx.JSON(
+		http.StatusOK,
+		helpers.NewResponse(
+			http.StatusOK,
+			"Successfully uploaded CSV file",
+			cloudinary,
+		),
+	)
 }

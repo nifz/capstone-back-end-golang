@@ -178,6 +178,7 @@ func Init(e *echo.Echo, db *gorm.DB) {
 
 	admin.GET("/order/hotel", hotelOrderController.GetHotelOrdersByAdmin)
 	admin.GET("/order/hotel/detail", hotelOrderController.GetHotelOrderDetailByAdmin)
+	admin.POST("/order/hotel/csv", hotelOrderController.CsvHotelOrder)
 
 	// crud station
 	public.GET("/station", stationController.GetAllStations)

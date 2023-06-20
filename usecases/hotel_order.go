@@ -20,6 +20,7 @@ type HotelOrderUsecase interface {
 	GetHotelOrderByID(userID, hotelOrderId uint, isCheckIn, isCheckOut bool) (dtos.HotelOrderResponse, error)
 	CreateHotelOrder(userID uint, hotelOrderInput dtos.HotelOrderInput) (dtos.HotelOrderResponse, error)
 	UpdateHotelOrder(userID, hotelOrderID uint, status string) (dtos.HotelOrderResponse, error)
+	CsvHotelOrder() ([]dtos.CsvHotelOrder, error)
 }
 
 type hotelOrderUsecase struct {
@@ -1423,6 +1424,62 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 	}
 
 	return hotelOrderResponses, nil
+}
+
+// CsvHotelOrder godoc
+// @Summary      CSV Hotel Order
+// @Description  CSV
+// @Tags         Admin - Order
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} dtos.StatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /admin/order/hotel/csv [post]
+// @Security BearerAuth
+func (u *hotelOrderUsecase) CsvHotelOrder() ([]dtos.CsvHotelOrder, error) {
+	var newOrderResponses []dtos.CsvHotelOrder
+	hotelOrder, _ := u.hotelOrderRepo.CsvHotelOrder()
+
+	for _, hotelOrder := range hotelOrder {
+
+		getHotelOrder, err := u.hotelOrderRepo.GetHotelOrderByID(hotelOrder.ID, 1)
+		if err != nil {
+			return newOrderResponses, err
+		}
+
+		getHotel, err := u.hotelRepo.GetHotelByID2(uint(getHotelOrder.HotelID))
+		if err != nil {
+			return newOrderResponses, err
+		}
+
+		getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByHotelID(uint(getHotelOrder.HotelID))
+		if err != nil {
+			return newOrderResponses, err
+		}
+
+		newHotelOrderResponse := dtos.CsvHotelOrder{
+			HotelOrderCode:   getHotelOrder.HotelOrderCode,
+			Hotel:            getHotel.Name,
+			HotelRoom:        getHotelRoom.Name,
+			CheckIn:          helpers.FormatDateToYMD(&getHotelOrder.DateStart),
+			CheckOut:         helpers.FormatDateToYMD(&getHotelOrder.DateEnd),
+			NumberOfNight:    getHotelOrder.NumberOfNight,
+			Price:            getHotelOrder.Price,
+			TotalAmount:      getHotelOrder.TotalAmount,
+			NameOrder:        getHotelOrder.NameOrder,
+			EmailOrder:       getHotel.Email,
+			PhoneNumberOrder: getHotelOrder.PhoneNumberOrder,
+			Status:           getHotelOrder.Status,
+			CreatedAt:        getHotelOrder.CreatedAt,
+		}
+		newOrderResponses = append(newOrderResponses, newHotelOrderResponse)
+	}
+
+	return newOrderResponses, nil
 }
 
 func hasMatchingTravelerDetail(hotelOrderID uint, search string, travelerDetailRepo repositories.TravelerDetailRepository) bool {
