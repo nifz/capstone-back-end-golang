@@ -42,6 +42,10 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	stationUsecase := usecases.NewStationUsecase(stationRepository)
 	stationController := controllers.NewStationController(stationUsecase)
 
+	historySeenStationRepository := repositories.NewHistorySeenStationRepository(db)
+	historySeenStationUsecase := usecases.NewHistorySeenStationUsecase(historySeenStationRepository, stationRepository)
+	historySeenStationController := controllers.NewHistorySeenStationController(historySeenStationUsecase)
+
 	trainStationRepository := repositories.NewTrainStationRepository(db)
 	// trainStationUsecase := usecases.NewTrainStationUsecase(trainStationRepository)
 	// trainStationController := controllers.NewTrainStationController(trainStationUsecase)
@@ -49,7 +53,7 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	ticketTravelerDetailRepository := repositories.NewTicketTravelerDetailRepository(db)
 
 	trainRepository := repositories.NewTrainRepository(db)
-	trainUsecase := usecases.NewTrainUsecase(trainRepository, trainStationRepository)
+	trainUsecase := usecases.NewTrainUsecase(trainRepository, trainStationRepository, historySeenStationUsecase)
 	trainController := controllers.NewTrainController(trainUsecase)
 
 	trainCarriageRepository := repositories.NewTrainCarriageRepository(db)
@@ -93,7 +97,11 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	hotelRatingsUsecase := usecases.NewHotelRatingsUsecase(hotelRatingsRepository, hotelRepository, userRepository, hotelOrderRepository, notificationRepository)
 	hotelRatingsController := controllers.NewHotelRatingsController(hotelRatingsUsecase)
 
-	hotelUsecase := usecases.NewHotelUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository, historySearchRepository, hotelRatingsRepository, userRepository)
+	historySeenHotelRepository := repositories.NewHistorySeenHotelRepository(db)
+	historySeenHotelUsecase := usecases.NewHistorySeenHotelUsecase(historySeenHotelRepository, hotelRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository)
+	historySeenHotelController := controllers.NewHistorySeenHotelController(historySeenHotelUsecase)
+
+	hotelUsecase := usecases.NewHotelUsecase(hotelRepository, hotelRoomRepository, hotelRoomImageRepository, hotelRoomFacilitiesRepository, hotelImageRepository, hotelFacilitiesRepository, hotelPolicyRepository, historySearchRepository, hotelRatingsRepository, userRepository, historySeenHotelUsecase)
 	hotelController := controllers.NewHotelController(hotelUsecase)
 
 	dashboardRepository := repositories.NewDashboardRepository(db)
@@ -156,7 +164,11 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.POST("/history-search", historySearchController.HistorySearchCreate)
 	user.DELETE("/history-search/:id", historySearchController.HistorySearchDelete)
 
-	user.GET("/notification/:id", notificationController.GetNotificationByUserID)
+	user.GET("/history-seen-station", historySeenStationController.GetAllHistorySeenStations)
+
+	user.GET("/history-seen-hotel", historySeenHotelController.GetAllHistorySeenHotels)
+
+	user.GET("/notification", notificationController.GetNotificationByUserID)
 
 	// ratings hotel
 	// public.GET("/hotel/ratings", hotelController.GetAllHotelRatings)
