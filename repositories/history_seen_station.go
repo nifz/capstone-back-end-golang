@@ -27,14 +27,14 @@ func (r *historySeenStationRepository) GetAllHistorySeenStation(page, limit int,
 		histories []models.HistorySeenStation
 		count     int64
 	)
-	err := r.db.Order("id DESC").Find(&histories).Count(&count).Error
+	err := r.db.Where("user_id = ?", userId).Order("id DESC").Find(&histories).Count(&count).Error
 	if err != nil {
 		return histories, int(count), err
 	}
 
 	offset := (page - 1) * limit
 
-	err = r.db.Order("id DESC").Limit(limit).Offset(offset).Find(&histories).Error
+	err = r.db.Where("user_id = ?", userId).Order("id DESC").Limit(limit).Offset(offset).Find(&histories).Error
 
 	return histories, int(count), err
 }
