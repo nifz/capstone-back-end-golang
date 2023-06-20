@@ -17,13 +17,13 @@ func initiateCoreApiClient() {
 }
 
 // CheckTransaction godoc
-// @Summary      Get Transaction
-// @Description  Get Transaction
+// @Summary      Get Transaction order by midtrans
+// @Description  Get Transaction order by midtrans
 // @Tags         User - Order
 // @Accept       json
 // @Produce      json
 // @Param order_id query string true "Order id"
-// @Success      200 {object} dtos.GetAllHotelOrderStatusOKResponse
+// @Success      200 {object} dtos.StatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
 // @Failure      403 {object} dtos.ForbiddenResponse

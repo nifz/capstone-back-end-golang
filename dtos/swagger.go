@@ -325,3 +325,41 @@ type HotelRatingCreeatedResponses struct {
 	Message    string              `json:"message" example:"Successfully created hotel rating"`
 	Data       HotelRatingResponse `json:"data"`
 }
+
+type GetAllHistorySeenStationStatusOKResponse struct {
+	StatusCode int                        `json:"status_code" example:"200"`
+	Message    string                     `json:"message" example:"Successfully get history seen station"`
+	Data       HistorySeenStationResponse `json:"data"`
+	Meta       helpers.Meta               `json:"meta"`
+}
+
+type HistorySeenStationStatusOKResponse struct {
+	StatusCode int                        `json:"status_code" example:"200"`
+	Message    string                     `json:"message" example:"Successfully get history seen station"`
+	Data       HistorySeenStationResponse `json:"data"`
+}
+
+type HistorySeenStationCreeatedResponse struct {
+	StatusCode int                        `json:"status_code" example:"201"`
+	Message    string                     `json:"message" example:"Successfully created history seen station"`
+	Data       HistorySeenStationResponse `json:"data"`
+}
+
+type GetAllHistorySeenHotelStatusOKResponse struct {
+	StatusCode int                      `json:"status_code" example:"200"`
+	Message    string                   `json:"message" example:"Successfully get history seen hotel"`
+	Data       HistorySeenHotelResponse `json:"data"`
+	Meta       helpers.Meta             `json:"meta"`
+}
+
+type HistorySeenHotelStatusOKResponse struct {
+	StatusCode int                      `json:"status_code" example:"200"`
+	Message    string                   `json:"message" example:"Successfully get history seen hotel"`
+	Data       HistorySeenHotelResponse `json:"data"`
+}
+
+type HistorySeenHotelCreeatedResponse struct {
+	StatusCode int                      `json:"status_code" example:"201"`
+	Message    string                   `json:"message" example:"Successfully created history seen hotel"`
+	Data       HistorySeenHotelResponse `json:"data"`
+}

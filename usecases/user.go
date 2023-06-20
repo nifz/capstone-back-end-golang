@@ -436,8 +436,8 @@ func (u *userUsecase) UserDeletePhotoProfile(userId uint) (dtos.UserInformationR
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
 // @Param search query string false "Search data"
-// @Param sort_by query string false "Sort by name"
-// @Param filter query string false "Filter data"
+// @Param sort_by query string false "Sort by name" Enums(asc, desc)
+// @Param filter query string false "Filter data" Enums(active, inactive)
 // @Success      200 {object} dtos.GetAllUserStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -502,7 +502,7 @@ func (u *userUsecase) UserGetAll(page, limit int, search, sortBy, filter string)
 // @Accept       json
 // @Produce      json
 // @Param id query int false "User ID"
-// @Param isDeleted query bool false "Update deleted user"
+// @Param isDeleted query bool false "Use this params if user want to be delete"
 // @Success      200 {object} dtos.GetAllUserStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse

@@ -57,8 +57,8 @@ func NewHotelOrderUsecase(hotelOrderRepo repositories.HotelOrderRepository, hote
 // @Param name query string false "Filter by name hotel"
 // @Param address query string false "Filter by address hotel"
 // @Param order_date query string false "Filter by order date hotel"
-// @Param order_by query string false "Filter order by"
-// @Param status query string false "Filter by status order"
+// @Param order_by query string false "Filter order by" Enums(latest, oldest, highest_price, lowest_price)
+// @Param status query string false "Filter by status order" Enums(unpaid, paid, done, canceled, refund)
 // @Success      200 {object} dtos.GetAllHotelOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -286,12 +286,12 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search,
 // @Produce      json
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
-// @Param rating_class query int false "Hotel rating class"
 // @Param search query string false "search hotel name"
+// @Param rating_class query int false "Hotel rating class" Enums(1,2,3,4,5)
 // @Param date_start query string false "Date start"
 // @Param date_end query string false "Date end"
-// @Param order_by query string false "Filter order by"
-// @Param status query string false "Filter by status order"
+// @Param order_by query string false "Filter order by" Enums(latest, oldest, highest_price, lowest_price)
+// @Param status query string false "Filter by status order" Enums(unpaid, paid, done, canceled, refund)
 // @Success      200 {object} dtos.GetAllHotelOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -727,8 +727,8 @@ func (u *hotelOrderUsecase) GetHotelOrdersDetailByAdmin(hotelOrderId uint) (dtos
 // @Accept       json
 // @Produce      json
 // @Param hotel_order_id query int true "Hotel Order ID"
-// @Param update_check_in query bool false "Update status order check in"
-// @Param update_check_out query bool false "Update status order check out"
+// @Param update_check_in query bool false "Use this params if want update status order check in"
+// @Param update_check_out query bool false "Use this params if want update status order check out"
 // @Success      200 {object} dtos.HotelOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -938,8 +938,8 @@ func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint, isCheck
 // @Accept       json
 // @Produce      json
 // @Param hotel_order_id query int true "Hotel Order ID"
-// @Param update_check_in query bool false "Update status order check in"
-// @Param update_check_out query bool false "Update status order check out"
+// @Param update_check_in query bool false "Use this params if update status order check in"
+// @Param update_check_out query bool false "Use this params if update status order check out"
 // @Success      200 {object} dtos.HotelOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
