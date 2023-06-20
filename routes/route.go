@@ -154,7 +154,7 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	user.POST("/hotel/order", hotelOrderController.CreateHotelOrder)
 	user.POST("/hotel/order/midtrans", hotelOrderController.CreateHotelOrder2)
 	user.PATCH("/hotel/order", hotelOrderController.UpdateHotelOrder)
-	user.GET("/transaction", controllers.CheckTransaction)
+	public.GET("/transaction", controllers.CheckTransaction)
 
 	user.GET("/order/hotel", hotelOrderController.GetHotelOrders)
 	user.GET("/order/hotel/detail", hotelOrderController.GetHotelOrderByID)

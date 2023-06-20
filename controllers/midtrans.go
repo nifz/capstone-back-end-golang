@@ -29,8 +29,7 @@ func initiateCoreApiClient() {
 // @Failure      403 {object} dtos.ForbiddenResponse
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /user/transaction [get]
-// @Security BearerAuth
+// @Router       /public/transaction [get]
 func CheckTransaction(ctx echo.Context) error {
 	initiateCoreApiClient()
 	res, err := c.CheckTransaction(ctx.QueryParam("order_id"))
