@@ -4757,6 +4757,11 @@ paths:
         required: true
         type: integer
       - description: Update Status Order ID
+        enum:
+        - paid
+        - done
+        - canceled
+        - refund
         in: query
         name: status
         required: true
