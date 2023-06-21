@@ -415,21 +415,16 @@ func (u *hotelRoomUsecase) UpdateHotelRoom(id uint, roomInput dtos.HotelRoomInpu
 		}
 	}
 
-	getImage, err := u.hotelRoomImageRepo.GetAllHotelRoomImageByID(updatedHotelRoom.ID)
-	if err != nil {
-		return hotelRoomResponse, err
-	}
-
 	getFacilities, err := u.hotelRoomFacilitiesRepo.GetAllHotelRoomFacilitiesByID(updatedHotelRoom.ID)
 	if err != nil {
 		return hotelRoomResponse, err
 	}
 
 	var hotelRoomImageResponses []dtos.HotelRoomImageResponse
-	for _, image := range getImage {
+	for _, image := range roomInput.HotelRoomImage {
 		hotelRoomImageResponse := dtos.HotelRoomImageResponse{
-			HotelID:     image.HotelID,
-			HotelRoomID: image.HotelRoomID,
+			HotelID:     getHotel.ID,
+			HotelRoomID: hotelRooms.ID,
 			ImageUrl:    image.ImageUrl,
 		}
 		hotelRoomImageResponses = append(hotelRoomImageResponses, hotelRoomImageResponse)
