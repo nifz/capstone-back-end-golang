@@ -148,7 +148,7 @@ func (u *hotelUsecase) GetAllHotels(page, limit, minimumPrice, maximumPrice, rat
 			UpdatedAt:       hotel.UpdatedAt,
 		}
 
-		if ratingClass > 0 && hotelResponse.Class < ratingClass {
+		if ratingClass > 0 && hotelResponse.Class != ratingClass {
 			continue // Skip the hotel if its rating class is below the specified ratingClass
 		}
 
