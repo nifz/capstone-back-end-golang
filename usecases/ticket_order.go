@@ -1203,7 +1203,7 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 // @Accept       json
 // @Produce      json
 // @Param ticket_order_id query int true "Ticket Order ID"
-// @Param status query string true "Update Status Order ID"
+// @Param status query string true "Update Status Order ID" Enums(paid, done, canceled, refund)
 // @Success      200 {object} dtos.TicketOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse

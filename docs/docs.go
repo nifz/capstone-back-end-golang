@@ -5388,6 +5388,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "enum": [
+                            "paid",
+                            "done",
+                            "canceled",
+                            "refund"
+                        ],
                         "type": "string",
                         "description": "Update Status Order ID",
                         "name": "status",
