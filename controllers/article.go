@@ -104,7 +104,7 @@ func (c *articleController) CreateArticle(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -185,7 +185,7 @@ func (c *articleController) CreateArticle(ctx echo.Context) error {
 				helpers.NewErrorResponse(
 					http.StatusBadRequest,
 					"The provided file format is not allowed. Please upload a JPEG or PNG image",
-					helpers.GetErrorData(nil),
+					"Unauthorized",
 				),
 			)
 		}
@@ -235,7 +235,7 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -330,7 +330,7 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 				helpers.NewErrorResponse(
 					http.StatusBadRequest,
 					"The provided file format is not allowed. Please upload a JPEG or PNG image",
-					helpers.GetErrorData(nil),
+					"Unauthorized",
 				),
 			)
 		}
@@ -380,7 +380,7 @@ func (c *articleController) DeleteArticle(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}

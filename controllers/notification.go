@@ -31,7 +31,7 @@ func (c *notificationController) GetNotificationByUserID(ctx echo.Context) error
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}

@@ -34,7 +34,7 @@ func (c *historySeenStationController) GetAllHistorySeenStations(ctx echo.Contex
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -97,7 +97,7 @@ func (c *historySeenStationController) CreateHistorySeenStation(ctx echo.Context
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
