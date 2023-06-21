@@ -49,7 +49,7 @@ func NewDashboardUsecase(dashboardRepository repositories.DashboardRepository, u
 // @Security BearerAuth
 func (u *dashboardUsecase) DashboardGetAll() (dtos.DashboardResponse, error) {
 	var dashboardResponse dtos.DashboardResponse
-	countUser, countUserToday, countTrain, countTrainToday, countTicketOrder, countTicketOrderToday, newTicketOrder, newUser, newHotelOrder, countHotelOrder, countHotelOrderToday, err := u.dashboardRepository.DashboardGetAll()
+	countUser, countUserToday, countTrain, countTrainToday, countHotel, countHotelToday, countTicketOrder, countTicketOrderToday, newTicketOrder, newUser, newHotelOrder, countHotelOrder, countHotelOrderToday, err := u.dashboardRepository.DashboardGetAll()
 	if err != nil {
 		return dashboardResponse, err
 	}
@@ -138,6 +138,10 @@ func (u *dashboardUsecase) DashboardGetAll() (dtos.DashboardResponse, error) {
 		CountUser: echo.Map{
 			"total_user":       countUser,
 			"total_user_today": countUserToday,
+		},
+		CountHotel: echo.Map{
+			"total_hotel": countHotel,
+			"total_hotel_today": countHotelToday,
 		},
 		CountTrain: echo.Map{
 			"total_train":       countTrain,
