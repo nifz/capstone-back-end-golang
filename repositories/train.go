@@ -168,7 +168,10 @@ func (r *trainRepository) UpdateTrain(train models.Train) (models.Train, error) 
 
 func (r *trainRepository) DeleteTrain(id uint) error {
 	var train models.Train
-	err := r.db.Where("id = ?", id).Delete(&train).Error
+	err := r.db.Where("id = ?", id).First(&train).Error
+	train.Status = "unavailable"
+	err = r.db.Where("id = ?", id).Save(&train).Error
+	err = r.db.Where("id = ?", id).Delete(&train).Error
 	if err != nil {
 		return err
 	}
