@@ -1730,6 +1730,9 @@ func (u *hotelOrderUsecase) UpdateHotelOrder(userID, hotelOrderID uint, status s
 	if err != nil {
 		return hotelOrderResponses, err
 	}
+	if hotelOrder.Status == status {
+		return hotelOrderResponses, errors.New("Failed to update hotel order status")
+	}
 	hotelOrder.Status = status
 	hotelOrder, err = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
 	if err != nil {
