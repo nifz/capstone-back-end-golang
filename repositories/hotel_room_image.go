@@ -45,7 +45,7 @@ func (r *hotelRoomImageRepository) GetAllHotelRoomImages(page, limit int) ([]mod
 
 func (r *hotelRoomImageRepository) GetAllHotelRoomImageByID(id uint) ([]models.HotelRoomImage, error) {
 	var roomImage []models.HotelRoomImage
-	err := r.db.Where("id = ?", id).Find(&roomImage).Error
+	err := r.db.Where("hotel_room_id = ?", id).Find(&roomImage).Error
 	return roomImage, err
 }
 
