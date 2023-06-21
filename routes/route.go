@@ -249,6 +249,6 @@ func Init(e *echo.Echo, db *gorm.DB) {
 
 	// Hotel Ratings
 	// public.GET("/hotel/ratings", hotelRatingsController.GetAllHotelRatings)
-	admin.GET("/hotel-ratings/:id", hotelRatingsController.GetRatingsByHotelsId)
+	public.GET("/hotel/:id/rating", hotelRatingsController.GetRatingsByHotelsId)
 
 }

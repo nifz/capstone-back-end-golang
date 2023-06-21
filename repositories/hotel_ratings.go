@@ -43,12 +43,12 @@ func (r *hotelRatingsRepository) GetHotelRatingsByHotelID(page, limit int, id ui
 		return nil, hotelRatings, int(count), err
 	}
 	ratingCounts := make(map[int]int)
-	if filter == "terbaru" {
+	if filter == "latest" {
 		err = r.db.Where("hotel_id = ?", id).Order("created_at DESC").Limit(limit).Offset(offset).Find(&hotelRatings).Error
 		// for _, rating := range hotelRatings {
 		// 	ratingCounts[rating.Rating]++
 		// }
-	} else if filter == "terlama" {
+	} else if filter == "oldest" {
 		err = r.db.Where("hotel_id = ?", id).Order("created_at ASC").Limit(limit).Offset(offset).Find(&hotelRatings).Error
 		// for _, rating := range hotelRatings {
 		// 	ratingCounts[rating.Rating]++

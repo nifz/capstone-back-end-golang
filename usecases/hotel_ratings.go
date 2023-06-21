@@ -11,9 +11,9 @@ type HotelRatingsUsecase interface {
 	// user
 	CreateHotelRating(userId uint, hotelRatingInput dtos.HotelRatingInput) (dtos.HotelRatingResponse, error)
 	GetHotelRatingsByIdOrders(id uint) (dtos.HotelRatingResponse, error)
-	GetAllHotelRatingsByIdHotels(page, limit int, hotel_id uint) ([]dtos.RatingInfo, int, error)
+	GetAllHotelRatingsByIdHotels(page, limit int, hotelId uint) ([]dtos.RatingInfo, int, error)
 	// admin
-	GetHotelRatingsByHotelID(page, limit int, id uint, filter string) (dtos.HotelRatingsByIdHotels, int, error)
+	GetHotelRatingsByHotelID(star, page, limit int, id uint, filter string) (dtos.HotelRatingsByIdHotels, int, error)
 }
 
 type hotelRatingsUsecase struct {
@@ -113,14 +113,32 @@ func (u *hotelRatingsUsecase) CreateHotelRating(userId uint, hotelRatingInput dt
 	return hotelRatingResponse, nil
 }
 
-func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(page, limit int, id uint, filter string) (dtos.HotelRatingsByIdHotels, int, error) {
+// GetHotelByID godoc
+// @Summary      Get hotel by ID
+// @Description  Get hotel by ID
+// @Tags         Admin - Hotel
+// @Accept       json
+// @Produce      json
+// @Param id path integer true "ID Hotel"
+// @Param page query int false "Page number"
+// @Param limit query int false "Number of items per page"
+// @Param filter query string false "Filter order by review hotel from user" Enums(latest, oldest)
+// @Param rating query int false "Filter rating hotel by user" Enums(1,2,3,4,5)
+// @Success      200 {object} dtos.GetAllRatingByIdHotelStatusOKResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /public/hotel/{id}/rating [get]
+func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(star, page, limit int, id uint, filter string) (dtos.HotelRatingsByIdHotels, int, error) {
 	var (
 		hotelRatingsResponse dtos.HotelRatingsByIdHotels
 	)
 
 	ratingCounts, hotelRatings, count, err := u.hotelRatingsRepository.GetHotelRatingsByHotelID(page, limit, id, filter)
 	if err != nil {
-		return hotelRatingsResponse, 0, errors.New("Hotel ID is not found")
+		return hotelRatingsResponse, 0, nil
 	}
 
 	hotelRatingsResponse.HotelID = id
@@ -128,23 +146,6 @@ func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(page, limit int, id uint,
 	// hotelRatingsResponse.RatingCounts = ratingCounts
 
 	var totalRating int
-	for _, rating := range hotelRatings {
-		userDetail, err := u.userRepository.UserGetById2(rating.UserID)
-		if err != nil {
-			return hotelRatingsResponse, 0, errors.New("User ID is not valid")
-		}
-
-		ratingInfo := dtos.RatingInfo{
-			UserID:    rating.UserID,
-			Username:  userDetail.FullName,
-			UserImage: userDetail.ProfilePicture,
-			Rating:    rating.Rating,
-			Review:    rating.Review,
-			CreatedAt: rating.CreatedAt,
-		}
-		hotelRatingsResponse.Ratings = append(hotelRatingsResponse.Ratings, ratingInfo)
-		totalRating += rating.Rating
-	}
 
 	if len(hotelRatings) > 0 {
 		hotelRatingsResponse.RataRataRating = float64(totalRating) / float64(len(hotelRatings))
@@ -158,6 +159,26 @@ func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(page, limit int, id uint,
 	hotelRatingsResponse.Rating2 = ratingCounts[2]
 	hotelRatingsResponse.Rating1 = ratingCounts[1]
 
+	for _, rating := range hotelRatings {
+		userDetail, err := u.userRepository.UserGetById2(rating.UserID)
+		if err != nil {
+			return hotelRatingsResponse, 0, errors.New("User ID is not valid")
+		}
+		if star == 0 && star != rating.Rating {
+			continue
+		}
+
+		ratingInfo := dtos.RatingInfo{
+			UserID:    rating.UserID,
+			Username:  userDetail.FullName,
+			UserImage: userDetail.ProfilePicture,
+			Rating:    rating.Rating,
+			Review:    rating.Review,
+			CreatedAt: rating.CreatedAt,
+		}
+		hotelRatingsResponse.Ratings = append(hotelRatingsResponse.Ratings, ratingInfo)
+		totalRating += rating.Rating
+	}
 	return hotelRatingsResponse, count, nil
 }
 
@@ -178,10 +199,10 @@ func (u *hotelRatingsUsecase) GetHotelRatingsByIdOrders(id uint) (dtos.HotelRati
 	return hotelRatingsResponse, nil
 }
 
-func (u *hotelRatingsUsecase) GetAllHotelRatingsByIdHotels(page, limit int, hotel_id uint) ([]dtos.RatingInfo, int, error) {
+func (u *hotelRatingsUsecase) GetAllHotelRatingsByIdHotels(page, limit int, hotelId uint) ([]dtos.RatingInfo, int, error) {
 	var hotelRatingsResponse []dtos.RatingInfo
 
-	hotelRatings, count, err := u.hotelRatingsRepository.GetAllHotelRatingsByIdHotels(page, limit, hotel_id)
+	hotelRatings, count, err := u.hotelRatingsRepository.GetAllHotelRatingsByIdHotels(page, limit, hotelId)
 	if err != nil {
 		return hotelRatingsResponse, 0, errors.New("Hotel ID is not found")
 	}
