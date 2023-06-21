@@ -339,8 +339,9 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses,
 		if train.ArriveTime == "" || train.StationID < 1 {
 			return trainResponse, errors.New("Failed to create train")
 		}
-		station, err := u.trainRepo.GetStationByID2(train.StationID)
+		station, err := u.trainRepo.GetStationByID3(train.StationID)
 		if err != nil {
+			_ = u.trainRepo.ForceDeleteTrain(createTrain.ID)
 			return trainResponse, err
 		}
 		trainStation := models.TrainStation{
