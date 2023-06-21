@@ -927,6 +927,23 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 				return ticketOrderResponse, errors.New("Failed to get train id")
 			}
 
+			getTrainStation, err := u.trainRepo.SearchTrainAvailable(getTrain.ID, uint(ticketTravelerDetailDeparture.StationOriginID), uint(ticketTravelerDetailDeparture.StationDestinationID))
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train station")
+			}
+
+			if getTrain.Status != "available" {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train")
+			}
+
+			// Check if route[0] matches stationOriginId and route[1] matches stationDestinationId
+			if len(getTrainStation) < 2 || getTrainStation[0].StationID != uint(ticketTravelerDetailDeparture.StationOriginID) || getTrainStation[1].StationID != uint(ticketTravelerDetailDeparture.StationDestinationID) {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train")
+			}
+
 			if travelerDetail.IDCardNumber != "" {
 				trainPrice = getTrainCarriage.Price
 				sumTrainPrice += trainPrice
