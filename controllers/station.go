@@ -76,7 +76,7 @@ func (c *stationController) GetAllStationsByAdmin(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -155,7 +155,7 @@ func (c *stationController) CreateStation(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -201,7 +201,7 @@ func (c *stationController) UpdateStation(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -261,7 +261,7 @@ func (c *stationController) DeleteStation(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}

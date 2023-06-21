@@ -185,6 +185,19 @@ definitions:
         example: 200
         type: integer
     type: object
+  dtos.GetAllRatingByIdHotelStatusOKResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dtos.HotelRatingsByIdHotels'
+      message:
+        example: Successfully get history seen hotel
+        type: string
+      meta:
+        $ref: '#/definitions/helpers.Meta'
+      status_code:
+        example: 200
+        type: integer
+    type: object
   dtos.GetAllStationStatusOKResponse:
     properties:
       data:
@@ -733,8 +746,6 @@ definitions:
         type: integer
       review:
         type: string
-      user_id:
-        type: integer
     type: object
   dtos.HotelRatingResponse:
     properties:
@@ -747,6 +758,30 @@ definitions:
       review:
         type: string
       user_id:
+        type: integer
+    type: object
+  dtos.HotelRatingsByIdHotels:
+    properties:
+      hotel_id:
+        type: integer
+      rata_rata_rating:
+        type: number
+      rating_1:
+        type: integer
+      rating_2:
+        type: integer
+      rating_3:
+        type: integer
+      rating_4:
+        type: integer
+      rating_5:
+        description: RatingCounts   map[int]int  `json:"rating_counts"`
+        type: integer
+      ratings:
+        items:
+          $ref: '#/definitions/dtos.RatingInfo'
+        type: array
+      total_rating:
         type: integer
     type: object
   dtos.HotelResponse:
@@ -3954,6 +3989,72 @@ paths:
             $ref: '#/definitions/dtos.InternalServerErrorResponse'
       security:
       - BearerAuth: []
+      summary: Get hotel by ID
+      tags:
+      - Admin - Hotel
+  /public/hotel/{id}/rating:
+    get:
+      consumes:
+      - application/json
+      description: Get hotel by ID
+      parameters:
+      - description: ID Hotel
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter order by review hotel from user
+        enum:
+        - latest
+        - oldest
+        in: query
+        name: filter
+        type: string
+      - description: Filter rating hotel by user
+        enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        in: query
+        name: rating
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.GetAllRatingByIdHotelStatusOKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
       summary: Get hotel by ID
       tags:
       - Admin - Hotel

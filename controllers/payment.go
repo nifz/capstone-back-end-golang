@@ -103,7 +103,7 @@ func (c *paymentController) CreatePayment(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -184,7 +184,7 @@ func (c *paymentController) CreatePayment(ctx echo.Context) error {
 				helpers.NewErrorResponse(
 					http.StatusBadRequest,
 					"The provided file format is not allowed. Please upload a JPEG or PNG image",
-					helpers.GetErrorData(nil),
+					"Unauthorized",
 				),
 			)
 		}
@@ -234,7 +234,7 @@ func (c *paymentController) UpdatePayment(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -329,7 +329,7 @@ func (c *paymentController) UpdatePayment(ctx echo.Context) error {
 				helpers.NewErrorResponse(
 					http.StatusBadRequest,
 					"The provided file format is not allowed. Please upload a JPEG or PNG image",
-					helpers.GetErrorData(nil),
+					"Unauthorized",
 				),
 			)
 		}
@@ -379,7 +379,7 @@ func (c *paymentController) DeletePayment(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}

@@ -102,7 +102,7 @@ func (c *UserController) UserUpdatePassword(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -162,7 +162,7 @@ func (c *UserController) UserUpdateProfile(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -222,7 +222,7 @@ func (c *UserController) UserCredential(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -268,7 +268,7 @@ func (c *UserController) UserUpdatePhotoProfile(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -413,7 +413,7 @@ func (c *UserController) UserDeletePhotoProfile(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -460,7 +460,7 @@ func (c *UserController) UserGetAll(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -513,7 +513,7 @@ func (c *UserController) UserGetDetail(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -553,7 +553,7 @@ func (c *UserController) UserAdminRegister(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -600,7 +600,7 @@ func (c *UserController) UserAdminUpdate(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}

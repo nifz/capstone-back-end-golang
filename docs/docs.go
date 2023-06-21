@@ -3216,6 +3216,103 @@ const docTemplate = `{
                 }
             }
         },
+        "/public/hotel/{id}/rating": {
+            "get": {
+                "description": "Get hotel by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin - Hotel"
+                ],
+                "summary": "Get hotel by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID Hotel",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "latest",
+                            "oldest"
+                        ],
+                        "type": "string",
+                        "description": "Filter order by review hotel from user",
+                        "name": "filter",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "type": "integer",
+                        "description": "Filter rating hotel by user",
+                        "name": "rating",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.GetAllRatingByIdHotelStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/public/payment": {
             "get": {
                 "description": "Get all payments",
@@ -6035,6 +6132,25 @@ const docTemplate = `{
                 }
             }
         },
+        "dtos.GetAllRatingByIdHotelStatusOKResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dtos.HotelRatingsByIdHotels"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Successfully get history seen hotel"
+                },
+                "meta": {
+                    "$ref": "#/definitions/helpers.Meta"
+                },
+                "status_code": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
         "dtos.GetAllStationStatusOKResponse": {
             "type": "object",
             "properties": {
@@ -6835,9 +6951,6 @@ const docTemplate = `{
                 },
                 "review": {
                     "type": "string"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },
@@ -6857,6 +6970,42 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dtos.HotelRatingsByIdHotels": {
+            "type": "object",
+            "properties": {
+                "hotel_id": {
+                    "type": "integer"
+                },
+                "rata_rata_rating": {
+                    "type": "number"
+                },
+                "rating_1": {
+                    "type": "integer"
+                },
+                "rating_2": {
+                    "type": "integer"
+                },
+                "rating_3": {
+                    "type": "integer"
+                },
+                "rating_4": {
+                    "type": "integer"
+                },
+                "rating_5": {
+                    "description": "RatingCounts   map[int]int  ` + "`" + `json:\"rating_counts\"` + "`" + `",
+                    "type": "integer"
+                },
+                "ratings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dtos.RatingInfo"
+                    }
+                },
+                "total_rating": {
                     "type": "integer"
                 }
             }

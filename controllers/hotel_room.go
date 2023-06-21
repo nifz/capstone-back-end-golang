@@ -102,7 +102,7 @@ func (c *hotelRoomController) CreateHotelRoom(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -148,7 +148,7 @@ func (c *hotelRoomController) UpdateHotelRoom(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -208,7 +208,7 @@ func (c *hotelRoomController) DeleteHotelRoom(ctx echo.Context) error {
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}

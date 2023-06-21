@@ -34,7 +34,7 @@ func (c *historySeenHotelController) GetAllHistorySeenHotels(ctx echo.Context) e
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
@@ -97,7 +97,7 @@ func (c *historySeenHotelController) CreateHistorySeenHotel(ctx echo.Context) er
 			helpers.NewErrorResponse(
 				http.StatusUnauthorized,
 				"No token provided",
-				helpers.GetErrorData(nil),
+				"Unauthorized",
 			),
 		)
 	}
