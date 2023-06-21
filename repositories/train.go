@@ -17,9 +17,11 @@ type TrainRepository interface {
 	SearchTrainAvailable(trainId, originId, destinationId uint) ([]models.TrainStation, error)
 	GetStationByID(id uint) (models.Station, error)
 	GetStationByID2(id uint) (models.Station, error)
+	GetStationByID3(id uint) (models.Station, error)
 	CreateTrain(train models.Train) (models.Train, error)
 	UpdateTrain(train models.Train) (models.Train, error)
 	DeleteTrain(id uint) error
+	ForceDeleteTrain(id uint) error
 }
 
 type trainRepository struct {
@@ -156,6 +158,12 @@ func (r *trainRepository) GetStationByID2(id uint) (models.Station, error) {
 	return station, err
 }
 
+func (r *trainRepository) GetStationByID3(id uint) (models.Station, error) {
+	var station models.Station
+	err := r.db.Where("id = ?", id).First(&station).Error
+	return station, err
+}
+
 func (r *trainRepository) CreateTrain(train models.Train) (models.Train, error) {
 	err := r.db.Create(&train).Error
 	return train, err
@@ -188,6 +196,32 @@ func (r *trainRepository) DeleteTrain(id uint) error {
 		TrainID: train.ID,
 	}
 	err = r.db.Where("train_id = ?", trainCarriage.TrainID).Delete(&trainCarriage).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *trainRepository) ForceDeleteTrain(id uint) error {
+	var train models.Train
+	err := r.db.Unscoped().Where("id = ?", id).Delete(&train).Error
+	if err != nil {
+		return err
+	}
+
+	trainStation := models.TrainStation{
+		TrainID: train.ID,
+	}
+	err = r.db.Unscoped().Where("train_id = ?", trainStation.TrainID).Delete(&trainStation).Error
+	if err != nil {
+		return err
+	}
+
+	trainCarriage := models.TrainCarriage{
+		TrainID: train.ID,
+	}
+	err = r.db.Unscoped().Where("train_id = ?", trainCarriage.TrainID).Delete(&trainCarriage).Error
 	if err != nil {
 		return err
 	}
