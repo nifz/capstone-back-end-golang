@@ -1237,6 +1237,10 @@ func (u *ticketOrderUsecase) UpdateTicketOrder(userID, ticketOrderID uint, statu
 		return ticketOrderResponse, err
 	}
 
+	if createTicketOrder.Status == status {
+		return ticketOrderResponse, errors.New("Failed to update hotel order status")
+	}
+
 	createTicketOrder.Status = status
 
 	createTicketOrder, err = u.ticketOrderRepo.UpdateTicketOrder(createTicketOrder)
