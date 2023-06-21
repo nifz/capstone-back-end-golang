@@ -477,7 +477,7 @@ func (u *hotelRoomUsecase) UpdateHotelRoom(id uint, roomInput dtos.HotelRoomInpu
 // @Router       /admin/hotel-room/{id} [delete]
 // @Security BearerAuth
 func (u *hotelRoomUsecase) DeleteHotelRoom(id uint) error {
-	u.hotelRoomImageRepo.DeleteHotelRoomImage(id)
-	u.hotelRoomFacilitiesRepo.DeleteHotelRoomFacilities(id)
+	// u.hotelRoomImageRepo.DeleteHotelRoomImage(id)
+	// u.hotelRoomFacilitiesRepo.DeleteHotelRoomFacilities(id)
 	return u.hotelRoomRepo.DeleteHotelRoom(id)
 }

@@ -227,6 +227,9 @@ func (u *hotelUsecase) GetHotelByID(userId, id uint) (dtos.HotelByIDResponse, er
 
 	var hotelRoomResponses []dtos.HotelRoomHotelIDResponse
 	for _, room := range getRoom {
+		if !room.DeletedAt.Time.IsZero() {
+			continue
+		}
 		getImageRoom, err := u.hotelRoomImageRepo.GetAllHotelRoomImageByID(room.ID)
 		if err != nil {
 			return hotelResponses, err
@@ -688,9 +691,9 @@ func (u *hotelUsecase) UpdateHotel(id uint, hotel dtos.HotelInput) (dtos.HotelRe
 // @Router       /admin/hotel/{id} [delete]
 // @Security BearerAuth
 func (u *hotelUsecase) DeleteHotel(id uint) error {
-	u.hotelImageRepo.DeleteHotelImage(id)
-	u.hotelFacilitiesRepo.DeleteHotelFacilities(id)
-	u.hotelPoliciesRepo.DeleteHotelPolicies(id)
+	// u.hotelImageRepo.DeleteHotelImage(id)
+	// u.hotelFacilitiesRepo.DeleteHotelFacilities(id)
+	// u.hotelPoliciesRepo.DeleteHotelPolicies(id)
 	return u.hotelRepo.DeleteHotel(id)
 }
 
