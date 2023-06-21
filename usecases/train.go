@@ -326,6 +326,10 @@ func (u *trainUsecase) CreateTrain(train *dtos.TrainInput) (dtos.TrainResponses,
 		Status:    train.Status,
 	}
 
+	if len(train.Route) < 2 {
+		return trainResponse, errors.New("Route must be at least 2 station")
+	}
+
 	createdTrain, err := u.trainRepo.CreateTrain(createTrain)
 	if err != nil {
 		return trainResponse, err
