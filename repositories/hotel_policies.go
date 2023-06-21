@@ -59,6 +59,6 @@ func (r *hotelPoliciesRepository) UpdateHotelPolicies(HotelPolicies models.Hotel
 
 func (r *hotelPoliciesRepository) DeleteHotelPolicies(id uint) error {
 	var HotelPolicies models.HotelPolicies
-	err := r.db.Where("hotel_id = ?", id).Delete(&HotelPolicies).Error
+	err := r.db.Unscoped().Where("hotel_id = ?", id).Delete(&HotelPolicies).Error
 	return err
 }

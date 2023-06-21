@@ -66,6 +66,6 @@ func (r *hotelImageRepository) UpdateHotelImage(hotelImage models.HotelImage) (m
 
 func (r *hotelImageRepository) DeleteHotelImage(id uint) error {
 	var hotelImage models.HotelImage
-	err := r.db.Where("hotel_id = ?", id).Delete(&hotelImage).Error
+	err := r.db.Unscoped().Where("hotel_id = ?", id).Delete(&hotelImage).Error
 	return err
 }
