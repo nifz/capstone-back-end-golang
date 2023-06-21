@@ -9,7 +9,7 @@ import (
 
 type HotelRatingsUsecase interface {
 	// user
-	CreateHotelRating(hotelRatingInput dtos.HotelRatingInput) (dtos.HotelRatingResponse, error)
+	CreateHotelRating(userId uint, hotelRatingInput dtos.HotelRatingInput) (dtos.HotelRatingResponse, error)
 	GetHotelRatingsByIdOrders(id uint) (dtos.HotelRatingResponse, error)
 	GetAllHotelRatingsByIdHotels(page, limit int, hotel_id uint) ([]dtos.RatingInfo, int, error)
 	// admin
@@ -51,15 +51,15 @@ func NewHotelRatingsUsecase(hotelRatingsRepository repositories.HotelRatingsRepo
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/hotel-ratings [post]
 // @Security BearerAuth
-func (u *hotelRatingsUsecase) CreateHotelRating(hotelRatingInput dtos.HotelRatingInput) (dtos.HotelRatingResponse, error) {
+func (u *hotelRatingsUsecase) CreateHotelRating(userId uint, hotelRatingInput dtos.HotelRatingInput) (dtos.HotelRatingResponse, error) {
 	var hotelRatingResponse dtos.HotelRatingResponse
 
-	_, err := u.hotelRatingsRepository.CheckExistHotelRating(hotelRatingInput.HotelOrderID, hotelRatingInput.UserID)
+	_, err := u.hotelRatingsRepository.CheckExistHotelRating(hotelRatingInput.HotelOrderID, userId)
 	if err == nil {
 		return hotelRatingResponse, errors.New("You have already rated this hotel")
 	}
 
-	_, err = u.hotelOrderRepository.GetHotelOrderByID(hotelRatingInput.HotelOrderID, hotelRatingInput.UserID)
+	hotelOrder, err := u.hotelOrderRepository.GetHotelOrderByID(hotelRatingInput.HotelOrderID, userId)
 	if err != nil {
 		return hotelRatingResponse, errors.New("Hotel Order ID is not valid")
 	}
@@ -68,14 +68,9 @@ func (u *hotelRatingsUsecase) CreateHotelRating(hotelRatingInput dtos.HotelRatin
 		return hotelRatingResponse, errors.New("Rating must be between 0 and 5")
 	}
 
-	_, err = u.hotelRepository.GetHotelByID(hotelRatingInput.HotelID)
+	_, err = u.hotelRepository.GetHotelByID(hotelOrder.HotelID)
 	if err != nil {
 		return hotelRatingResponse, errors.New("Hotel ID is not valid")
-	}
-
-	_, err = u.userRepository.UserGetById2(hotelRatingInput.UserID)
-	if err != nil {
-		return hotelRatingResponse, errors.New("User ID is not valid")
 	}
 
 	if len(hotelRatingInput.Review) < 10 {
@@ -85,7 +80,7 @@ func (u *hotelRatingsUsecase) CreateHotelRating(hotelRatingInput dtos.HotelRatin
 	hotelRating := models.HotelRating{
 		HotelOrderID: hotelRatingInput.HotelOrderID,
 		HotelID:      hotelRatingInput.HotelID,
-		UserID:       hotelRatingInput.UserID,
+		UserID:       userId,
 		Rating:       hotelRatingInput.Rating,
 		Review:       hotelRatingInput.Review,
 	}

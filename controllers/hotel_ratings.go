@@ -30,7 +30,29 @@ func NewHotelRatingsController(hotelRatingUsecase usecases.HotelRatingsUsecase) 
 
 // Implementasi fungsi-fungsi dari interface ItemController
 
-func (c *hotelRatingsController) CreateHotelRating(ctx echo.Context) error {
+func (c *hotelRatingsController) CreateHotelRating(ctx echo.Context) error {tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(nil),
+			),
+		)
+	}
+
+	userId, err := middlewares.GetUserIdFromToken(tokenString)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
 	var hotelRatingsInputDTO dtos.HotelRatingInput
 
 	if err := ctx.Bind(&hotelRatingsInputDTO); err != nil {
@@ -44,7 +66,7 @@ func (c *hotelRatingsController) CreateHotelRating(ctx echo.Context) error {
 		)
 	}
 
-	ratings, err := c.hotelRatingUsecase.CreateHotelRating(hotelRatingsInputDTO)
+	ratings, err := c.hotelRatingUsecase.CreateHotelRating(userId, hotelRatingsInputDTO)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,

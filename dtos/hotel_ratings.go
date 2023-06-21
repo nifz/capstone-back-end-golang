@@ -5,7 +5,6 @@ import "time"
 type HotelRatingInput struct {
 	HotelOrderID uint   `form:"hotel_order_id" json:"hotel_order_id"`
 	HotelID      uint   `form:"hotel_id" json:"hotel_id"`
-	UserID       uint   `form:"user_id" json:"user_id"`
 	Rating       int    `form:"rating" json:"rating"`
 	Review       string `form:"review" json:"review"`
 }
