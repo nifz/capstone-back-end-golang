@@ -14,7 +14,7 @@ type HotelRatingsRepository interface {
 	GetAllHotelRatingsByIdHotels(page, limit int, hotel_id uint) ([]models.HotelRating, int, error)
 	GetAllHotelRatingsByIdHotels2(hotel_id uint) ([]models.HotelRating, error)
 	// admin
-	GetHotelRatingsByHotelID(id uint, filter string) (map[int]int, []models.HotelRating, error)
+	GetHotelRatingsByHotelID(id uint, filter string) (map[int]int, []models.HotelRating, int, error)
 }
 
 type hotelRatingsRepository struct {
@@ -32,13 +32,14 @@ func (r *hotelRatingsRepository) CreateHotelRating(hotelRating models.HotelRatin
 	err := r.db.Create(&hotelRating).Error
 	return hotelRating, err
 }
-func (r *hotelRatingsRepository) GetHotelRatingsByHotelID(id uint, filter string) (map[int]int, []models.HotelRating, error) {
+func (r *hotelRatingsRepository) GetHotelRatingsByHotelID(id uint, filter string) (map[int]int, []models.HotelRating, int, error) {
 	var (
 		hotelRatings []models.HotelRating
+		count        int64
 	)
-	err := r.db.Where("hotel_id = ?", id).First(&hotelRatings).Error
+	err := r.db.Where("hotel_id = ?", id).First(&hotelRatings).Count(&count).Error
 	if err != nil {
-		return nil, hotelRatings, err
+		return nil, hotelRatings, int(count), err
 	}
 	ratingCounts := make(map[int]int)
 	if filter == "latest" {
@@ -62,7 +63,7 @@ func (r *hotelRatingsRepository) GetHotelRatingsByHotelID(id uint, filter string
 		ratingCounts[rating.Rating]++
 	}
 
-	return ratingCounts, hotelRatings, err
+	return ratingCounts, hotelRatings, int(count), err
 }
 func (r *hotelRatingsRepository) GetHotelRatingsByIdOrders(id uint) (models.HotelRating, error) {
 	var hotelRating models.HotelRating
