@@ -140,13 +140,17 @@ func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(star, page, limit int, id
 	hotelRatingsResponse.TotalRating = len(hotelRatings)
 	// hotelRatingsResponse.RatingCounts = ratingCounts
 
-	var totalRating int
+	sumRatings := 0
+	for _, rating := range hotelRatings {
+		sumRatings += rating.Rating
+	}
 
 	if len(hotelRatings) > 0 {
-		hotelRatingsResponse.RataRataRating = float64(totalRating) / float64(len(hotelRatings))
+		hotelRatingsResponse.RataRataRating = float64(sumRatings) / float64(len(hotelRatings))
 	} else {
 		hotelRatingsResponse.RataRataRating = 0
 	}
+
 	// Set individual rating counts
 	hotelRatingsResponse.Rating5 = ratingCounts[5]
 	hotelRatingsResponse.Rating4 = ratingCounts[4]
@@ -172,7 +176,6 @@ func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(star, page, limit int, id
 			CreatedAt: rating.CreatedAt,
 		}
 		hotelRatingsResponse.Ratings = append(hotelRatingsResponse.Ratings, ratingInfo)
-		totalRating += rating.Rating
 	}
 
 	// Apply offset and limit to trainResponses
