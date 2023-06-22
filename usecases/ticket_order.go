@@ -48,7 +48,7 @@ func NewTicketOrderUsecase(ticketOrderRepo repositories.TicketOrderRepository, t
 // @Param page query int false "Page number"
 // @Param limit query int false "Number of items per page"
 // @Param search query string false "Search order"
-// @Param class query string false "Filter by class train" Enums(1,2,3,4,5)
+// @Param class query string false "Filter by class train" Enums(ekonomi, bisnis, eksekutif)
 // @Param name query string false "Filter by name train"
 // @Param order_by query string false "Filter order by" Enums(higher_price, lower_price, last_departure, early_departure)
 // @Param status query string false "Filter by status order" Enums(unpaid, paid, done, canceled, refund)
@@ -1237,7 +1237,7 @@ func (u *ticketOrderUsecase) UpdateTicketOrder(userID, ticketOrderID uint, statu
 		return ticketOrderResponse, err
 	}
 
-	if createTicketOrder.Status == status {
+	if createTicketOrder.Status == status || status == "unpaid" {
 		return ticketOrderResponse, errors.New("Failed to update hotel order status")
 	}
 

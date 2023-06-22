@@ -5234,11 +5234,9 @@ const docTemplate = `{
                     },
                     {
                         "enum": [
-                            "1",
-                            "2",
-                            "3",
-                            "4",
-                            "5"
+                            "ekonomi",
+                            "bisnis",
+                            "eksekutif"
                         ],
                         "type": "string",
                         "description": "Filter by class train",

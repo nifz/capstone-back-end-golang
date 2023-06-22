@@ -86,16 +86,16 @@ func (u *hotelUsecase) GetAllHotels(page, limit, minimumPrice, maximumPrice, rat
 
 		getImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotel.ID)
 		if err != nil {
-			return hotelResponses, 0, err
+			continue
 		}
 		getFacilities, err := u.hotelFacilitiesRepo.GetAllHotelFacilitiesByID(hotel.ID)
 		if err != nil {
-			return hotelResponses, 0, err
+			continue
 		}
 
 		getPolicy, err := u.hotelPoliciesRepo.GetHotelPoliciesByIDHotel(hotel.ID)
 		if err != nil {
-			return hotelResponses, 0, err
+			continue
 		}
 
 		var hotelImageResponses []dtos.HotelImageResponse
@@ -755,16 +755,16 @@ func (u *hotelUsecase) SearchHotelAvailable(userId, page, limit, minimumPrice, m
 
 		getImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotel.ID)
 		if err != nil {
-			return hotelResponses, 0, err
+			continue
 		}
 		getFacilities, err := u.hotelFacilitiesRepo.GetAllHotelFacilitiesByID(hotel.ID)
 		if err != nil {
-			return hotelResponses, 0, err
+			continue
 		}
 
 		getPolicy, err := u.hotelPoliciesRepo.GetHotelPoliciesByIDHotel(hotel.ID)
 		if err != nil {
-			return hotelResponses, 0, err
+			continue
 		}
 
 		var hotelImageResponses []dtos.HotelImageResponse
