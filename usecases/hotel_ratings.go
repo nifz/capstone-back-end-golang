@@ -136,7 +136,7 @@ func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(star, page, limit int, id
 		hotelRatingsResponse dtos.HotelRatingsByIdHotels
 	)
 
-	ratingCounts, hotelRatings, err := u.hotelRatingsRepository.GetHotelRatingsByHotelID(id, filter)
+	ratingCounts, hotelRatings, count, err := u.hotelRatingsRepository.GetHotelRatingsByHotelID(id, filter)
 	if err != nil {
 		return hotelRatingsResponse, 0, nil
 	}
@@ -196,7 +196,7 @@ func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(star, page, limit int, id
 
 	subsetHotelRatingResponses := hotelRatingsResponse.Ratings[start:end]
 	hotelRatingsResponse.Ratings = subsetHotelRatingResponses
-	return hotelRatingsResponse, len(hotelRatingsResponse.Ratings), nil
+	return hotelRatingsResponse, count, nil
 }
 
 func (u *hotelRatingsUsecase) GetHotelRatingsByIdOrders(id uint) (dtos.HotelRatingResponse, error) {
