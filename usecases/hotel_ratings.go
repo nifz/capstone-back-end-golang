@@ -68,18 +68,13 @@ func (u *hotelRatingsUsecase) CreateHotelRating(userId uint, hotelRatingInput dt
 		return hotelRatingResponse, errors.New("Rating must be between 0 and 5")
 	}
 
-	_, err = u.hotelRepository.GetHotelByID(hotelOrder.HotelID)
-	if err != nil {
-		return hotelRatingResponse, errors.New("Hotel ID is not valid")
-	}
-
 	if len(hotelRatingInput.Review) < 10 {
 		return hotelRatingResponse, errors.New("Review must be at least 10 characters long")
 	}
 
 	hotelRating := models.HotelRating{
-		HotelOrderID: hotelRatingInput.HotelOrderID,
-		HotelID:      hotelRatingInput.HotelID,
+		HotelOrderID: hotelOrder.ID,
+		HotelID:      hotelOrder.HotelID,
 		UserID:       userId,
 		Rating:       hotelRatingInput.Rating,
 		Review:       hotelRatingInput.Review,
