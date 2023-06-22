@@ -102,7 +102,7 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search,
 
 		getHotelImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotelOrder.HotelID)
 		if err != nil {
-			return hotelOrderResponses, 0, err
+			continue
 		}
 		var hotelImageResponses []dtos.HotelImageResponse
 		for _, hotelImage := range getHotelImage {
@@ -114,11 +114,11 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search,
 		}
 		getHotelFacilities, err := u.hotelFacilitiesRepo.GetAllHotelFacilitiesByID(hotelOrder.HotelID)
 		if err != nil {
-			return hotelOrderResponses, 0, err
+			continue
 		}
 		getHotelPolicies, err := u.hotelPoliciesRepo.GetHotelPoliciesByIDHotel(hotelOrder.HotelID)
 		if err != nil {
-			return hotelOrderResponses, 0, err
+			continue
 		}
 		var hotelFacilitiesResponses []dtos.HotelFacilitiesResponse
 		for _, hotelFacilities := range getHotelFacilities {
@@ -134,7 +134,7 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search,
 		}
 		getHotelRoomImage, err := u.hotelRoomImageRepo.GetAllHotelRoomImageByID(getHotelRoom.ID)
 		if err != nil {
-			return hotelOrderResponses, 0, err
+			continue
 		}
 		var hotelRoomImageResponses []dtos.HotelRoomImageResponse
 		for _, hotelRoomImage := range getHotelRoomImage {
@@ -147,7 +147,7 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search,
 		}
 		getHotelRoomFacilities, err := u.hotelRoomFacilitiesRepo.GetAllHotelRoomFacilitiesByHotelRoomID(getHotelRoom.ID)
 		if err != nil {
-			return hotelOrderResponses, 0, err
+			continue
 		}
 		var hotelRoomFacilitiesResponses []dtos.HotelRoomFacilitiesResponse
 		for _, hotelRoomFacilities := range getHotelRoomFacilities {
@@ -160,11 +160,11 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search,
 		}
 		getPayment, err := u.paymentRepo.GetPaymentByID(uint(hotelOrder.PaymentID))
 		if err != nil {
-			return hotelOrderResponses, 0, err
+			continue
 		}
 		getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByHotelOrderID(hotelOrder.ID)
 		if err != nil {
-			return hotelOrderResponses, 0, err
+			continue
 		}
 
 		var travelerDetailResponses []dtos.TravelerDetailResponse
@@ -352,7 +352,7 @@ func (u *hotelOrderUsecase) GetHotelOrdersByAdmin(page, limit, ratingClass int, 
 		}
 		getHotelImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotelOrder.HotelID)
 		if err != nil {
-			return hotelOrderResponses, 0, err
+			continue
 		}
 		var hotelImageResponses []dtos.HotelImageResponse
 		for _, hotelImage := range getHotelImage {
@@ -364,11 +364,11 @@ func (u *hotelOrderUsecase) GetHotelOrdersByAdmin(page, limit, ratingClass int, 
 		}
 		getHotelFacilities, err := u.hotelFacilitiesRepo.GetAllHotelFacilitiesByID(hotelOrder.HotelID)
 		if err != nil {
-			return hotelOrderResponses, 0, err
+			continue
 		}
 		getHotelPolicies, err := u.hotelPoliciesRepo.GetHotelPoliciesByIDHotel(hotelOrder.HotelID)
 		if err != nil {
-			return hotelOrderResponses, 0, err
+			continue
 		}
 		var hotelFacilitiesResponses []dtos.HotelFacilitiesResponse
 		for _, hotelFacilities := range getHotelFacilities {
