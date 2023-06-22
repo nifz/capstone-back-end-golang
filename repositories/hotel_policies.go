@@ -43,7 +43,7 @@ func (r *hotelPoliciesRepository) GetAllHotelPolicies(page, limit int) ([]models
 
 func (r *hotelPoliciesRepository) GetHotelPoliciesByIDHotel(id uint) (models.HotelPolicies, error) {
 	var HotelPolicies models.HotelPolicies
-	err := r.db.Unscoped().Where("hotel_id = ?", id).Unscoped().First(&HotelPolicies).Error
+	err := r.db.Where("hotel_id = ?", id).First(&HotelPolicies).Error
 	return HotelPolicies, err
 }
 
