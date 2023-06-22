@@ -14,7 +14,7 @@ type HotelRatingsRepository interface {
 	GetAllHotelRatingsByIdHotels(page, limit int, hotel_id uint) ([]models.HotelRating, int, error)
 	GetAllHotelRatingsByIdHotels2(hotel_id uint) ([]models.HotelRating, error)
 	// admin
-	GetHotelRatingsByHotelID(page, limit int, id uint, filter string) (map[int]int, []models.HotelRating, int, error)
+	GetHotelRatingsByHotelID(id uint, filter string) (map[int]int, []models.HotelRating, error)
 }
 
 type hotelRatingsRepository struct {
@@ -32,29 +32,27 @@ func (r *hotelRatingsRepository) CreateHotelRating(hotelRating models.HotelRatin
 	err := r.db.Create(&hotelRating).Error
 	return hotelRating, err
 }
-func (r *hotelRatingsRepository) GetHotelRatingsByHotelID(page, limit int, id uint, filter string) (map[int]int, []models.HotelRating, int, error) {
+func (r *hotelRatingsRepository) GetHotelRatingsByHotelID(id uint, filter string) (map[int]int, []models.HotelRating, error) {
 	var (
 		hotelRatings []models.HotelRating
-		count        int64
 	)
-	offset := (page - 1) * limit
-	err := r.db.Where("hotel_id = ?", id).First(&hotelRatings).Count(&count).Error
+	err := r.db.Where("hotel_id = ?", id).First(&hotelRatings).Error
 	if err != nil {
-		return nil, hotelRatings, int(count), err
+		return nil, hotelRatings, err
 	}
 	ratingCounts := make(map[int]int)
 	if filter == "latest" {
-		err = r.db.Where("hotel_id = ?", id).Order("created_at DESC").Limit(limit).Offset(offset).Find(&hotelRatings).Error
+		err = r.db.Where("hotel_id = ?", id).Order("created_at DESC").Find(&hotelRatings).Error
 		// for _, rating := range hotelRatings {
 		// 	ratingCounts[rating.Rating]++
 		// }
 	} else if filter == "oldest" {
-		err = r.db.Where("hotel_id = ?", id).Order("created_at ASC").Limit(limit).Offset(offset).Find(&hotelRatings).Error
+		err = r.db.Where("hotel_id = ?", id).Order("created_at ASC").Find(&hotelRatings).Error
 		// for _, rating := range hotelRatings {
 		// 	ratingCounts[rating.Rating]++
 		// }
 	} else {
-		err = r.db.Where("hotel_id = ?", id).Limit(limit).Offset(offset).Find(&hotelRatings).Error
+		err = r.db.Where("hotel_id = ?", id).Find(&hotelRatings).Error
 		// if err != nil {
 		// 	return nil, hotelRatings, int(count), err
 		// }
@@ -64,7 +62,7 @@ func (r *hotelRatingsRepository) GetHotelRatingsByHotelID(page, limit int, id ui
 		ratingCounts[rating.Rating]++
 	}
 
-	return ratingCounts, hotelRatings, int(count), err
+	return ratingCounts, hotelRatings, err
 }
 func (r *hotelRatingsRepository) GetHotelRatingsByIdOrders(id uint) (models.HotelRating, error) {
 	var hotelRating models.HotelRating

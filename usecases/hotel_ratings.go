@@ -13,7 +13,7 @@ type HotelRatingsUsecase interface {
 	GetHotelRatingsByIdOrders(id uint) (dtos.HotelRatingResponse, error)
 	GetAllHotelRatingsByIdHotels(page, limit int, hotelId uint) ([]dtos.RatingInfo, int, error)
 	// admin
-	GetHotelRatingsByHotelID(star, page, limit int, id uint, filter string) (dtos.HotelRatingsByIdHotels, int, error)
+	GetHotelRatingsByHotelID(star, page, limit int, id uint, filter string) (dtos.HotelRatingsByIdHotels, error)
 }
 
 type hotelRatingsUsecase struct {
@@ -131,14 +131,14 @@ func (u *hotelRatingsUsecase) CreateHotelRating(userId uint, hotelRatingInput dt
 // @Failure      404 {object} dtos.NotFoundResponse
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /public/hotel/{id}/rating [get]
-func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(star, page, limit int, id uint, filter string) (dtos.HotelRatingsByIdHotels, int, error) {
+func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(star, page, limit int, id uint, filter string) (dtos.HotelRatingsByIdHotels, error) {
 	var (
 		hotelRatingsResponse dtos.HotelRatingsByIdHotels
 	)
 
-	ratingCounts, hotelRatings, count, err := u.hotelRatingsRepository.GetHotelRatingsByHotelID(page, limit, id, filter)
+	ratingCounts, hotelRatings, err := u.hotelRatingsRepository.GetHotelRatingsByHotelID(id, filter)
 	if err != nil {
-		return hotelRatingsResponse, 0, nil
+		return hotelRatingsResponse, nil
 	}
 
 	hotelRatingsResponse.HotelID = id
@@ -162,7 +162,7 @@ func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(star, page, limit int, id
 	for _, rating := range hotelRatings {
 		userDetail, err := u.userRepository.UserGetById2(rating.UserID)
 		if err != nil {
-			return hotelRatingsResponse, 0, errors.New("User ID is not valid")
+			return hotelRatingsResponse, errors.New("User ID is not valid")
 		}
 		if star == 0 && star != rating.Rating {
 			continue
@@ -179,7 +179,24 @@ func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(star, page, limit int, id
 		hotelRatingsResponse.Ratings = append(hotelRatingsResponse.Ratings, ratingInfo)
 		totalRating += rating.Rating
 	}
-	return hotelRatingsResponse, count, nil
+
+	// Apply offset and limit to trainResponses
+	start := (page - 1) * limit
+	end := start + limit
+
+	// Ensure that `start` is within the range of trainResponses
+	if start >= len(hotelRatingsResponse.Ratings) {
+		return hotelRatingsResponse, nil
+	}
+
+	// Ensure that `end` does not exceed the length of trainResponses
+	if end > len(hotelRatingsResponse.Ratings) {
+		end = len(hotelRatingsResponse.Ratings)
+	}
+
+	subsetHotelRatingResponses := hotelRatingsResponse.Ratings[start:end]
+	hotelRatingsResponse.Ratings = subsetHotelRatingResponses
+	return hotelRatingsResponse, nil
 }
 
 func (u *hotelRatingsUsecase) GetHotelRatingsByIdOrders(id uint) (dtos.HotelRatingResponse, error) {
