@@ -745,22 +745,6 @@ func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint, isCheck
 		return hotelOrderResponses, err
 	}
 
-	InitiateCoreApiClient()
-
-	res, err := c.CheckTransaction(hotelOrder.HotelOrderCode)
-	if res.TransactionStatus == "settlement" {
-		hotelOrder.Status = "paid"
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
-	}
-	if res.TransactionStatus == "expire" {
-		hotelOrder.Status = "canceled"
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
-	}
-	if res.TransactionStatus == "" {
-		hotelOrder.Status = "canceled"
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
-	}
-
 	if hotelOrder.IsCheckIn == false && hotelOrder.IsCheckOut == false && isCheckIn == true {
 		hotelOrder.IsCheckIn = true
 		_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
