@@ -37,7 +37,7 @@ func (r *historySearchRepository) HistorySearchGetByUserId(userId uint, page, li
 
 	offset := (page - 1) * limit
 
-	err = r.db.Limit(limit).Offset(offset).Find(&historySearch).Error
+	err = r.db.Where("user_id = ?", userId).Limit(limit).Offset(offset).Find(&historySearch).Error
 
 	return historySearch, int(count), err
 }
