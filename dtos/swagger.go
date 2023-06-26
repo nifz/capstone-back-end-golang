@@ -363,3 +363,22 @@ type HistorySeenHotelCreeatedResponse struct {
 	Message    string                   `json:"message" example:"Successfully created history seen hotel"`
 	Data       HistorySeenHotelResponse `json:"data"`
 }
+
+type GetAllRatingByIdHotelStatusOKResponse struct {
+	StatusCode int                      `json:"status_code" example:"200"`
+	Message    string                   `json:"message" example:"Successfully get history seen hotel"`
+	Data       HotelRatingsByIdHotels `json:"data"`
+	Meta       helpers.Meta             `json:"meta"`
+}
+
+type RatingByIdHotelStatusOKResponse struct {
+	StatusCode int                      `json:"status_code" example:"200"`
+	Message    string                   `json:"message" example:"Successfully get history seen hotel"`
+	Data       HotelRatingsByIdHotels `json:"data"`
+}
+
+type RatingByIdHotelCreeatedResponse struct {
+	StatusCode int                      `json:"status_code" example:"201"`
+	Message    string                   `json:"message" example:"Successfully created history seen hotel"`
+	Data       HotelRatingsByIdHotels `json:"data"`
+}

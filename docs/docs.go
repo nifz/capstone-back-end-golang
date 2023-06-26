@@ -6938,9 +6938,6 @@ const docTemplate = `{
         "dtos.HotelRatingInput": {
             "type": "object",
             "properties": {
-                "hotel_id": {
-                    "type": "integer"
-                },
                 "hotel_order_id": {
                     "type": "integer"
                 },
