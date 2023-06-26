@@ -738,8 +738,6 @@ definitions:
     type: object
   dtos.HotelRatingInput:
     properties:
-      hotel_id:
-        type: integer
       hotel_order_id:
         type: integer
       rating:
