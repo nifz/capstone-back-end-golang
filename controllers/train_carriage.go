@@ -79,9 +79,9 @@ func (c *trainCarriageController) GetTrainCarriageByID(ctx echo.Context) error {
 
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get train carriage by id",
 				helpers.GetErrorData(err),
 			),
@@ -174,9 +174,9 @@ func (c *trainCarriageController) UpdateTrainCarriage(ctx echo.Context) error {
 	trainCarriage, err := c.trainCarriageUsecase.GetTrainCarriageByID(uint(id))
 	if trainCarriage.TrainCarriageID == 0 {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get train carriage by id",
 				helpers.GetErrorData(err),
 			),
@@ -222,9 +222,9 @@ func (c *trainCarriageController) DeleteTrainCarriage(ctx echo.Context) error {
 	err := c.trainCarriageUsecase.DeleteTrainCarriage(uint(id))
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to delete train carriage",
 				helpers.GetErrorData(err),
 			),

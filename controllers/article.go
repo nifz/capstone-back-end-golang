@@ -76,9 +76,9 @@ func (c *articleController) GetArticleByID(ctx echo.Context) error {
 
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get article by id",
 				helpers.GetErrorData(err),
 			),
@@ -256,9 +256,9 @@ func (c *articleController) UpdateArticle(ctx echo.Context) error {
 	article, err := c.articleUsecase.GetArticleByID(uint(id))
 	if article.ArticleID == 0 {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get article by id",
 				helpers.GetErrorData(err),
 			),
@@ -386,7 +386,20 @@ func (c *articleController) DeleteArticle(ctx echo.Context) error {
 	}
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
-	err := c.articleUsecase.DeleteArticle(uint(id))
+	_, err := c.articleUsecase.GetArticleByID(uint(id))
+
+	if err != nil {
+		return ctx.JSON(
+			http.StatusNotFound,
+			helpers.NewErrorResponse(
+				http.StatusNotFound,
+				"Failed to delete article",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	err = c.articleUsecase.DeleteArticle(uint(id))
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,

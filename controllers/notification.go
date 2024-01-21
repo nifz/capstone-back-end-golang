@@ -51,9 +51,9 @@ func (c *notificationController) GetNotificationByUserID(ctx echo.Context) error
 
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get notification by user id",
 				helpers.GetErrorData(err),
 			),

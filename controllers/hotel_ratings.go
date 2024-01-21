@@ -118,9 +118,9 @@ func (c *hotelRatingsController) GetRatingsByHotelsId(ctx echo.Context) error {
 	ratings, count, err := c.hotelRatingUsecase.GetHotelRatingsByHotelID(rating, page, limit, hotelId, filter)
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get hotel rating",
 				helpers.GetErrorData(err),
 			),
@@ -146,9 +146,9 @@ func (c *hotelRatingsController) GetHotelRatingsByIdOrders(ctx echo.Context) err
 	ratings, err := c.hotelRatingUsecase.GetHotelRatingsByIdOrders(hotelOrderId)
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get hotel rating",
 				helpers.GetErrorData(err),
 			),
@@ -185,9 +185,9 @@ func (c *hotelRatingsController) GetAllHotelRatingsByIdHotels(ctx echo.Context) 
 	ratings, count, err := c.hotelRatingUsecase.GetAllHotelRatingsByIdHotels(page, limit, hotelId)
 	if err != nil {
 		return ctx.JSON(
-			http.StatusInternalServerError,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusInternalServerError,
+				http.StatusNotFound,
 				"Failed fetching hotel rating",
 				helpers.GetErrorData(err),
 			),

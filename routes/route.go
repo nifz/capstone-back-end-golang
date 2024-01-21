@@ -145,6 +145,7 @@ func Init(e *echo.Echo, db *gorm.DB) {
 	// train ka
 	user.GET("/train/search", trainController.SearchTrainAvailable)
 	user.POST("/train/order", ticketOrderController.CreateTicketOrder)
+	user.POST("/train/order/midtrans", ticketOrderController.CreateTicketOrderMidtrans)
 	user.PATCH("/train/order", ticketOrderController.UpdateTicketOrder)
 
 	user.GET("/hotel/search", hotelController.SearchHotelAvailable)
@@ -158,7 +159,6 @@ func Init(e *echo.Echo, db *gorm.DB) {
 
 	user.GET("/order/hotel", hotelOrderController.GetHotelOrders)
 	user.GET("/order/hotel/detail", hotelOrderController.GetHotelOrderByID)
-	user.GET("/order/hotel/detail/midtrans", hotelOrderController.GetHotelOrderByID2)
 
 	user.GET("/history-search", historySearchController.HistorySearchGetAll)
 	user.POST("/history-search", historySearchController.HistorySearchCreate)

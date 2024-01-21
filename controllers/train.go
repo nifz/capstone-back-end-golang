@@ -133,9 +133,9 @@ func (c *trainController) GetTrainByID(ctx echo.Context) error {
 
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get train by id",
 				helpers.GetErrorData(err),
 			),
@@ -228,9 +228,9 @@ func (c *trainController) UpdateTrain(ctx echo.Context) error {
 	train, err := c.trainUsecase.GetTrainByID(uint(id))
 	if train.TrainID == 0 {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get train by id",
 				helpers.GetErrorData(err),
 			),
@@ -276,9 +276,9 @@ func (c *trainController) DeleteTrain(ctx echo.Context) error {
 	err := c.trainUsecase.DeleteTrain(uint(id))
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to delete train",
 				helpers.GetErrorData(err),
 			),

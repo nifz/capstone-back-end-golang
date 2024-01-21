@@ -20,7 +20,6 @@ type HotelOrderController interface {
 	GetHotelOrdersByAdmin(c echo.Context) error
 	GetHotelOrderDetailByAdmin(c echo.Context) error
 	GetHotelOrderByID(c echo.Context) error
-	GetHotelOrderByID2(c echo.Context) error
 	CreateHotelOrder(c echo.Context) error
 	CreateHotelOrder2(c echo.Context) error
 	UpdateHotelOrder(c echo.Context) error
@@ -178,9 +177,9 @@ func (c *hotelOrderController) GetHotelOrderDetailByAdmin(ctx echo.Context) erro
 	hotelOrder, err := c.hotelOrderUsecase.GetHotelOrdersDetailByAdmin(uint(hotelOrderId))
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get a hotel order",
 				helpers.GetErrorData(err),
 			),
@@ -234,65 +233,9 @@ func (c *hotelOrderController) GetHotelOrderByID(ctx echo.Context) error {
 	hotelOrder, err := c.hotelOrderUsecase.GetHotelOrderByID(userId, uint(hotelOrderId), isCheckIn, isCheckOut)
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
-				"Failed to get a hotel order",
-				helpers.GetErrorData(err),
-			),
-		)
-	}
-
-	return ctx.JSON(
-		http.StatusOK,
-		helpers.NewResponse(
-			http.StatusOK,
-			"Successfully to get order hotels",
-			hotelOrder,
-		),
-	)
-}
-
-func (c *hotelOrderController) GetHotelOrderByID2(ctx echo.Context) error {
-	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
-	if tokenString == "" {
-		return ctx.JSON(
-			http.StatusUnauthorized,
-			helpers.NewErrorResponse(
-				http.StatusUnauthorized,
-				"No token provided",
-				"Unauthorized",
-			),
-		)
-	}
-
-	userId, err := middlewares.GetUserIdFromToken(tokenString)
-	if err != nil {
-		return ctx.JSON(
-			http.StatusUnauthorized,
-			helpers.NewErrorResponse(
-				http.StatusUnauthorized,
-				"No token provided",
-				helpers.GetErrorData(err),
-			),
-		)
-	}
-
-	hotelOrderIdParam := ctx.QueryParam("hotel_order_id")
-	hotelOrderId, _ := strconv.Atoi(hotelOrderIdParam)
-
-	isCheckInParam := ctx.QueryParam("update_check_in")
-	isCheckIn, _ := strconv.ParseBool(isCheckInParam)
-
-	isCheckOutParam := ctx.QueryParam("update_check_out")
-	isCheckOut, _ := strconv.ParseBool(isCheckOutParam)
-
-	hotelOrder, err := c.hotelOrderUsecase.GetHotelOrderByID2(userId, uint(hotelOrderId), isCheckIn, isCheckOut)
-	if err != nil {
-		return ctx.JSON(
-			http.StatusBadRequest,
-			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get a hotel order",
 				helpers.GetErrorData(err),
 			),
@@ -393,7 +336,7 @@ func (c *hotelOrderController) CreateHotelOrder2(ctx echo.Context) error {
 		)
 	}
 
-	var hotelOrderInput dtos.HotelOrderMidtransInput
+	var hotelOrderInput dtos.HotelOrderInput
 	if err := ctx.Bind(&hotelOrderInput); err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,
@@ -405,7 +348,7 @@ func (c *hotelOrderController) CreateHotelOrder2(ctx echo.Context) error {
 		)
 	}
 
-	hotelOrder, err := c.hotelOrderUsecase.CreateHotelOrder2(userId, hotelOrderInput)
+	hotelOrder, err := c.hotelOrderUsecase.CreateHotelOrderMidtrans(userId, hotelOrderInput)
 	if err != nil {
 		return ctx.JSON(
 			http.StatusBadRequest,

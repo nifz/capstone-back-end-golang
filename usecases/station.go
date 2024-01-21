@@ -272,5 +272,9 @@ func (u *stationUsecase) UpdateStation(id uint, stationInput dtos.StationInput) 
 // @Router       /admin/station/{id} [delete]
 // @Security BearerAuth
 func (u *stationUsecase) DeleteStation(id uint) error {
+	_, err := u.stationRepo.GetStationByID2(id)
+	if err != nil {
+		return err
+	}
 	return u.stationRepo.DeleteStation(id)
 }

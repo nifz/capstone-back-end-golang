@@ -22,7 +22,7 @@ type UserUsecase interface {
 	UserDeletePhotoProfile(userId uint) (dtos.UserInformationResponse, error)
 	UserGetAll(page, limit int, search, sortBy, filter string) ([]dtos.UserInformationResponse, int, error)
 	UserGetDetail(id int, isDeleted bool) (dtos.UserInformationResponse, error)
-	UserAdminRegister(input dtos.UserRegisterInput) (dtos.UserInformationResponse, error)
+	UserAdminRegister(input dtos.UserRegisterInputByAdmin) (dtos.UserInformationResponse, error)
 	UserAdminUpdate(id uint, input dtos.UserRegisterInputUpdateByAdmin) (dtos.UserInformationResponse, error)
 }
 
@@ -557,7 +557,7 @@ func (u *userUsecase) UserGetDetail(id int, isDeleted bool) (dtos.UserInformatio
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/user/register [post]
 // @Security BearerAuth
-func (u *userUsecase) UserAdminRegister(input dtos.UserRegisterInput) (dtos.UserInformationResponse, error) {
+func (u *userUsecase) UserAdminRegister(input dtos.UserRegisterInputByAdmin) (dtos.UserInformationResponse, error) {
 	var (
 		user         models.User
 		userResponse dtos.UserInformationResponse

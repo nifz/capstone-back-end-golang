@@ -514,6 +514,10 @@ func (u *trainUsecase) UpdateTrain(id uint, train dtos.TrainInput) (dtos.TrainRe
 // @Router       /admin/train/{id} [delete]
 // @Security BearerAuth
 func (u *trainUsecase) DeleteTrain(id uint) error {
+	_, err := u.trainRepo.GetTrainByID2(id)
+	if err != nil {
+		return err
+	}
 	return u.trainRepo.DeleteTrain(id)
 }
 

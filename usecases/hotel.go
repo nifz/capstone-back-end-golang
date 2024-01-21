@@ -694,6 +694,11 @@ func (u *hotelUsecase) DeleteHotel(id uint) error {
 	// u.hotelImageRepo.DeleteHotelImage(id)
 	// u.hotelFacilitiesRepo.DeleteHotelFacilities(id)
 	// u.hotelPoliciesRepo.DeleteHotelPolicies(id)
+
+	_, err := u.hotelRepo.GetHotelByID(id)
+	if err != nil {
+		return err
+	}
 	return u.hotelRepo.DeleteHotel(id)
 }
 

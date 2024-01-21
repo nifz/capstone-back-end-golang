@@ -109,10 +109,9 @@ func (u *historySearchUsecase) HistorySearchCreate(userId uint, input dtos.Histo
 // @Router       /user/history-search/{id} [delete]
 // @Security BearerAuth
 func (u *historySearchUsecase) HistorySearchDelete(userId, id uint) error {
-	err := u.historySearchRepository.HistorySearchDelete(userId, id)
+	_, err := u.historySearchRepository.HistorySearchGetById(userId, id)
 	if err != nil {
 		return err
 	}
-
-	return nil
+	return u.historySearchRepository.HistorySearchDelete(userId, id)
 }

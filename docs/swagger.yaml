@@ -620,6 +620,8 @@ definitions:
         type: integer
       payment:
         $ref: '#/definitions/dtos.PaymentResponses'
+      payment_url:
+        type: string
       phone_number_order:
         example: "085115151515"
         type: string
@@ -1259,7 +1261,7 @@ definitions:
         example: 1
         type: integer
       quantity_infant:
-        example: 1
+        example: 0
         type: integer
       ticket_traveler_detail_departure:
         items:
@@ -1339,18 +1341,14 @@ definitions:
         example: "2023-05-31"
         type: string
       station_destination_id:
-        example: 2
         type: integer
       station_origin_id:
-        example: 1
         type: integer
       train_carriage_id:
         description: TrainID              int    `form:"train_id" json:"train_id"
           example:"1"`
-        example: 1
         type: integer
       train_seat_id:
-        example: 2
         type: integer
     type: object
   dtos.TicketTravelerDetailOrderResponse:
@@ -1386,7 +1384,7 @@ definitions:
       station_origin:
         $ref: '#/definitions/dtos.StationResponseSimply'
       status:
-        example: "2023-05-31"
+        example: unpaid
         type: string
       ticket_order_code:
         example: RANDOMCODE123
@@ -1791,9 +1789,6 @@ definitions:
     type: object
   dtos.UserRegisterInput:
     properties:
-      birth_date:
-        example: "2002-09-12"
-        type: string
       confirm_password:
         example: qweqwe123
         type: string
@@ -1803,9 +1798,6 @@ definitions:
       full_name:
         example: Mochammad Hanif
         type: string
-      is_active:
-        example: true
-        type: boolean
       password:
         example: qweqwe123
         type: string
@@ -2433,7 +2425,7 @@ paths:
         - canceled
         - refund
         in: query
-        name: status
+        name: filter
         type: string
       produces:
       - application/json
@@ -5232,57 +5224,6 @@ paths:
       summary: Get Hotel Order User by ID
       tags:
       - User - Order
-  /user/order/hotel/detail/midtrans:
-    get:
-      consumes:
-      - application/json
-      description: Get Hotel Order User by ID
-      parameters:
-      - description: Hotel Order ID
-        in: query
-        name: hotel_order_id
-        required: true
-        type: integer
-      - description: Use this params if update status order check in
-        in: query
-        name: update_check_in
-        type: boolean
-      - description: Use this params if update status order check out
-        in: query
-        name: update_check_out
-        type: boolean
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dtos.HotelOrderStatusOKResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/dtos.BadRequestResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/dtos.UnauthorizedResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/dtos.ForbiddenResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/dtos.NotFoundResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/dtos.InternalServerErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Get Hotel Order User by ID
-      tags:
-      - User - Order
   /user/order/ticket:
     get:
       consumes:
@@ -5465,6 +5406,50 @@ paths:
       summary: Update Order ticket KA
       tags:
       - User - Train
+    post:
+      consumes:
+      - application/json
+      description: Order ticket KA
+      parameters:
+      - description: Payload Body [RAW]
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.TicketOrderInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dtos.TicketOrderCreeatedResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dtos.BadRequestResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dtos.UnauthorizedResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dtos.ForbiddenResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dtos.NotFoundResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dtos.InternalServerErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Order ticket KA
+      tags:
+      - User - Train
+  /user/train/order/midtrans:
     post:
       consumes:
       - application/json

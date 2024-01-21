@@ -17,6 +17,7 @@ type TicketOrderController interface {
 	GetTicketOrderDetailByAdmin(c echo.Context) error
 	GetTicketOrderByID(c echo.Context) error
 	CreateTicketOrder(c echo.Context) error
+	CreateTicketOrderMidtrans(c echo.Context) error
 	UpdateTicketOrder(c echo.Context) error
 }
 
@@ -176,9 +177,9 @@ func (c *ticketOrderController) GetTicketOrderDetailByAdmin(ctx echo.Context) er
 	ticketOrder, err := c.ticketOrderUsecase.GetTicketOrdersDetailByAdmin(uint(ticketOrderId), uint(trainId))
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get a ticket order",
 				helpers.GetErrorData(err),
 			),
@@ -228,9 +229,9 @@ func (c *ticketOrderController) GetTicketOrderByID(ctx echo.Context) error {
 	ticketOrder, err := c.ticketOrderUsecase.GetTicketOrderByID(userId, uint(ticketOrderId), uint(trainId))
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get a ticket order",
 				helpers.GetErrorData(err),
 			),
@@ -306,6 +307,65 @@ func (c *ticketOrderController) CreateTicketOrder(ctx echo.Context) error {
 	)
 }
 
+func (c *ticketOrderController) CreateTicketOrderMidtrans(ctx echo.Context) error {
+	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
+	if tokenString == "" {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				"Unauthorized",
+			),
+		)
+	}
+
+	userId, err := middlewares.GetUserIdFromToken(tokenString)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusUnauthorized,
+			helpers.NewErrorResponse(
+				http.StatusUnauthorized,
+				"No token provided",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	var ticketOrderInput dtos.TicketOrderInput
+	if err := ctx.Bind(&ticketOrderInput); err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed binding ticket order",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	ticketOrder, err := c.ticketOrderUsecase.CreateTicketOrderMidtrans(userId, ticketOrderInput)
+	if err != nil {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			helpers.NewErrorResponse(
+				http.StatusBadRequest,
+				"Failed to created a ticket order",
+				helpers.GetErrorData(err),
+			),
+		)
+	}
+
+	return ctx.JSON(
+		http.StatusCreated,
+		helpers.NewResponse(
+			http.StatusCreated,
+			"Successfully to created a ticket order",
+			ticketOrder,
+		),
+	)
+}
+
 func (c *ticketOrderController) UpdateTicketOrder(ctx echo.Context) error {
 	tokenString := middlewares.GetTokenFromHeader(ctx.Request())
 	if tokenString == "" {
@@ -351,9 +411,9 @@ func (c *ticketOrderController) UpdateTicketOrder(ctx echo.Context) error {
 	ticketOrder, err := c.ticketOrderUsecase.UpdateTicketOrder(userId, uint(ticketOrderID), statusParam)
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to update a ticket order",
 				helpers.GetErrorData(err),
 			),

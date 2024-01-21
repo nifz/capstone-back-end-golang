@@ -834,7 +834,7 @@ const docTemplate = `{
                         ],
                         "type": "string",
                         "description": "Filter by status order",
-                        "name": "status",
+                        "name": "filter",
                         "in": "query"
                     }
                 ],
@@ -5116,85 +5116,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/order/hotel/detail/midtrans": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get Hotel Order User by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User - Order"
-                ],
-                "summary": "Get Hotel Order User by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Hotel Order ID",
-                        "name": "hotel_order_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Use this params if update status order check in",
-                        "name": "update_check_in",
-                        "in": "query"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Use this params if update status order check out",
-                        "name": "update_check_out",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.HotelOrderStatusOKResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.BadRequestResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.ForbiddenResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.NotFoundResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/user/order/ticket": {
             "get": {
                 "security": [
@@ -5501,6 +5422,75 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dtos.TicketOrderStatusOKResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.BadRequestResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.UnauthorizedResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ForbiddenResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.NotFoundResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/train/order/midtrans": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Order ticket KA",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User - Train"
+                ],
+                "summary": "Order ticket KA",
+                "parameters": [
+                    {
+                        "description": "Payload Body [RAW]",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TicketOrderInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TicketOrderCreeatedResponse"
                         }
                     },
                     "400": {
@@ -6765,6 +6755,9 @@ const docTemplate = `{
                 "payment": {
                     "$ref": "#/definitions/dtos.PaymentResponses"
                 },
+                "payment_url": {
+                    "type": "string"
+                },
                 "phone_number_order": {
                     "type": "string",
                     "example": "085115151515"
@@ -7698,7 +7691,7 @@ const docTemplate = `{
                 },
                 "quantity_infant": {
                     "type": "integer",
-                    "example": 1
+                    "example": 0
                 },
                 "ticket_traveler_detail_departure": {
                     "type": "array",
@@ -7810,21 +7803,17 @@ const docTemplate = `{
                     "example": "2023-05-31"
                 },
                 "station_destination_id": {
-                    "type": "integer",
-                    "example": 2
+                    "type": "integer"
                 },
                 "station_origin_id": {
-                    "type": "integer",
-                    "example": 1
+                    "type": "integer"
                 },
                 "train_carriage_id": {
                     "description": "TrainID              int    ` + "`" + `form:\"train_id\" json:\"train_id\" example:\"1\"` + "`" + `",
-                    "type": "integer",
-                    "example": 1
+                    "type": "integer"
                 },
                 "train_seat_id": {
-                    "type": "integer",
-                    "example": 2
+                    "type": "integer"
                 }
             }
         },
@@ -7874,7 +7863,7 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string",
-                    "example": "2023-05-31"
+                    "example": "unpaid"
                 },
                 "ticket_order_code": {
                     "type": "string",
@@ -8447,10 +8436,6 @@ const docTemplate = `{
         "dtos.UserRegisterInput": {
             "type": "object",
             "properties": {
-                "birth_date": {
-                    "type": "string",
-                    "example": "2002-09-12"
-                },
                 "confirm_password": {
                     "type": "string",
                     "example": "qweqwe123"
@@ -8462,10 +8447,6 @@ const docTemplate = `{
                 "full_name": {
                     "type": "string",
                     "example": "Mochammad Hanif"
-                },
-                "is_active": {
-                    "type": "boolean",
-                    "example": true
                 },
                 "password": {
                     "type": "string",

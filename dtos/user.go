@@ -5,23 +5,22 @@ import (
 )
 
 type UserRegisterInput struct {
-	FullName        string  `form:"full_name" json:"full_name" example:"Mochammad Hanif"`
-	Email           string  `form:"email" json:"email" example:"me@hanifz.com"`
-	Password        string  `form:"password" json:"password" example:"qweqwe123"`
-	ConfirmPassword string  `form:"confirm_password" json:"confirm_password" example:"qweqwe123"`
-	BirthDate       *string `form:"birth_date" json:"birth_date,omitempty" example:"2002-09-12"`
-	PhoneNumber     string  `form:"phone_number" json:"phone_number" example:"0851555555151"`
-	Role            string  `form:"role" json:"role" example:"user"`
-	IsActive        *bool   `form:"is_active" json:"is_active,omitempty" example:"true"`
-}
-type UserRegisterInputByAdmin struct {
 	FullName        string `form:"full_name" json:"full_name" example:"Mochammad Hanif"`
 	Email           string `form:"email" json:"email" example:"me@hanifz.com"`
 	Password        string `form:"password" json:"password" example:"qweqwe123"`
 	ConfirmPassword string `form:"confirm_password" json:"confirm_password" example:"qweqwe123"`
 	PhoneNumber     string `form:"phone_number" json:"phone_number" example:"0851555555151"`
-	BirthDate       string `form:"birth_date" json:"birth_date" example:"2000-01-01"`
 	Role            string `form:"role" json:"role" example:"user"`
+}
+type UserRegisterInputByAdmin struct {
+	FullName        string  `form:"full_name" json:"full_name" example:"Mochammad Hanif"`
+	Email           string  `form:"email" json:"email" example:"me@hanifz.com"`
+	Password        string  `form:"password" json:"password" example:"qweqwe123"`
+	ConfirmPassword string  `form:"confirm_password" json:"confirm_password" example:"qweqwe123"`
+	PhoneNumber     string  `form:"phone_number" json:"phone_number" example:"0851555555151"`
+	BirthDate       *string `form:"birth_date" json:"birth_date,omitempty" example:"2002-09-12"`
+	Role            string  `form:"role" json:"role" example:"user"`
+	IsActive        *bool   `form:"is_active" json:"is_active,omitempty" example:"true"`
 }
 
 type UserRegisterInputUpdateByAdmin struct {
@@ -78,7 +77,7 @@ type UserInformationResponse struct {
 	FullName       string    `json:"full_name" example:"Mochammad Hanif"`
 	Email          string    `json:"email" example:"me@hanifz.com"`
 	PhoneNumber    string    `json:"phone_number" example:"0851555555151"`
-	BirthDate      string    `json:"birth_date" example:"2002-09-12"`
+	BirthDate      string    `json:"birth_date,omitempty" example:"2002-09-12"`
 	ProfilePicture string    `json:"profile_picture_url" example:"https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"`
 	Citizen        string    `json:"citizen" example:"Indonesia"`
 	Role           *string   `json:"role,omitempty" example:"user"`
@@ -93,7 +92,7 @@ type UserInformationResponses struct {
 	FullName       string `json:"full_name" example:"Mochammad Hanif"`
 	Email          string `json:"email" example:"me@hanifz.com"`
 	PhoneNumber    string `json:"phone_number" example:"0851555555151"`
-	BirthDate      string `json:"birth_date" example:"2002-09-12"`
+	BirthDate      string `json:"birth_date,omitempty" example:"2002-09-12"`
 	ProfilePicture string `json:"profile_picture_url" example:"https://icon-library.com/images/default-user-icon/default-user-icon-13.jpg"`
 	Citizen        string `json:"citizen" example:"Indonesia"`
 }

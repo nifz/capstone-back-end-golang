@@ -32,6 +32,7 @@ type HotelOrderMidtransInput struct {
 }
 
 type HotelOrderResponse struct {
+	PaymentURL       string                    `json:"payment_url,omitempty"`
 	HotelOrderID     int                       `json:"hotel_order_id" example:"1"`
 	QuantityAdult    int                       `json:"quantity_adult" example:"1"`
 	QuantityInfant   int                       `json:"quantity_infant" example:"1"`
@@ -57,7 +58,7 @@ type HotelOrderResponse struct {
 }
 
 type HotelOrderResponse2 struct {
-	PaymentURL       string                    `json:"payment_url"`
+	PaymentURL       string                    `json:"payment_url,omitempty"`
 	HotelOrderID     int                       `json:"hotel_order_id" example:"1"`
 	QuantityAdult    int                       `json:"quantity_adult" example:"1"`
 	QuantityInfant   int                       `json:"quantity_infant" example:"1"`

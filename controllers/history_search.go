@@ -169,9 +169,9 @@ func (h *HistorySearchController) HistorySearchDelete(ctx echo.Context) error {
 	err = h.historyUsecase.HistorySearchDelete(userId, uint(id))
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to delete history search data",
 				helpers.GetErrorData(err),
 			),

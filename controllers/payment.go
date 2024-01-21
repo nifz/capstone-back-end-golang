@@ -75,9 +75,9 @@ func (c *paymentController) GetPaymentByID(ctx echo.Context) error {
 
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get payment by id",
 				helpers.GetErrorData(err),
 			),
@@ -255,9 +255,9 @@ func (c *paymentController) UpdatePayment(ctx echo.Context) error {
 	payment, err := c.paymentUsecase.GetPaymentByID(uint(id))
 	if payment.ID == 0 {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get payment by id",
 				helpers.GetErrorData(err),
 			),
@@ -388,9 +388,9 @@ func (c *paymentController) DeletePayment(ctx echo.Context) error {
 	err := c.paymentUsecase.DeletePayment(uint(id))
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to delete payment",
 				helpers.GetErrorData(err),
 			),

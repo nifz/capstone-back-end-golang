@@ -19,9 +19,8 @@ type HotelOrderUsecase interface {
 	GetHotelOrdersDetailByAdmin(hotelOrderId uint) (dtos.HotelOrderResponse, error)
 	GetHotelOrderByID(userID, hotelOrderId uint, isCheckIn, isCheckOut bool) (dtos.HotelOrderResponse, error)
 	CreateHotelOrder(userID uint, hotelOrderInput dtos.HotelOrderInput) (dtos.HotelOrderResponse, error)
-	CreateHotelOrder2(userID uint, hotelOrderInput dtos.HotelOrderMidtransInput) (dtos.HotelOrderResponse2, error)
+	CreateHotelOrderMidtrans(userID uint, hotelOrderInput dtos.HotelOrderInput) (dtos.HotelOrderResponse2, error)
 	UpdateHotelOrder(userID, hotelOrderID uint, status string) (dtos.HotelOrderResponse, error)
-	GetHotelOrderByID2(userID, hotelOrderId uint, isCheckIn, isCheckOut bool) (dtos.HotelOrderResponse2, error)
 	CsvHotelOrder() ([]dtos.CsvHotelOrder, error)
 }
 
@@ -291,7 +290,7 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search,
 // @Param date_start query string false "Date start"
 // @Param date_end query string false "Date end"
 // @Param order_by query string false "Filter order by" Enums(latest, oldest, highest_price, lowest_price)
-// @Param status query string false "Filter by status order" Enums(unpaid, paid, done, canceled, refund)
+// @Param filter query string false "Filter by status order" Enums(unpaid, paid, done, canceled, refund)
 // @Success      200 {object} dtos.GetAllHotelOrderStatusOKResponse
 // @Failure      400 {object} dtos.BadRequestResponse
 // @Failure      401 {object} dtos.UnauthorizedResponse
@@ -300,10 +299,10 @@ func (u *hotelOrderUsecase) GetHotelOrders(page, limit int, userID uint, search,
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /admin/order/hotel [get]
 // @Security BearerAuth
-func (u *hotelOrderUsecase) GetHotelOrdersByAdmin(page, limit, ratingClass int, search, dateStart, dateEnd, orderBy, status string) ([]dtos.HotelOrderResponse, int, error) {
+func (u *hotelOrderUsecase) GetHotelOrdersByAdmin(page, limit, ratingClass int, search, dateStart, dateEnd, orderBy, filter string) ([]dtos.HotelOrderResponse, int, error) {
 	var hotelOrderResponses []dtos.HotelOrderResponse
 
-	hotelOrders, _, err := u.hotelOrderRepo.GetHotelOrders(page, limit, 1, status)
+	hotelOrders, _, err := u.hotelOrderRepo.GetHotelOrders(1, 99999, 1, filter)
 	if err != nil {
 		return hotelOrderResponses, 0, err
 	}
@@ -325,6 +324,7 @@ func (u *hotelOrderUsecase) GetHotelOrdersByAdmin(page, limit, ratingClass int, 
 	}
 
 	for _, hotelOrder := range hotelOrders {
+
 		// Filter hotel orders based on dateStart and dateEnd
 		if !startDate.IsZero() && hotelOrder.DateStart.Before(startDate) {
 			continue // Skip hotel order if its dateStart is before the specified startDate
@@ -538,7 +538,17 @@ func (u *hotelOrderUsecase) GetHotelOrdersByAdmin(page, limit, ratingClass int, 
 			return hotelOrderResponses[i].Price < hotelOrderResponses[j].Price
 		})
 	}
-	return hotelOrderResponses, len(hotelOrderResponses), nil
+
+	// Apply pagination to the final slice of hotelOrderResponses
+	startIndex := (page - 1) * limit
+	endIndex := startIndex + limit
+	if endIndex > len(hotelOrderResponses) {
+		endIndex = len(hotelOrderResponses)
+	}
+
+	paginatedHotelOrderResponses := hotelOrderResponses[startIndex:endIndex]
+
+	return paginatedHotelOrderResponses, len(hotelOrderResponses), nil
 }
 
 // GetHotelOrdersByAdmin godoc
@@ -745,6 +755,20 @@ func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint, isCheck
 		return hotelOrderResponses, err
 	}
 
+	InitiateCoreApiClient()
+
+	if hotelOrder.PaymentID == 0 {
+		res, _ := c.CheckTransaction(hotelOrder.HotelOrderCode)
+		if res.TransactionStatus == "settlement" {
+			hotelOrder.Status = "paid"
+			_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
+		}
+		if res.TransactionStatus == "expire" {
+			hotelOrder.Status = "canceled"
+			_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
+		}
+	}
+
 	if hotelOrder.IsCheckIn == false && hotelOrder.IsCheckOut == false && isCheckIn == true {
 		hotelOrder.IsCheckIn = true
 		_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
@@ -818,10 +842,6 @@ func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint, isCheck
 		}
 		hotelRoomFacilitiesResponses = append(hotelRoomFacilitiesResponses, hotelRoomFacilitiesResponse)
 	}
-	getPayment, err := u.paymentRepo.GetPaymentByID(uint(hotelOrder.PaymentID))
-	if err != nil {
-		return hotelOrderResponses, err
-	}
 	getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByHotelOrderID(hotelOrder.ID)
 	if err != nil {
 		return hotelOrderResponses, err
@@ -837,6 +857,32 @@ func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint, isCheck
 			IDCardNumber: *travelerDetail.IDCardNumber,
 		}
 		travelerDetailResponses = append(travelerDetailResponses, travelerDetailResponse)
+	}
+
+	var paymentResp = dtos.PaymentResponses{}
+
+	if hotelOrder.PaymentID == 0 {
+		paymentResp = dtos.PaymentResponses{
+			ID:            0,
+			Type:          "With Midtrans",
+			Name:          "Third Party Payment",
+			ImageUrl:      "null",
+			AccountName:   "Midtans",
+			AccountNumber: "null",
+		}
+	} else {
+		getPayment, err := u.paymentRepo.GetPaymentByID(uint(hotelOrder.PaymentID))
+		if err != nil {
+			return hotelOrderResponses, err
+		}
+		paymentResp = dtos.PaymentResponses{
+			ID:            int(getPayment.ID),
+			Type:          getPayment.Type,
+			ImageUrl:      getPayment.ImageUrl,
+			Name:          getPayment.Name,
+			AccountName:   getPayment.AccountName,
+			AccountNumber: getPayment.AccountNumber,
+		}
 	}
 
 	hotelOrderResponses = dtos.HotelOrderResponse{
@@ -899,214 +945,7 @@ func (u *hotelOrderUsecase) GetHotelOrderByID(userID, hotelOrderId uint, isCheck
 				HotelRoomFacility: hotelRoomFacilitiesResponses,
 			},
 		},
-		Payment: &dtos.PaymentResponses{
-			ID:            int(getPayment.ID),
-			Type:          getPayment.Type,
-			ImageUrl:      getPayment.ImageUrl,
-			Name:          getPayment.Name,
-			AccountName:   getPayment.AccountName,
-			AccountNumber: getPayment.AccountNumber,
-		},
-		TravelerDetail: travelerDetailResponses,
-		CreatedAt:      hotelOrder.CreatedAt,
-		UpdatedAt:      hotelOrder.UpdatedAt,
-	}
-
-	return hotelOrderResponses, nil
-}
-
-// GetHotelOrderByID godoc
-// @Summary      Get Hotel Order User by ID
-// @Description  Get Hotel Order User by ID
-// @Tags         User - Order
-// @Accept       json
-// @Produce      json
-// @Param hotel_order_id query int true "Hotel Order ID"
-// @Param update_check_in query bool false "Use this params if update status order check in"
-// @Param update_check_out query bool false "Use this params if update status order check out"
-// @Success      200 {object} dtos.HotelOrderStatusOKResponse
-// @Failure      400 {object} dtos.BadRequestResponse
-// @Failure      401 {object} dtos.UnauthorizedResponse
-// @Failure      403 {object} dtos.ForbiddenResponse
-// @Failure      404 {object} dtos.NotFoundResponse
-// @Failure      500 {object} dtos.InternalServerErrorResponse
-// @Router       /user/order/hotel/detail/midtrans [get]
-// @Security BearerAuth
-func (u *hotelOrderUsecase) GetHotelOrderByID2(userID, hotelOrderId uint, isCheckIn, isCheckOut bool) (dtos.HotelOrderResponse2, error) {
-	var hotelOrderResponses dtos.HotelOrderResponse2
-
-	hotelOrder, err := u.hotelOrderRepo.GetHotelOrderByID2(hotelOrderId, userID)
-	if err != nil {
-		return hotelOrderResponses, err
-	}
-
-	InitiateCoreApiClient()
-
-	res, err := c.CheckTransaction(hotelOrder.HotelOrderCode)
-	if res.TransactionStatus == "settlement" {
-		hotelOrder.Status = "paid"
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder2(hotelOrder)
-	}
-	if res.TransactionStatus == "expire" {
-		hotelOrder.Status = "canceled"
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder2(hotelOrder)
-	}
-	if res.TransactionStatus == "" {
-		hotelOrder.Status = "canceled"
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder2(hotelOrder)
-	}
-
-	if hotelOrder.IsCheckIn == false && hotelOrder.IsCheckOut == false && isCheckIn == true {
-		hotelOrder.IsCheckIn = true
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder2(hotelOrder)
-	}
-
-	if hotelOrder.IsCheckIn == true && hotelOrder.IsCheckOut == false && isCheckOut == true {
-		hotelOrder.IsCheckOut = true
-		hotelOrder.Status = "done"
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder2(hotelOrder)
-	}
-
-	getHotel, err := u.hotelRepo.GetHotelByID2(hotelOrder.HotelID)
-	if err != nil {
-		return hotelOrderResponses, err
-	}
-	getHotelImage, err := u.hotelImageRepo.GetAllHotelImageByID(hotelOrder.HotelID)
-	if err != nil {
-		return hotelOrderResponses, err
-	}
-	var hotelImageResponses []dtos.HotelImageResponse
-	for _, hotelImage := range getHotelImage {
-		hotelImageResponse := dtos.HotelImageResponse{
-			HotelID:  hotelImage.HotelID,
-			ImageUrl: hotelImage.ImageUrl,
-		}
-		hotelImageResponses = append(hotelImageResponses, hotelImageResponse)
-	}
-	getHotelFacilities, err := u.hotelFacilitiesRepo.GetAllHotelFacilitiesByID(hotelOrder.HotelID)
-	if err != nil {
-		return hotelOrderResponses, err
-	}
-	getHotelPolicies, err := u.hotelPoliciesRepo.GetHotelPoliciesByIDHotel(hotelOrder.HotelID)
-	if err != nil {
-		return hotelOrderResponses, err
-	}
-	var hotelFacilitiesResponses []dtos.HotelFacilitiesResponse
-	for _, hotelFacilities := range getHotelFacilities {
-		hotelFacilitiesResponse := dtos.HotelFacilitiesResponse{
-			HotelID: hotelFacilities.HotelID,
-			Name:    hotelFacilities.Name,
-		}
-		hotelFacilitiesResponses = append(hotelFacilitiesResponses, hotelFacilitiesResponse)
-	}
-	getHotelRoom, err := u.hotelRoomRepo.GetHotelRoomByID(hotelOrder.HotelRoomID)
-	if err != nil {
-		return hotelOrderResponses, err
-	}
-	getHotelRoomImage, err := u.hotelRoomImageRepo.GetAllHotelRoomImageByID(getHotelRoom.ID)
-	if err != nil {
-		return hotelOrderResponses, err
-	}
-	var hotelRoomImageResponses []dtos.HotelRoomImageResponse
-	for _, hotelRoomImage := range getHotelRoomImage {
-		hotelRoomImageResponse := dtos.HotelRoomImageResponse{
-			HotelID:     hotelRoomImage.HotelID,
-			HotelRoomID: hotelRoomImage.ID,
-			ImageUrl:    hotelRoomImage.ImageUrl,
-		}
-		hotelRoomImageResponses = append(hotelRoomImageResponses, hotelRoomImageResponse)
-	}
-	getHotelRoomFacilities, err := u.hotelRoomFacilitiesRepo.GetAllHotelRoomFacilitiesByHotelRoomID(getHotelRoom.ID)
-	if err != nil {
-		return hotelOrderResponses, err
-	}
-	var hotelRoomFacilitiesResponses []dtos.HotelRoomFacilitiesResponse
-	for _, hotelRoomFacilities := range getHotelRoomFacilities {
-		hotelRoomFacilitiesResponse := dtos.HotelRoomFacilitiesResponse{
-			HotelID:     hotelRoomFacilities.HotelID,
-			HotelRoomID: hotelRoomFacilities.ID,
-			Name:        hotelRoomFacilities.Name,
-		}
-		hotelRoomFacilitiesResponses = append(hotelRoomFacilitiesResponses, hotelRoomFacilitiesResponse)
-	}
-	getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByHotelOrderID(hotelOrder.ID)
-	if err != nil {
-		return hotelOrderResponses, err
-	}
-
-	var travelerDetailResponses []dtos.TravelerDetailResponse
-
-	for _, travelerDetail := range getTravelerDetail {
-		travelerDetailResponse := dtos.TravelerDetailResponse{
-			ID:           int(travelerDetail.ID),
-			Title:        travelerDetail.Title,
-			FullName:     travelerDetail.FullName,
-			IDCardNumber: *travelerDetail.IDCardNumber,
-		}
-		travelerDetailResponses = append(travelerDetailResponses, travelerDetailResponse)
-	}
-
-	hotelOrderResponses = dtos.HotelOrderResponse2{
-		PaymentURL:       hotelOrder.PaymentURL,
-		HotelOrderID:     int(hotelOrder.ID),
-		QuantityAdult:    hotelOrder.QuantityAdult,
-		QuantityInfant:   hotelOrder.QuantityInfant,
-		NumberOfNight:    hotelOrder.NumberOfNight,
-		DateStart:        helpers.FormatDateToYMD(&hotelOrder.DateStart),
-		DateEnd:          helpers.FormatDateToYMD(&hotelOrder.DateEnd),
-		Price:            hotelOrder.Price,
-		TotalAmount:      hotelOrder.TotalAmount,
-		NameOrder:        hotelOrder.NameOrder,
-		EmailOrder:       hotelOrder.EmailOrder,
-		PhoneNumberOrder: hotelOrder.PhoneNumberOrder,
-		SpecialRequest:   hotelOrder.SpecialRequest,
-		HotelOrderCode:   hotelOrder.HotelOrderCode,
-		IsCheckIn:        hotelOrder.IsCheckIn,
-		IsCheckOut:       hotelOrder.IsCheckOut,
-		Status:           hotelOrder.Status,
-		Hotel: dtos.HotelByIDResponses{
-			HotelID:         getHotel.ID,
-			Name:            getHotel.Name,
-			Class:           getHotel.Class,
-			Description:     getHotel.Description,
-			PhoneNumber:     getHotel.PhoneNumber,
-			Email:           getHotel.Email,
-			Address:         getHotel.Address,
-			HotelImage:      hotelImageResponses,
-			HotelFacilities: hotelFacilitiesResponses,
-			HotelPolicy: dtos.HotelPoliciesResponse{
-				HotelID:            getHotelPolicies.HotelID,
-				IsCheckInCheckOut:  getHotelPolicies.IsCheckInCheckOut,
-				TimeCheckIn:        getHotelPolicies.TimeCheckIn,
-				TimeCheckOut:       getHotelPolicies.TimeCheckOut,
-				IsPolicyCanceled:   getHotelPolicies.IsPolicyCanceled,
-				PolicyMinimumAge:   getHotelPolicies.PolicyMinimumAge,
-				IsPolicyMinimumAge: getHotelPolicies.IsPolicyMinimumAge,
-				IsCheckInEarly:     getHotelPolicies.IsCheckInEarly,
-				IsCheckOutOverdue:  getHotelPolicies.IsCheckOutOverdue,
-				IsBreakfast:        getHotelPolicies.IsBreakfast,
-				TimeBreakfastStart: getHotelPolicies.TimeBreakfastStart,
-				TimeBreakfastEnd:   getHotelPolicies.TimeBreakfastEnd,
-				IsSmoking:          getHotelPolicies.IsSmoking,
-				IsPet:              getHotelPolicies.IsPet,
-			},
-			HotelRoom: dtos.HotelRoomHotelIDResponse{
-				HotelRoomID:       getHotelRoom.ID,
-				HotelID:           getHotelRoom.HotelID,
-				Name:              getHotelRoom.Name,
-				SizeOfRoom:        getHotelRoom.SizeOfRoom,
-				QuantityOfRoom:    getHotelRoom.QuantityOfRoom,
-				Description:       getHotelRoom.Description,
-				NormalPrice:       getHotelRoom.NormalPrice,
-				Discount:          getHotelRoom.Discount,
-				DiscountPrice:     getHotelRoom.DiscountPrice,
-				NumberOfGuest:     getHotelRoom.NumberOfGuest,
-				MattressSize:      getHotelRoom.MattressSize,
-				NumberOfMattress:  getHotelRoom.NumberOfMattress,
-				HotelRoomImage:    hotelRoomImageResponses,
-				HotelRoomFacility: hotelRoomFacilitiesResponses,
-			},
-		},
+		Payment:        &paymentResp,
 		TravelerDetail: travelerDetailResponses,
 		CreatedAt:      hotelOrder.CreatedAt,
 		UpdatedAt:      hotelOrder.UpdatedAt,
@@ -1385,7 +1224,7 @@ func (u *hotelOrderUsecase) CreateHotelOrder(userID uint, hotelOrderInput dtos.H
 	return hotelOrderResponse, nil
 }
 
-// CreateHotelOrder godoc
+// CreateHotelOrderMidtrans godoc
 // @Summary      Order Hotel
 // @Description  Order Hotel
 // @Tags         User - Hotel
@@ -1400,7 +1239,7 @@ func (u *hotelOrderUsecase) CreateHotelOrder(userID uint, hotelOrderInput dtos.H
 // @Failure      500 {object} dtos.InternalServerErrorResponse
 // @Router       /user/hotel/order/midtrans [post]
 // @Security BearerAuth
-func (u *hotelOrderUsecase) CreateHotelOrder2(userID uint, hotelOrderInput dtos.HotelOrderMidtransInput) (dtos.HotelOrderResponse2, error) {
+func (u *hotelOrderUsecase) CreateHotelOrderMidtrans(userID uint, hotelOrderInput dtos.HotelOrderInput) (dtos.HotelOrderResponse2, error) {
 	var hotelOrderResponse dtos.HotelOrderResponse2
 	sumHotelPrice := 0
 	if hotelOrderInput.HotelRoomID < 1 || hotelOrderInput.QuantityAdult < 1 || hotelOrderInput.DateStart == "" || hotelOrderInput.DateEnd == "" || hotelOrderInput.NameOrder == "" || hotelOrderInput.EmailOrder == "" || hotelOrderInput.PhoneNumberOrder == "" || hotelOrderInput.TravelerDetail == nil {
@@ -1436,7 +1275,7 @@ func (u *hotelOrderUsecase) CreateHotelOrder2(userID uint, hotelOrderInput dtos.
 		return hotelOrderResponse, errors.New("Failed to date start cannot be larger than date end")
 	}
 
-	createHotelOrder := models.HotelOrderMidtrans{
+	createHotelOrder := models.HotelOrder{
 		UserID:           userID,
 		HotelID:          getHotels.ID,
 		HotelRoomID:      uint(hotelOrderInput.HotelRoomID),
@@ -1445,6 +1284,7 @@ func (u *hotelOrderUsecase) CreateHotelOrder2(userID uint, hotelOrderInput dtos.
 		NumberOfNight:    days,
 		DateStart:        dateStartParse,
 		DateEnd:          dateEndParse,
+		PaymentID:        0,
 		Price:            0,
 		TotalAmount:      0,
 		NameOrder:        hotelOrderInput.NameOrder,
@@ -1455,7 +1295,7 @@ func (u *hotelOrderUsecase) CreateHotelOrder2(userID uint, hotelOrderInput dtos.
 		Status:           "unpaid",
 	}
 
-	createHotelOrder, err = u.hotelOrderRepo.CreateHotelOrder2(createHotelOrder)
+	createHotelOrder, err = u.hotelOrderRepo.CreateHotelOrder(createHotelOrder)
 	if err != nil {
 		return hotelOrderResponse, err
 	}
@@ -1496,7 +1336,7 @@ func (u *hotelOrderUsecase) CreateHotelOrder2(userID uint, hotelOrderInput dtos.
 		travelerDetailResponses = append(travelerDetailResponses, travelerDetailResponseses)
 	}
 
-	hotelOrder, err := u.hotelOrderRepo.GetHotelOrderByID2(createHotelOrder.ID, userID)
+	hotelOrder, err := u.hotelOrderRepo.GetHotelOrderByID(createHotelOrder.ID, userID)
 	if err != nil {
 		return hotelOrderResponse, err
 	}
@@ -1543,7 +1383,7 @@ func (u *hotelOrderUsecase) CreateHotelOrder2(userID uint, hotelOrderInput dtos.
 	createHotelOrder.Price = sumHotelPrice
 	createHotelOrder.TotalAmount = sumHotelPrice * createHotelOrder.NumberOfNight
 
-	hotelOrder, err = u.hotelOrderRepo.UpdateHotelOrder2(createHotelOrder)
+	hotelOrder, err = u.hotelOrderRepo.UpdateHotelOrder(createHotelOrder)
 	if err != nil {
 		return hotelOrderResponse, err
 	}
@@ -1610,18 +1450,18 @@ func (u *hotelOrderUsecase) CreateHotelOrder2(userID uint, hotelOrderInput dtos.
 		return dtos.HotelOrderResponse2{}, errors.New("Failed to create transaction")
 	}
 	hotelOrder.PaymentURL = createMidtrans
-	_, _ = u.hotelOrderRepo.UpdateHotelOrder2(hotelOrder)
+	_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
 
 	InitiateCoreApiClient()
 
 	res, err := c.CheckTransaction(hotelOrder.HotelOrderCode)
 	if res.TransactionStatus == "settlement" {
 		hotelOrder.Status = "paid"
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder2(hotelOrder)
+		_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
 	}
 	if res.TransactionStatus == "expire" {
 		hotelOrder.Status = "canceled"
-		_, _ = u.hotelOrderRepo.UpdateHotelOrder2(hotelOrder)
+		_, _ = u.hotelOrderRepo.UpdateHotelOrder(hotelOrder)
 	}
 
 	hotelOrderResponse = dtos.HotelOrderResponse2{

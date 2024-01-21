@@ -526,9 +526,9 @@ func (c *UserController) UserGetDetail(ctx echo.Context) error {
 	users, err := c.userUsecase.UserGetDetail(id, isDeleted)
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed fetching user",
 				helpers.GetErrorData(err),
 			),
@@ -557,7 +557,7 @@ func (c *UserController) UserAdminRegister(ctx echo.Context) error {
 			),
 		)
 	}
-	var userInput dtos.UserRegisterInput
+	var userInput dtos.UserRegisterInputByAdmin
 	err := ctx.Bind(&userInput)
 	if err != nil {
 		return ctx.JSON(
@@ -622,9 +622,9 @@ func (c *UserController) UserAdminUpdate(ctx echo.Context) error {
 	user, err := c.userUsecase.UserAdminUpdate(uint(id), userInput)
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to update user",
 				helpers.GetErrorData(err),
 			),

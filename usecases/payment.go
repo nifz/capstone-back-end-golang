@@ -168,9 +168,6 @@ func (u *paymentUsecase) CreatePayment(payment *dtos.PaymentInput) (dtos.Payment
 func (u *paymentUsecase) UpdatePayment(id uint, paymentInput dtos.PaymentInput) (dtos.PaymentResponse, error) {
 	var payment models.Payment
 	var paymentResponse dtos.PaymentResponse
-	if payment.Type == "" || payment.Name == "" || payment.AccountName == "" || payment.AccountNumber == "" || payment.ImageUrl == "" {
-		return paymentResponse, errors.New("Failed to update payment")
-	}
 
 	payment, err := u.paymentRepo.GetPaymentByID2(id)
 	if err != nil {
@@ -181,6 +178,7 @@ func (u *paymentUsecase) UpdatePayment(id uint, paymentInput dtos.PaymentInput) 
 	payment.Name = paymentInput.Name
 	payment.AccountName = paymentInput.AccountName
 	payment.AccountNumber = paymentInput.AccountNumber
+	payment.ImageUrl = paymentInput.ImageUrl
 
 	payment, err = u.paymentRepo.UpdatePayment(payment)
 
@@ -193,6 +191,7 @@ func (u *paymentUsecase) UpdatePayment(id uint, paymentInput dtos.PaymentInput) 
 	paymentResponse.Name = payment.Name
 	paymentResponse.AccountName = payment.AccountName
 	paymentResponse.AccountNumber = payment.AccountNumber
+	paymentResponse.ImageUrl = payment.ImageUrl
 	paymentResponse.CreatedAt = &payment.CreatedAt
 	paymentResponse.UpdatedAt = &payment.UpdatedAt
 
@@ -216,5 +215,9 @@ func (u *paymentUsecase) UpdatePayment(id uint, paymentInput dtos.PaymentInput) 
 // @Router       /admin/payment/{id} [delete]
 // @Security BearerAuth
 func (u *paymentUsecase) DeletePayment(id uint) error {
+	_, err := u.paymentRepo.GetPaymentByID2(id)
+	if err != nil {
+		return err
+	}
 	return u.paymentRepo.DeletePayment(id)
 }

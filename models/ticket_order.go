@@ -16,5 +16,6 @@ type TicketOrder struct {
 	EmailOrder       string
 	PhoneNumberOrder string
 	TicketOrderCode  string
+	PaymentURL       string
 	Status           string `gorm:"type:ENUM('unpaid', 'paid', 'done', 'canceled', 'refund')"`
 }

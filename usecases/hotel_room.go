@@ -345,7 +345,7 @@ func (u *hotelRoomUsecase) UpdateHotelRoom(id uint, roomInput dtos.HotelRoomInpu
 	var hotelRooms models.HotelRoom
 	var hotelRoomResponse dtos.HotelRoomResponse
 
-	if roomInput.HotelID < 1 || roomInput.Name == "" || roomInput.SizeOfRoom < 1 || roomInput.QuantityOfRoom < 1 || roomInput.Description == "" || roomInput.NormalPrice < 1 || roomInput.Discount < 0 || roomInput.NumberOfGuest < 1 || roomInput.MattressSize == "" || roomInput.NumberOfMattress < 1 || roomInput.HotelRoomImage == nil || roomInput.HotelRoomFacility == nil {
+	if roomInput.Name == "" || roomInput.SizeOfRoom < 1 || roomInput.QuantityOfRoom < 1 || roomInput.Description == "" || roomInput.NormalPrice < 1 || roomInput.Discount < 0 || roomInput.NumberOfGuest < 1 || roomInput.MattressSize == "" || roomInput.NumberOfMattress < 1 || roomInput.HotelRoomImage == nil || roomInput.HotelRoomFacility == nil {
 		return hotelRoomResponse, errors.New("failed to update hotel room")
 	}
 
@@ -354,7 +354,7 @@ func (u *hotelRoomUsecase) UpdateHotelRoom(id uint, roomInput dtos.HotelRoomInpu
 		return hotelRoomResponse, err
 	}
 
-	getHotel, err := u.hotelRepo.GetHotelByID(roomInput.HotelID)
+	getHotel, err := u.hotelRepo.GetHotelByID(hotelRooms.HotelID)
 	if err != nil {
 		return hotelRoomResponse, errors.New("failed to update hotel room, hotel_id not found")
 	}
@@ -479,5 +479,10 @@ func (u *hotelRoomUsecase) UpdateHotelRoom(id uint, roomInput dtos.HotelRoomInpu
 func (u *hotelRoomUsecase) DeleteHotelRoom(id uint) error {
 	// u.hotelRoomImageRepo.DeleteHotelRoomImage(id)
 	// u.hotelRoomFacilitiesRepo.DeleteHotelRoomFacilities(id)
+
+	_, err := u.hotelRepo.GetHotelByID(id)
+	if err != nil {
+		return err
+	}
 	return u.hotelRoomRepo.DeleteHotelRoom(id)
 }

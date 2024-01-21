@@ -18,6 +18,7 @@ type TicketOrderUsecase interface {
 	GetTicketOrdersDetailByAdmin(ticketOrderId, trainId uint) (dtos.TicketTravelerDetailOrderResponse, error)
 	GetTicketOrderByID(userID, ticketTravelerDetailId, ticketOrderId uint) (dtos.TicketTravelerDetailOrderResponse, error)
 	CreateTicketOrder(userID uint, ticketOrderInput dtos.TicketOrderInput) (dtos.TicketOrderResponse, error)
+	CreateTicketOrderMidtrans(userID uint, ticketOrderInput dtos.TicketOrderInput) (dtos.TicketOrderResponseMidtrans, error)
 	UpdateTicketOrder(userID, ticketOrderID uint, status string) (dtos.TicketOrderResponse, error)
 }
 
@@ -154,9 +155,31 @@ func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, searc
 		if err != nil {
 			return ticketTravelerDetailResponses, 0, err
 		}
-		getPayment, err := u.paymentRepo.GetPaymentByID(uint(getOrderTicket.PaymentID))
-		if err != nil {
-			return ticketTravelerDetailResponses, 0, err
+
+		var paymentResp = dtos.PaymentResponses{}
+
+		if getOrderTicket.PaymentID == 0 {
+			paymentResp = dtos.PaymentResponses{
+				ID:            0,
+				Type:          "With Midtrans",
+				Name:          "Third Party Payment",
+				ImageUrl:      "null",
+				AccountName:   "Midtans",
+				AccountNumber: "null",
+			}
+		} else {
+			getPayment, err := u.paymentRepo.GetPaymentByID(uint(getOrderTicket.PaymentID))
+			if err != nil {
+				return ticketTravelerDetailResponses, 0, err
+			}
+			paymentResp = dtos.PaymentResponses{
+				ID:            int(getPayment.ID),
+				Type:          getPayment.Type,
+				ImageUrl:      getPayment.ImageUrl,
+				Name:          getPayment.Name,
+				AccountName:   getPayment.AccountName,
+				AccountNumber: getPayment.AccountNumber,
+			}
 		}
 
 		ticketTravelerDetailResponse := dtos.TicketTravelerDetailOrderResponse{
@@ -167,15 +190,8 @@ func (u *ticketOrderUsecase) GetTicketOrders(page, limit int, userID uint, searc
 			EmailOrder:       getTicketOrder.EmailOrder,
 			PhoneNumberOrder: getTicketOrder.PhoneNumberOrder,
 			TicketOrderCode:  getTicketOrder.TicketOrderCode,
-			Payment: dtos.PaymentResponses{
-				ID:            int(getPayment.ID),
-				Type:          getPayment.Type,
-				ImageUrl:      getPayment.ImageUrl,
-				Name:          getPayment.Name,
-				AccountName:   getPayment.AccountName,
-				AccountNumber: getPayment.AccountNumber,
-			},
-			TravelerDetail: travelerDetailResponses,
+			Payment:          &paymentResp,
+			TravelerDetail:   travelerDetailResponses,
 			Train: dtos.TrainResponsesSimply{
 				TrainID:         getTrain.ID,
 				CodeTrain:       getTrain.CodeTrain,
@@ -380,7 +396,7 @@ func (u *ticketOrderUsecase) GetTicketOrdersByAdmin(page, limit int, search, dat
 				BirthDate:   helpers.FormatDateToYMD(getUser.BirthDate),
 				Citizen:     getUser.Citizen,
 			},
-			Payment: dtos.PaymentResponses{
+			Payment: &dtos.PaymentResponses{
 				ID:            int(getPayment.ID),
 				Type:          getPayment.Type,
 				ImageUrl:      getPayment.ImageUrl,
@@ -602,7 +618,7 @@ func (u *ticketOrderUsecase) GetTicketOrdersDetailByAdmin(ticketOrderId, trainId
 			BirthDate:   helpers.FormatDateToYMD(getUser.BirthDate),
 			Citizen:     getUser.Citizen,
 		},
-		Payment: dtos.PaymentResponses{
+		Payment: &dtos.PaymentResponses{
 			ID:            int(getPayment.ID),
 			Type:          getPayment.Type,
 			ImageUrl:      getPayment.ImageUrl,
@@ -730,6 +746,19 @@ func (u *ticketOrderUsecase) GetTicketOrderByID(userID, ticketOrderId, trainId u
 		return ticketTravelerDetailResponses, err
 	}
 
+	InitiateCoreApiClient()
+
+	if getTicketOrder.PaymentID == 0 {
+		res, _ := c.CheckTransaction(getTicketOrder.TicketOrderCode)
+		if res.TransactionStatus == "settlement" {
+			getTicketOrder.Status = "paid"
+			_, _ = u.ticketOrderRepo.UpdateTicketOrder(getTicketOrder)
+		} else {
+			getTicketOrder.Status = "canceled"
+			_, _ = u.ticketOrderRepo.UpdateTicketOrder(getTicketOrder)
+		}
+	}
+
 	getTrain, err := u.trainRepo.GetTrainByID(uint(ticketTravelerDetail.TrainID))
 	if err != nil {
 		return ticketTravelerDetailResponses, err
@@ -772,11 +801,35 @@ func (u *ticketOrderUsecase) GetTicketOrderByID(userID, ticketOrderId, trainId u
 	if err != nil {
 		return ticketTravelerDetailResponses, err
 	}
-	getPayment, err := u.paymentRepo.GetPaymentByID(uint(getOrderTicket.PaymentID))
-	if err != nil {
-		return ticketTravelerDetailResponses, err
-	}
 
+	var paymentResp = dtos.PaymentResponses{}
+
+	if getOrderTicket.PaymentID == 0 {
+		paymentResp = dtos.PaymentResponses{
+			ID:            0,
+			Type:          "With Midtrans",
+			Name:          "Third Party Payment",
+			ImageUrl:      "null",
+			AccountName:   "Midtans",
+			AccountNumber: "null",
+		}
+	} else {
+
+		getPayment, err := u.paymentRepo.GetPaymentByID(uint(getOrderTicket.PaymentID))
+
+		if err != nil {
+			return ticketTravelerDetailResponses, err
+		}
+
+		paymentResp = dtos.PaymentResponses{
+			ID:            int(getPayment.ID),
+			Type:          getPayment.Type,
+			ImageUrl:      getPayment.ImageUrl,
+			Name:          getPayment.Name,
+			AccountName:   getPayment.AccountName,
+			AccountNumber: getPayment.AccountNumber,
+		}
+	}
 	ticketTravelerDetailResponses = dtos.TicketTravelerDetailOrderResponse{
 		TicketOrderID:    int(getTicketOrder.ID),
 		QuantityAdult:    getTicketOrder.QuantityAdult,
@@ -785,15 +838,8 @@ func (u *ticketOrderUsecase) GetTicketOrderByID(userID, ticketOrderId, trainId u
 		EmailOrder:       getTicketOrder.EmailOrder,
 		PhoneNumberOrder: getTicketOrder.PhoneNumberOrder,
 		TicketOrderCode:  getTicketOrder.TicketOrderCode,
-		Payment: dtos.PaymentResponses{
-			ID:            int(getPayment.ID),
-			Type:          getPayment.Type,
-			ImageUrl:      getPayment.ImageUrl,
-			Name:          getPayment.Name,
-			AccountName:   getPayment.AccountName,
-			AccountNumber: getPayment.AccountNumber,
-		},
-		TravelerDetail: travelerDetailResponses,
+		Payment:          &paymentResp,
+		TravelerDetail:   travelerDetailResponses,
 		Train: dtos.TrainResponsesSimply{
 			TrainID:         getTrain.ID,
 			CodeTrain:       getTrain.CodeTrain,
@@ -1205,6 +1251,429 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 			AccountName:   getPayment.AccountName,
 			AccountNumber: getPayment.AccountNumber,
 		},
+		TicketTravelerDetail: ticketTravelerDetailDepartureResponses,
+		CreatedAt:            getOrderTicket.CreatedAt,
+		UpdatedAt:            getOrderTicket.UpdatedAt,
+	}
+
+	return ticketOrderResponse, nil
+}
+
+// CreateTicketOrderMidtrans godoc
+// @Summary      Order ticket KA
+// @Description  Order ticket KA
+// @Tags         User - Train
+// @Accept       json
+// @Produce      json
+// @Param        request body dtos.TicketOrderInput true "Payload Body [RAW]"
+// @Success      201 {object} dtos.TicketOrderCreeatedResponse
+// @Failure      400 {object} dtos.BadRequestResponse
+// @Failure      401 {object} dtos.UnauthorizedResponse
+// @Failure      403 {object} dtos.ForbiddenResponse
+// @Failure      404 {object} dtos.NotFoundResponse
+// @Failure      500 {object} dtos.InternalServerErrorResponse
+// @Router       /user/train/order/midtrans [post]
+// @Security BearerAuth
+func (u *ticketOrderUsecase) CreateTicketOrderMidtrans(userID uint, ticketOrderInput dtos.TicketOrderInput) (dtos.TicketOrderResponseMidtrans, error) {
+	var ticketOrderResponse dtos.TicketOrderResponseMidtrans
+	sumTrainPrice := 0
+	trainPrice := 0
+	if ticketOrderInput.QuantityAdult < 1 || ticketOrderInput.NameOrder == "" || ticketOrderInput.EmailOrder == "" || ticketOrderInput.PhoneNumberOrder == "" || ticketOrderInput.TravelerDetail == nil || ticketOrderInput.TicketTravelerDetailDeparture == nil {
+		return ticketOrderResponse, errors.New("Failed to create ticket order")
+	}
+	createTicketOrder := models.TicketOrder{
+		UserID:           userID,
+		QuantityAdult:    ticketOrderInput.QuantityAdult,
+		QuantityInfant:   ticketOrderInput.QuantityInfant,
+		Price:            0,
+		WithReturn:       ticketOrderInput.WithReturn,
+		PaymentID:        0,
+		TotalAmount:      0,
+		NameOrder:        ticketOrderInput.NameOrder,
+		EmailOrder:       ticketOrderInput.EmailOrder,
+		PhoneNumberOrder: ticketOrderInput.PhoneNumberOrder,
+		TicketOrderCode:  "ticket-order-" + uuid.New().String(),
+		Status:           "unpaid",
+	}
+
+	createTicketOrder, err := u.ticketOrderRepo.CreateTicketOrder(createTicketOrder)
+	if err != nil {
+		return ticketOrderResponse, err
+	}
+
+	if createTicketOrder.ID > 0 && createTicketOrder.Status == "unpaid" {
+		createNotification := models.Notification{
+			UserID:     userID,
+			TemplateID: 7,
+		}
+
+		_, err = u.notificationRepo.CreateNotification(createNotification)
+		if err != nil {
+			return ticketOrderResponse, err
+		}
+	}
+
+	var ticketTravelerDetailDepartureResponses []dtos.TicketTravelerDetailResponse
+
+	for _, travelerDetail := range ticketOrderInput.TravelerDetail {
+		if travelerDetail.Title == "" || travelerDetail.FullName == "" {
+			return ticketOrderResponse, errors.New("Failed to create ticket order")
+		}
+		createTravelerDetail := models.TravelerDetail{
+			UserID:        userID,
+			TicketOrderID: &createTicketOrder.ID,
+			Title:         travelerDetail.Title,
+			FullName:      travelerDetail.FullName,
+			IDCardNumber:  &travelerDetail.IDCardNumber,
+		}
+		createTravelerDetail, err := u.travelerDetailRepo.CreateTravelerDetail(createTravelerDetail)
+		if err != nil {
+			return ticketOrderResponse, err
+		}
+
+		for _, ticketTravelerDetailDeparture := range ticketOrderInput.TicketTravelerDetailDeparture {
+			if ticketTravelerDetailDeparture.TrainCarriageID < 1 || ticketTravelerDetailDeparture.TrainSeatID < 1 || ticketTravelerDetailDeparture.StationOriginID < 1 || ticketTravelerDetailDeparture.StationDestinationID < 1 || ticketTravelerDetailDeparture.Date == "" {
+				return ticketOrderResponse, errors.New("Failed to create ticket order")
+			}
+			dateDepartureParse, err := helpers.FormatStringToDate(ticketTravelerDetailDeparture.Date)
+			if err != nil {
+				return ticketOrderResponse, errors.New("Failed to parsing date")
+			}
+
+			getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(uint(ticketTravelerDetailDeparture.TrainCarriageID))
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train carriage id")
+			}
+
+			getTrain, err := u.trainRepo.GetTrainByID2(uint(getTrainCarriage.TrainID))
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train id")
+			}
+
+			getTrainStation, err := u.trainRepo.SearchTrainAvailable(getTrain.ID, uint(ticketTravelerDetailDeparture.StationOriginID), uint(ticketTravelerDetailDeparture.StationDestinationID))
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train station")
+			}
+
+			if getTrain.Status != "available" {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train")
+			}
+
+			// Check if route[0] matches stationOriginId and route[1] matches stationDestinationId
+			if len(getTrainStation) < 2 || getTrainStation[0].StationID != uint(ticketTravelerDetailDeparture.StationOriginID) || getTrainStation[1].StationID != uint(ticketTravelerDetailDeparture.StationDestinationID) {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get train")
+			}
+
+			if travelerDetail.IDCardNumber != "" {
+				trainPrice = getTrainCarriage.Price
+				sumTrainPrice += trainPrice
+			} else {
+				trainPrice = 0
+				sumTrainPrice += trainPrice
+			}
+
+			getTrainSeat, err := u.trainSeatRepo.GetTrainSeatByID(uint(ticketTravelerDetailDeparture.TrainSeatID))
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, err
+			}
+			getStationOrigin, err := u.stationRepo.GetStationByID2(uint(ticketTravelerDetailDeparture.StationOriginID))
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get station origin id")
+			}
+			getStationDestination, err := u.stationRepo.GetStationByID2(uint(ticketTravelerDetailDeparture.StationDestinationID))
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, errors.New("Failed to get station destination id")
+			}
+
+			trainStationOrigin, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationOrigin.ID)
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, err
+			}
+			trainStationDestination, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationDestination.ID)
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				return ticketOrderResponse, err
+			}
+
+			createTicketTravelerDetail := models.TicketTravelerDetail{
+				TicketOrderID:        createTicketOrder.ID,
+				TravelerDetailID:     createTravelerDetail.ID,
+				TrainID:              uint(getTrain.ID),
+				TrainPrice:           trainPrice,
+				TrainCarriageID:      uint(getTrainCarriage.ID),
+				TrainSeatID:          uint(getTrainSeat.ID),
+				StationOriginID:      uint(getStationOrigin.ID),
+				DepartureTime:        trainStationOrigin.ArriveTime,
+				StationDestinationID: uint(getStationDestination.ID),
+				ArrivalTime:          trainStationDestination.ArriveTime,
+				DateOfDeparture:      dateDepartureParse,
+				BoardingTicketCode:   "boarding-ticket-" + uuid.New().String(),
+			}
+			createTicketTravelerDetail, err = u.ticketTravelerDetailRepo.CreateTicketTravelerDetail(createTicketTravelerDetail)
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
+				return ticketOrderResponse, err
+			}
+
+			getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID(createTicketTravelerDetail.TravelerDetailID)
+			if err != nil {
+				_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+				_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
+				return ticketOrderResponse, err
+			}
+
+			ticketTravelerDetailResponse := dtos.TicketTravelerDetailResponse{
+				TicketTravelerDetailID: int(createTicketTravelerDetail.ID),
+				TravelerDetail: dtos.TravelerDetailResponse{
+					ID:           int(getTravelerDetail.ID),
+					Title:        getTravelerDetail.Title,
+					FullName:     getTravelerDetail.FullName,
+					IDCardNumber: *getTravelerDetail.IDCardNumber,
+				},
+				Train: dtos.TrainResponsesSimply{
+					TrainID:         getTrain.ID,
+					CodeTrain:       getTrain.CodeTrain,
+					Name:            getTrain.Name,
+					Class:           getTrainCarriage.Class,
+					TrainPrice:      trainPrice,
+					TrainCarriageID: getTrainCarriage.ID,
+					TrainCarriage:   getTrainCarriage.Name,
+					TrainSeatID:     getTrainSeat.ID,
+					TrainSeat:       getTrainSeat.Name,
+				},
+				StationOrigin: dtos.StationResponseSimply{
+					StationID:  getStationOrigin.ID,
+					Origin:     getStationOrigin.Origin,
+					Name:       getStationOrigin.Name,
+					Initial:    getStationOrigin.Initial,
+					ArriveTime: createTicketTravelerDetail.DepartureTime,
+				},
+				StationDestination: dtos.StationResponseSimply{
+					StationID:  getStationDestination.ID,
+					Origin:     getStationDestination.Origin,
+					Name:       getStationDestination.Name,
+					Initial:    getStationDestination.Initial,
+					ArriveTime: createTicketTravelerDetail.ArrivalTime,
+				},
+				Date:               createTicketTravelerDetail.DateOfDeparture,
+				BoardingTicketCode: createTicketTravelerDetail.BoardingTicketCode,
+			}
+			ticketTravelerDetailDepartureResponses = append(ticketTravelerDetailDepartureResponses, ticketTravelerDetailResponse)
+		}
+
+		if createTicketOrder.WithReturn {
+			for _, ticketTravelerDetailReturn := range ticketOrderInput.TicketTravelerDetailReturn {
+				if ticketTravelerDetailReturn.TrainCarriageID < 1 || ticketTravelerDetailReturn.TrainSeatID < 1 || ticketTravelerDetailReturn.StationOriginID < 1 || ticketTravelerDetailReturn.StationDestinationID < 1 || ticketTravelerDetailReturn.Date == "" {
+					return ticketOrderResponse, errors.New("Failed to create ticket order")
+				}
+				dateReturn, err := helpers.FormatStringToDate(ticketTravelerDetailReturn.Date)
+				if err != nil {
+					return ticketOrderResponse, errors.New("Failed to parsing date")
+				}
+
+				getTrainCarriage, err := u.trainCarriageRepo.GetTrainCarriageByID2(uint(ticketTravelerDetailReturn.TrainCarriageID))
+				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get train carriage id")
+				}
+
+				getTrain, err := u.trainRepo.GetTrainByID2(getTrainCarriage.TrainID)
+				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get train id")
+				}
+
+				if travelerDetail.IDCardNumber != "" {
+					trainPrice = getTrainCarriage.Price
+					sumTrainPrice += trainPrice
+				} else {
+					trainPrice = 0
+					sumTrainPrice += trainPrice
+				}
+
+				getTrainSeat, err := u.trainSeatRepo.GetTrainSeatByID(uint(ticketTravelerDetailReturn.TrainSeatID))
+				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get train seat id")
+				}
+				getStationOrigin, err := u.stationRepo.GetStationByID(uint(ticketTravelerDetailReturn.StationOriginID))
+				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get station origin id")
+				}
+				getStationDestination, err := u.stationRepo.GetStationByID(uint(ticketTravelerDetailReturn.StationDestinationID))
+				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, errors.New("Failed to get station destination id")
+				}
+
+				trainStationOrigin, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationOrigin.ID)
+				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, err
+				}
+				trainStationDestination, err := u.trainStationRepo.GetTrainStationByTrainIDStationID(getTrain.ID, getStationDestination.ID)
+				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					return ticketOrderResponse, err
+				}
+
+				createTicketTravelerDetail := models.TicketTravelerDetail{
+					TicketOrderID:        createTicketOrder.ID,
+					TravelerDetailID:     createTravelerDetail.ID,
+					TrainID:              uint(getTrain.ID),
+					TrainPrice:           trainPrice,
+					TrainCarriageID:      uint(getTrainCarriage.ID),
+					TrainSeatID:          uint(getTrainSeat.ID),
+					StationOriginID:      uint(getStationOrigin.ID),
+					DepartureTime:        trainStationOrigin.ArriveTime,
+					StationDestinationID: uint(getStationDestination.ID),
+					ArrivalTime:          trainStationDestination.ArriveTime,
+					DateOfDeparture:      dateReturn,
+					BoardingTicketCode:   "boarding-ticket-" + uuid.New().String(),
+				}
+				createTicketTravelerDetail, err = u.ticketTravelerDetailRepo.CreateTicketTravelerDetail(createTicketTravelerDetail)
+				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
+					return ticketOrderResponse, err
+				}
+
+				getTravelerDetail, err := u.travelerDetailRepo.GetTravelerDetailByID(createTicketTravelerDetail.TravelerDetailID)
+				if err != nil {
+					_, _ = u.ticketOrderRepo.DeleteTicketOrder(createTicketOrder)
+					_, _ = u.ticketTravelerDetailRepo.DeleteTicketTravelerDetail(createTicketTravelerDetail)
+					return ticketOrderResponse, err
+				}
+
+				ticketTravelerDetailResponse := dtos.TicketTravelerDetailResponse{
+					TicketTravelerDetailID: int(createTicketTravelerDetail.ID),
+					TravelerDetail: dtos.TravelerDetailResponse{
+						ID:           int(getTravelerDetail.ID),
+						Title:        getTravelerDetail.Title,
+						FullName:     getTravelerDetail.FullName,
+						IDCardNumber: *getTravelerDetail.IDCardNumber,
+					},
+					Train: dtos.TrainResponsesSimply{
+						TrainID:         getTrain.ID,
+						CodeTrain:       getTrain.CodeTrain,
+						Name:            getTrain.Name,
+						Class:           getTrainCarriage.Class,
+						TrainPrice:      trainPrice,
+						TrainCarriageID: getTrainCarriage.ID,
+						TrainCarriage:   getTrainCarriage.Name,
+						TrainSeatID:     getTrainSeat.ID,
+						TrainSeat:       getTrainSeat.Name,
+					},
+					StationOrigin: dtos.StationResponseSimply{
+						StationID:  getStationOrigin.ID,
+						Origin:     getStationOrigin.Origin,
+						Name:       getStationOrigin.Name,
+						Initial:    getStationOrigin.Initial,
+						ArriveTime: createTicketTravelerDetail.DepartureTime,
+					},
+					StationDestination: dtos.StationResponseSimply{
+						StationID:  getStationDestination.ID,
+						Origin:     getStationDestination.Origin,
+						Name:       getStationDestination.Name,
+						Initial:    getStationDestination.Initial,
+						ArriveTime: createTicketTravelerDetail.ArrivalTime,
+					},
+					Date:               createTicketTravelerDetail.DateOfDeparture,
+					BoardingTicketCode: createTicketTravelerDetail.BoardingTicketCode,
+				}
+				ticketTravelerDetailDepartureResponses = append(ticketTravelerDetailDepartureResponses, ticketTravelerDetailResponse)
+			}
+		}
+
+	}
+
+	createTicketOrder.Price = sumTrainPrice
+	createTicketOrder.TotalAmount = sumTrainPrice * ticketOrderInput.QuantityAdult
+
+	updateTicketOrder, err := u.ticketOrderRepo.UpdateTicketOrder(createTicketOrder)
+	if err != nil {
+		return ticketOrderResponse, err
+	}
+
+	getOrderTicket, err := u.ticketOrderRepo.GetTicketOrderByID(updateTicketOrder.ID, userID)
+	if err != nil {
+		return ticketOrderResponse, err
+	}
+
+	getUser, _ := u.userRepo.UserGetById2(userID)
+
+	midtransInput := dtos.MidtransInput{
+		CustomerAddress: dtos.CustomerAddress{
+			FName:       getUser.FullName,
+			LName:       "- Tripease",
+			Phone:       getUser.PhoneNumber,
+			Address:     "PT Tripease",
+			City:        "Jakarta",
+			Postcode:    "11450",
+			CountryCode: "IDN",
+		},
+		TransactionDetails: dtos.TransactionDetails{
+			OrderID:  getOrderTicket.TicketOrderCode,
+			GrossAmt: getOrderTicket.TotalAmount,
+		},
+		CustomerDetail: dtos.CustomerDetail{
+			FName: getUser.FullName,
+			LName: "- Tripease",
+			Email: getUser.Email,
+			Phone: getUser.PhoneNumber,
+		},
+		Items: dtos.Items{
+			ID:    int(getOrderTicket.ID),
+			Price: getOrderTicket.TotalAmount,
+			Qty:   1,
+			Name:  "Tiket Kereta Api",
+		},
+	}
+
+	createMidtrans, err := CreateUrlTransactionWithGateway(midtransInput)
+	if err != nil {
+		return ticketOrderResponse, errors.New("Failed to create transaction")
+	}
+
+	createTicketOrder.PaymentURL = createMidtrans
+
+	_, _ = u.ticketOrderRepo.UpdateTicketOrder(createTicketOrder)
+
+	InitiateCoreApiClient()
+
+	res, err := c.CheckTransaction(createTicketOrder.TicketOrderCode)
+	if res.TransactionStatus == "settlement" {
+		createTicketOrder.Status = "paid"
+		_, _ = u.ticketOrderRepo.UpdateTicketOrder(createTicketOrder)
+	}
+	if res.TransactionStatus == "expire" {
+		createTicketOrder.Status = "canceled"
+		_, _ = u.ticketOrderRepo.UpdateTicketOrder(createTicketOrder)
+	}
+
+	ticketOrderResponse = dtos.TicketOrderResponseMidtrans{
+		PaymentURL:           createMidtrans,
+		TicketOrderID:        int(getOrderTicket.ID),
+		QuantityAdult:        getOrderTicket.QuantityAdult,
+		QuantityInfant:       getOrderTicket.QuantityInfant,
+		Price:                getOrderTicket.Price,
+		TotalAmount:          getOrderTicket.TotalAmount,
+		NameOrder:            getOrderTicket.NameOrder,
+		EmailOrder:           getOrderTicket.EmailOrder,
+		PhoneNumberOrder:     getOrderTicket.PhoneNumberOrder,
+		TicketOrderCode:      getOrderTicket.TicketOrderCode,
+		Status:               getOrderTicket.Status,
 		TicketTravelerDetail: ticketTravelerDetailDepartureResponses,
 		CreatedAt:            getOrderTicket.CreatedAt,
 		UpdatedAt:            getOrderTicket.UpdatedAt,

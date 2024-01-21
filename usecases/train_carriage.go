@@ -102,7 +102,9 @@ func (u *trainCarriageUsecase) GetAllTrainCarriages(trainId, page, limit int, cl
 		if err != nil {
 			return trainCarriageResponses, count, err
 		}
-
+		if len(getTrainStation) < 2 {
+			continue
+		}
 		for _, train := range getTrainStation {
 			getStation, err := u.trainRepo.GetStationByID(train.StationID)
 			if err != nil {
@@ -466,5 +468,9 @@ func (u *trainCarriageUsecase) UpdateTrainCarriage(id uint, trainCarriageInput d
 // @Router       /admin/train-carriage/{id} [delete]
 // @Security BearerAuth
 func (u *trainCarriageUsecase) DeleteTrainCarriage(id uint) error {
+	_, err := u.trainCarriageRepo.GetTrainCarriageByID2(id)
+	if err != nil {
+		return err
+	}
 	return u.trainCarriageRepo.DeleteTrainCarriage(id)
 }

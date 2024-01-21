@@ -133,7 +133,7 @@ func (u *hotelRatingsUsecase) GetHotelRatingsByHotelID(star, page, limit int, id
 
 	ratingCounts, hotelRatings, count, err := u.hotelRatingsRepository.GetHotelRatingsByHotelID(id, filter)
 	if err != nil {
-		return hotelRatingsResponse, 0, nil
+		return hotelRatingsResponse, 0, errors.New("Hotel ID is not found")
 	}
 
 	hotelRatingsResponse.HotelID = id

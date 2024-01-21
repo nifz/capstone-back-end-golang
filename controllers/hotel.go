@@ -110,9 +110,9 @@ func (c *hotelController) GetHotelByID(ctx echo.Context) error {
 
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get hotel by id",
 				helpers.GetErrorData(err),
 			),
@@ -217,9 +217,9 @@ func (c *hotelController) UpdateHotel(ctx echo.Context) error {
 	hotel, err := c.hotelUsecase.GetHotelByID(userId, uint(id))
 	if hotel.HotelID == 0 {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get hotel by id",
 				helpers.GetErrorData(err),
 			),
@@ -260,14 +260,15 @@ func (c *hotelController) DeleteHotel(ctx echo.Context) error {
 			),
 		)
 	}
+
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	err := c.hotelUsecase.DeleteHotel(uint(id))
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to delete hotel",
 				helpers.GetErrorData(err),
 			),

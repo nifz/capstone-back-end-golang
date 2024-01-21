@@ -74,9 +74,9 @@ func (c *hotelRoomController) GetHotelRoomByID(ctx echo.Context) error {
 
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get hotel room by id",
 				helpers.GetErrorData(err),
 			),
@@ -169,9 +169,9 @@ func (c *hotelRoomController) UpdateHotelRoom(ctx echo.Context) error {
 	hotelRoom, err := c.hotelRoomUsecase.GetHotelRoomByID(uint(id))
 	if hotelRoom.HotelRoomID == 0 {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get hotel room by id",
 				helpers.GetErrorData(err),
 			),
@@ -217,9 +217,9 @@ func (c *hotelRoomController) DeleteHotelRoom(ctx echo.Context) error {
 	err := c.hotelRoomUsecase.DeleteHotelRoom(uint(id))
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to delete hotel room",
 				helpers.GetErrorData(err),
 			),

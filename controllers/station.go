@@ -127,9 +127,9 @@ func (c *stationController) GetStationByID(ctx echo.Context) error {
 
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get station by id",
 				helpers.GetErrorData(err),
 			),
@@ -222,9 +222,9 @@ func (c *stationController) UpdateStation(ctx echo.Context) error {
 	station, err := c.stationUsecase.GetStationByID(uint(id))
 	if station.StationID == 0 {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to get station by id",
 				helpers.GetErrorData(err),
 			),
@@ -270,9 +270,9 @@ func (c *stationController) DeleteStation(ctx echo.Context) error {
 	err := c.stationUsecase.DeleteStation(uint(id))
 	if err != nil {
 		return ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusNotFound,
 			helpers.NewErrorResponse(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				"Failed to delete station",
 				helpers.GetErrorData(err),
 			),
