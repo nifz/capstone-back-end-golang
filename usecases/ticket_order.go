@@ -8,6 +8,7 @@ import (
 	"errors"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -897,6 +898,9 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 	if ticketOrderInput.QuantityAdult < 1 || ticketOrderInput.PaymentID < 1 || ticketOrderInput.NameOrder == "" || ticketOrderInput.EmailOrder == "" || ticketOrderInput.PhoneNumberOrder == "" || ticketOrderInput.TravelerDetail == nil || ticketOrderInput.TicketTravelerDetailDeparture == nil {
 		return ticketOrderResponse, errors.New("Failed to create ticket order")
 	}
+	if ticketOrderInput.QuantityInfant > 1 {
+		return ticketOrderResponse, errors.New("Quantity infant not existing")
+	}
 	createTicketOrder := models.TicketOrder{
 		UserID:           userID,
 		QuantityAdult:    ticketOrderInput.QuantityAdult,
@@ -952,10 +956,22 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 			return ticketOrderResponse, err
 		}
 
+		if ticketOrderInput.QuantityAdult != len(ticketOrderInput.TicketTravelerDetailDeparture) {
+			return ticketOrderResponse, errors.New("Quantity adult and ticket traveler detail departure does not match")
+		}
+
 		for _, ticketTravelerDetailDeparture := range ticketOrderInput.TicketTravelerDetailDeparture {
 			if ticketTravelerDetailDeparture.TrainCarriageID < 1 || ticketTravelerDetailDeparture.TrainSeatID < 1 || ticketTravelerDetailDeparture.StationOriginID < 1 || ticketTravelerDetailDeparture.StationDestinationID < 1 || ticketTravelerDetailDeparture.Date == "" {
 				return ticketOrderResponse, errors.New("Failed to create ticket order")
 			}
+
+			now := time.Now()
+			today := now.Format("2006-01-02")
+
+			if today > ticketTravelerDetailDeparture.Date {
+				return ticketOrderResponse, errors.New("Departure date must be earlier than")
+			}
+
 			dateDepartureParse, err := helpers.FormatStringToDate(ticketTravelerDetailDeparture.Date)
 			if err != nil {
 				return ticketOrderResponse, errors.New("Failed to parsing date")
@@ -1093,10 +1109,22 @@ func (u *ticketOrderUsecase) CreateTicketOrder(userID uint, ticketOrderInput dto
 		}
 
 		if createTicketOrder.WithReturn {
+
+			if ticketOrderInput.QuantityAdult != len(ticketOrderInput.TicketTravelerDetailReturn) {
+				return ticketOrderResponse, errors.New("Quantity adult and ticket traveler detail return does not match")
+			}
 			for _, ticketTravelerDetailReturn := range ticketOrderInput.TicketTravelerDetailReturn {
 				if ticketTravelerDetailReturn.TrainCarriageID < 1 || ticketTravelerDetailReturn.TrainSeatID < 1 || ticketTravelerDetailReturn.StationOriginID < 1 || ticketTravelerDetailReturn.StationDestinationID < 1 || ticketTravelerDetailReturn.Date == "" {
 					return ticketOrderResponse, errors.New("Failed to create ticket order")
 				}
+
+				now := time.Now()
+				today := now.Format("2006-01-02")
+
+				if today > ticketTravelerDetailReturn.Date {
+					return ticketOrderResponse, errors.New("Return date must be earlier than")
+				}
+
 				dateReturn, err := helpers.FormatStringToDate(ticketTravelerDetailReturn.Date)
 				if err != nil {
 					return ticketOrderResponse, errors.New("Failed to parsing date")
@@ -1281,6 +1309,10 @@ func (u *ticketOrderUsecase) CreateTicketOrderMidtrans(userID uint, ticketOrderI
 	if ticketOrderInput.QuantityAdult < 1 || ticketOrderInput.NameOrder == "" || ticketOrderInput.EmailOrder == "" || ticketOrderInput.PhoneNumberOrder == "" || ticketOrderInput.TravelerDetail == nil || ticketOrderInput.TicketTravelerDetailDeparture == nil {
 		return ticketOrderResponse, errors.New("Failed to create ticket order")
 	}
+
+	if ticketOrderInput.QuantityInfant > 1 {
+		return ticketOrderResponse, errors.New("Quantity infant not existing")
+	}
 	createTicketOrder := models.TicketOrder{
 		UserID:           userID,
 		QuantityAdult:    ticketOrderInput.QuantityAdult,
@@ -1331,10 +1363,22 @@ func (u *ticketOrderUsecase) CreateTicketOrderMidtrans(userID uint, ticketOrderI
 			return ticketOrderResponse, err
 		}
 
+		if ticketOrderInput.QuantityAdult != len(ticketOrderInput.TicketTravelerDetailDeparture) {
+			return ticketOrderResponse, errors.New("Quantity adult and ticket traveler detail departure does not match")
+		}
+
 		for _, ticketTravelerDetailDeparture := range ticketOrderInput.TicketTravelerDetailDeparture {
 			if ticketTravelerDetailDeparture.TrainCarriageID < 1 || ticketTravelerDetailDeparture.TrainSeatID < 1 || ticketTravelerDetailDeparture.StationOriginID < 1 || ticketTravelerDetailDeparture.StationDestinationID < 1 || ticketTravelerDetailDeparture.Date == "" {
 				return ticketOrderResponse, errors.New("Failed to create ticket order")
 			}
+
+			now := time.Now()
+			today := now.Format("2006-01-02")
+
+			if today > ticketTravelerDetailDeparture.Date {
+				return ticketOrderResponse, errors.New("Departure date must be earlier than")
+			}
+
 			dateDepartureParse, err := helpers.FormatStringToDate(ticketTravelerDetailDeparture.Date)
 			if err != nil {
 				return ticketOrderResponse, errors.New("Failed to parsing date")
@@ -1472,10 +1516,23 @@ func (u *ticketOrderUsecase) CreateTicketOrderMidtrans(userID uint, ticketOrderI
 		}
 
 		if createTicketOrder.WithReturn {
+
+			if ticketOrderInput.QuantityAdult != len(ticketOrderInput.TicketTravelerDetailReturn) {
+				return ticketOrderResponse, errors.New("Quantity adult and ticket traveler detail return does not match")
+			}
+
 			for _, ticketTravelerDetailReturn := range ticketOrderInput.TicketTravelerDetailReturn {
 				if ticketTravelerDetailReturn.TrainCarriageID < 1 || ticketTravelerDetailReturn.TrainSeatID < 1 || ticketTravelerDetailReturn.StationOriginID < 1 || ticketTravelerDetailReturn.StationDestinationID < 1 || ticketTravelerDetailReturn.Date == "" {
 					return ticketOrderResponse, errors.New("Failed to create ticket order")
 				}
+
+				now := time.Now()
+				today := now.Format("2006-01-02")
+
+				if today > ticketTravelerDetailReturn.Date {
+					return ticketOrderResponse, errors.New("Return date must be earlier than")
+				}
+
 				dateReturn, err := helpers.FormatStringToDate(ticketTravelerDetailReturn.Date)
 				if err != nil {
 					return ticketOrderResponse, errors.New("Failed to parsing date")

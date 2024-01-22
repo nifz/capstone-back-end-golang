@@ -14,6 +14,7 @@ type TrainRepository interface {
 	GetTrainByID2(id uint) (models.Train, error)
 	TrainStationByTrainID(id uint) (models.TrainStation, error)
 	GetTrainStationByTrainID(id uint) ([]models.TrainStation, error)
+	GetTrainCarriageByTrainID(id uint) ([]models.TrainCarriage, error)
 	SearchTrainAvailable(trainId, originId, destinationId uint) ([]models.TrainStation, error)
 	GetStationByID(id uint) (models.Station, error)
 	GetStationByID2(id uint) (models.Station, error)
@@ -126,6 +127,12 @@ func (r *trainRepository) GetTrainByID2(id uint) (models.Train, error) {
 
 func (r *trainRepository) GetTrainStationByTrainID(id uint) ([]models.TrainStation, error) {
 	var train []models.TrainStation
+	err := r.db.Where("train_id = ?", id).Find(&train).Error
+	return train, err
+}
+
+func (r *trainRepository) GetTrainCarriageByTrainID(id uint) ([]models.TrainCarriage, error) {
+	var train []models.TrainCarriage
 	err := r.db.Where("train_id = ?", id).Find(&train).Error
 	return train, err
 }

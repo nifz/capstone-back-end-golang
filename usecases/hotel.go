@@ -745,6 +745,29 @@ func (u *hotelUsecase) SearchHotelAvailable(userId, page, limit, minimumPrice, m
 	var hotelResponses []dtos.HotelResponse
 
 	for _, hotel := range hotels {
+
+		getHotelRoom, err := u.hotelRoomRepo.GetAllHotelRoomByHotelID(hotel.ID)
+		if err != nil {
+			continue
+		}
+
+		var hotelRoomResponses []dtos.HotelRoomHotelIDResponse
+		for _, hotelRoom := range getHotelRoom {
+			hotelRoomResponse := dtos.HotelRoomHotelIDResponse{
+				HotelRoomID:      hotelRoom.ID,
+				Name:             hotelRoom.Name,
+				SizeOfRoom:       hotelRoom.SizeOfRoom,
+				QuantityOfRoom:   hotelRoom.QuantityOfRoom,
+				Description:      hotelRoom.Description,
+				NormalPrice:      hotelRoom.NormalPrice,
+				Discount:         hotelRoom.Discount,
+				NumberOfGuest:    hotelRoom.NumberOfGuest,
+				MattressSize:     hotelRoom.MattressSize,
+				NumberOfMattress: hotelRoom.NumberOfMattress,
+			}
+			hotelRoomResponses = append(hotelRoomResponses, hotelRoomResponse)
+		}
+
 		getMinimumPriceRoom, err := u.hotelRoomRepo.GetMinimumPriceHotelRoomByHotelID(hotel.ID)
 		if err != nil {
 			continue
@@ -815,6 +838,7 @@ func (u *hotelUsecase) SearchHotelAvailable(userId, page, limit, minimumPrice, m
 			Email:           hotel.Email,
 			Address:         hotel.Address,
 			HotelRoomStart:  getMinimumPriceRoom.DiscountPrice,
+			HotelRoom:       hotelRoomResponses,
 			HotelImage:      hotelImageResponses,
 			HotelFacilities: hotelFacilitiesResponses,
 			HotelPolicy:     hotelPoliciesResponses,

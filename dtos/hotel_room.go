@@ -38,7 +38,7 @@ type HotelRoomResponse struct {
 
 type HotelRoomHotelIDResponse struct {
 	HotelRoomID       uint                          `form:"hotel_room_id" json:"hotel_room_id"`
-	HotelID           uint                          `form:"hotel_id" json:"hotel_id"`
+	HotelID           uint                          `form:"hotel_id" json:"hotel_id,omitempty"`
 	Name              string                        `form:"name" json:"name"`
 	SizeOfRoom        int                           `form:"size_of_room" json:"size_of_room"`
 	QuantityOfRoom    int                           `form:"quantity_of_room" json:"quantity_of_room"`
@@ -49,6 +49,6 @@ type HotelRoomHotelIDResponse struct {
 	NumberOfGuest     int                           `form:"number_of_guest" json:"number_of_guest"`
 	MattressSize      string                        `form:"mattress_size" json:"mattress_size"`
 	NumberOfMattress  int                           `form:"number_of_mattress" json:"number_of_mattress"`
-	HotelRoomImage    []HotelRoomImageResponse      `form:"hotel_room_image" json:"hotel_room_image"`
-	HotelRoomFacility []HotelRoomFacilitiesResponse `form:"hotel_room_facility" json:"hotel_room_facility"`
+	HotelRoomImage    []HotelRoomImageResponse      `form:"hotel_room_image" json:"hotel_room_image,omitempty"`
+	HotelRoomFacility []HotelRoomFacilitiesResponse `form:"hotel_room_facility" json:"hotel_room_facility,omitempty"`
 }
